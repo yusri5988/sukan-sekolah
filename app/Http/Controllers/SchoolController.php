@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\SchoolReference;
 use App\Models\Sekolah;
 use App\Services\SchoolService;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 use Inertia\Inertia;
 
 class SchoolController extends Controller
@@ -32,7 +34,19 @@ class SchoolController extends Controller
      */
     public function create()
     {
-        return Inertia::render('SuperAdmin/Sekolahs/Create');
+        $references = SchoolReference::query()
+            ->where('is_used', false)
+            ->orderBy('negeri')
+            ->orderBy('nama')
+            ->get(['id', 'negeri', 'nama']);
+
+        return Inertia::render('SuperAdmin/Sekolahs/Create', [
+            'referencesByState' => $references
+                ->groupBy('negeri')
+                ->map(fn ($items) => $items->values())
+                ->sortKeys()
+                ->toArray(),
+        ]);
     }
 
     /**
@@ -41,14 +55,20 @@ class SchoolController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'nama' => 'required|string|max:255',
-            'kod_sekolah' => 'nullable|string|max:50|unique:sekolahs,kod_sekolah',
-            'alamat' => 'nullable|string',
-            'telefon' => 'nullable|string|max:20',
-            'email' => 'nullable|email|max:255',
+            'school_reference_id' => [
+                'required',
+                'integer',
+                Rule::exists('school_references', 'id')->where(fn ($query) => $query->where('is_used', false)),
+            ],
+            'telefon' => ['required', 'string', 'max:20'],
         ]);
 
-        $result = $this->schoolService->createSekolah($validated);
+        $telefon = $this->formatPhoneNumber($validated['telefon']);
+
+        $result = $this->schoolService->createSekolahFromReference(
+            (int) $validated['school_reference_id'],
+            $telefon
+        );
 
         return redirect()
             ->route('super-admin.sekolahs.index')
@@ -66,5 +86,16 @@ class SchoolController extends Controller
         return Inertia::render('SuperAdmin/Sekolahs/Show', [
             'sekolah' => $sekolah,
         ]);
+    }
+
+    private function formatPhoneNumber(string $phone): string
+    {
+        $digits = preg_replace('/[^0-9]/', '', $phone);
+
+        if (str_starts_with($digits, '0')) {
+            $digits = '6'.$digits;
+        }
+
+        return $digits;
     }
 }

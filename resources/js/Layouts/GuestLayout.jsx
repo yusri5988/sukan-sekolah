@@ -3,7 +3,7 @@ import { Link } from '@inertiajs/react';
 
 export default function GuestLayout({ children }) {
     return (
-        <div className="flex min-h-screen flex-col items-center justify-center bg-white p-4 sm:p-6 selection:bg-orange-600 selection:text-white overflow-hidden relative">
+        <div className="flex min-h-screen flex-col items-center justify-start sm:justify-center bg-white p-4 sm:p-6 selection:bg-orange-600 selection:text-white overflow-x-hidden relative">
             {/* Dynamic Sports Background Texture */}
             <div className="absolute inset-0 opacity-[0.02] pointer-events-none select-none overflow-hidden uppercase font-black text-[15vw] leading-none text-slate-900 flex flex-col gap-0 items-center justify-center rotate-[-10deg]">
                 <div>Faster</div>
@@ -15,7 +15,7 @@ export default function GuestLayout({ children }) {
             <div className="absolute -top-20 -right-20 w-80 h-80 bg-orange-600/10 blur-[100px] -z-10 rounded-full" />
             <div className="absolute -bottom-20 -left-20 w-80 h-80 bg-blue-600/10 blur-[100px] -z-10 rounded-full" />
 
-            <div className="relative z-10 w-full max-w-md">
+            <div className="relative z-10 w-full max-w-md my-4 sm:my-0">
                 <div className="flex flex-col items-center mb-12">
                     <Link href="/">
                         <ApplicationLogo className="w-20 h-20 mb-6 transform hover:rotate-12 transition-transform duration-300 shadow-2xl" />

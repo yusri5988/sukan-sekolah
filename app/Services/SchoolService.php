@@ -3,39 +3,45 @@
 namespace App\Services;
 
 use App\DTOs\CreateSekolahResultDTO;
+use App\Models\SchoolReference;
 use App\Models\Sekolah;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
+use Illuminate\Validation\ValidationException;
 
 class SchoolService
 {
     /**
      * Create a new sekolah and auto-generate admin sekolah account
      */
-    public function createSekolah(array $data): CreateSekolahResultDTO
+    public function createSekolahFromReference(int $schoolReferenceId, string $telefon): CreateSekolahResultDTO
     {
-        return DB::transaction(function () use ($data) {
-            // Generate kod sekolah if not provided
-            if (empty($data['kod_sekolah'])) {
-                $data['kod_sekolah'] = $this->generateKodSekolah();
+        return DB::transaction(function () use ($schoolReferenceId, $telefon) {
+            $reference = SchoolReference::query()
+                ->lockForUpdate()
+                ->findOrFail($schoolReferenceId);
+
+            if ($reference->is_used) {
+                throw ValidationException::withMessages([
+                    'school_reference_id' => 'Sekolah ini sudah didaftarkan dalam sistem.',
+                ]);
             }
 
-            // Create sekolah
             $sekolah = Sekolah::create([
-                'nama' => $data['nama'],
-                'kod_sekolah' => $data['kod_sekolah'],
-                'alamat' => $data['alamat'] ?? null,
-                'telefon' => $data['telefon'] ?? null,
-                'email' => $data['email'] ?? null,
-                'admin_sekolah_id' => null, // Will be updated after creating admin
+                'nama' => $reference->nama,
+                'negeri' => $reference->negeri,
+                'kod_sekolah' => $this->generateKodSekolah(),
+                'alamat' => null,
+                'telefon' => $telefon,
+                'email' => null,
+                'admin_sekolah_id' => null,
+                'school_reference_id' => $reference->id,
             ]);
 
-            // Use fixed password for admin sekolah
             $generatedPassword = '123456';
 
-            // Create admin sekolah user
             $adminSekolah = User::create([
                 'name' => 'Admin '.$sekolah->nama,
                 'email' => $this->generateAdminEmail($sekolah),
@@ -44,8 +50,12 @@ class SchoolService
                 'sekolah_id' => $sekolah->id,
             ]);
 
-            // Update sekolah with admin_sekolah_id
             $sekolah->update(['admin_sekolah_id' => $adminSekolah->id]);
+
+            $reference->update([
+                'is_used' => true,
+                'used_at' => now(),
+            ]);
 
             return new CreateSekolahResultDTO(
                 sekolah: $sekolah,
@@ -68,21 +78,12 @@ class SchoolService
     }
 
     /**
-     * Generate admin email based on sekolah
+     * Generate sequential admin email for sekolah
      */
     private function generateAdminEmail(Sekolah $sekolah): string
     {
-        $prefix = Str::slug($sekolah->nama, '');
-        $random = Str::lower(Str::random(4));
+        $count = Sekolah::count() + 1;
 
-        return "admin.{$prefix}.{$random}@sekolah.edu.my";
-    }
-
-    /**
-     * Generate random password
-     */
-    private function generatePassword(): string
-    {
-        return Str::random(12);
+        return sprintf('sk%04d@sekolah.com', $count);
     }
 }

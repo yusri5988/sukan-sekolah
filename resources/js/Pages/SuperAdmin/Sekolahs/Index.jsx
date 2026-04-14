@@ -89,7 +89,7 @@ export default function SekolahsIndex() {
                                                         {sekolah.nama}
                                                     </div>
                                                     <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
-                                                        {sekolah.telefon || 'Tiada No. Telefon'}
+                                                        {sekolah.negeri || sekolah.telefon || 'Tiada Maklumat'}
                                                     </div>
                                                 </td>
                                                 <td className="px-8 py-6">

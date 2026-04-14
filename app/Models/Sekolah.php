@@ -15,11 +15,13 @@ class Sekolah extends Model
 
     protected $fillable = [
         'nama',
+        'negeri',
         'kod_sekolah',
         'alamat',
         'telefon',
         'email',
         'admin_sekolah_id',
+        'school_reference_id',
     ];
 
     /**
@@ -28,6 +30,14 @@ class Sekolah extends Model
     public function adminSekolah(): BelongsTo
     {
         return $this->belongsTo(User::class, 'admin_sekolah_id');
+    }
+
+    /**
+     * Get the seeded school reference associated with this sekolah.
+     */
+    public function schoolReference(): BelongsTo
+    {
+        return $this->belongsTo(SchoolReference::class);
     }
 
     /**

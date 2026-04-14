@@ -22,6 +22,7 @@ readonly class CreateSekolahResultDTO
             'sekolah' => [
                 'id' => $this->sekolah->id,
                 'nama' => $this->sekolah->nama,
+                'negeri' => $this->sekolah->negeri,
                 'kod_sekolah' => $this->sekolah->kod_sekolah,
                 'alamat' => $this->sekolah->alamat,
                 'telefon' => $this->sekolah->telefon,

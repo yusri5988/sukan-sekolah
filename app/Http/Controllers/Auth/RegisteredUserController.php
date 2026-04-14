@@ -3,50 +3,75 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
-use App\Models\User;
-use Illuminate\Auth\Events\Registered;
+use App\Models\SchoolReference;
+use App\Services\SchoolService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Validation\Rules;
-use Illuminate\Validation\ValidationException;
+use Illuminate\Validation\Rule;
 use Inertia\Inertia;
 use Inertia\Response;
 
 class RegisteredUserController extends Controller
 {
+    public function __construct(
+        private SchoolService $schoolService
+    ) {}
+
     /**
      * Display the registration view.
      */
     public function create(): Response
     {
-        return Inertia::render('Auth/Register');
+        $references = SchoolReference::query()
+            ->where('is_used', false)
+            ->orderBy('negeri')
+            ->orderBy('nama')
+            ->get(['id', 'nama', 'negeri']);
+
+        return Inertia::render('Auth/Register', [
+            'referencesByState' => $references
+                ->groupBy('negeri')
+                ->map(fn ($items) => $items->values())
+                ->sortKeys()
+                ->toArray(),
+        ]);
     }
 
     /**
      * Handle an incoming registration request.
-     *
-     * @throws ValidationException
      */
     public function store(Request $request): RedirectResponse
     {
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|string|lowercase|email|max:255|unique:'.User::class,
-            'password' => ['required', 'confirmed', Rules\Password::defaults()],
+        $validated = $request->validate([
+            'school_reference_id' => [
+                'required',
+                'integer',
+                Rule::exists('school_references', 'id')->where(fn ($query) => $query->where('is_used', false)),
+            ],
+            'telefon' => ['required', 'string', 'max:20'],
         ]);
 
-        $user = User::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'password' => Hash::make($request->password),
-        ]);
+        $telefon = $this->formatPhoneNumber($validated['telefon']);
 
-        event(new Registered($user));
+        $result = $this->schoolService->createSekolahFromReference(
+            (int) $validated['school_reference_id'],
+            $telefon
+        );
 
-        Auth::login($user);
+        return redirect()
+            ->route('register')
+            ->with('success', 'Sekolah berjaya didaftarkan!')
+            ->with('new_sekolah', $result->toArray());
+    }
 
-        return redirect(route('dashboard', absolute: false));
+    private function formatPhoneNumber(string $phone): string
+    {
+        $digits = preg_replace('/[^0-9]/', '', $phone);
+
+        if (str_starts_with($digits, '0')) {
+            $digits = '6'.$digits;
+        }
+
+        return $digits;
     }
 }

@@ -11,7 +11,7 @@ export default function SuperAdminDashboard({ stats }) {
             <div className="py-6 sm:py-12">
                 <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                     {/* Stat Cards */}
-                    <div className="grid grid-cols-1 gap-4 sm:gap-6 lg:grid-cols-3 mb-8 sm:mb-12">
+                    <div className="grid grid-cols-1 gap-4 sm:gap-6 lg:grid-cols-3 mb-6 sm:mb-8">
                         <div className="overflow-hidden bg-white border-4 border-slate-900 shadow-[4px_4px_0px_0px_rgba(15,23,42,1)] sm:shadow-[8px_8px_0px_0px_rgba(15,23,42,1)] rounded-xl sm:rounded-2xl transform hover:-translate-y-1 transition-transform">
                             <div className="p-5 sm:p-8">
                                 <div className="flex items-center">

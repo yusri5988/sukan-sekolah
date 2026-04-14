@@ -1,17 +1,36 @@
 import AdminSekolahLayout from '@/Layouts/AdminSekolahLayout';
-import { Head, usePage, useForm } from '@inertiajs/react';
+import { Head, usePage } from '@inertiajs/react';
 import { useState } from 'react';
 
-function AssignmentRow({ teacher, houses }) {
-    const { data, setData, patch, processing, errors } = useForm({
-        house_id: teacher.house ? teacher.house.id : null,
-    });
+function AssignmentRow({ teacher, houses, onSuccess }) {
+    const [houseId, setHouseId] = useState(teacher.house ? teacher.house.id : null);
+    const [saving, setSaving] = useState(false);
 
-    const handleSave = () => {
-        patch(route('admin-sekolah.teachers.assignment.update', teacher.id), {
-            preserveScroll: true,
-            onSuccess: () => {},
-        });
+    const handleSave = async () => {
+        setSaving(true);
+        try {
+            const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+            const response = await fetch(route('admin-sekolah.teachers.assignment.update', teacher.id), {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': csrfToken || '',
+                    'Accept': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest',
+                },
+                body: JSON.stringify({ house_id: houseId }),
+            });
+
+            if (response.ok) {
+                onSuccess?.('Lantikan guru berjaya dikemaskini!');
+            } else {
+                onSuccess?.('Ralat semasa menyimpan.', true);
+            }
+        } catch (error) {
+            onSuccess?.('Ralat semasa menyimpan.', true);
+        } finally {
+            setSaving(false);
+        }
     };
 
     return (
@@ -38,13 +57,13 @@ function AssignmentRow({ teacher, houses }) {
             </td>
             <td className="px-8 py-6">
                 <select
-                    className="border border-slate-300 rounded px-2 py-1" 
-                    value={data.house_id ?? ''}
-                    onChange={e => setData('house_id', e.target.value ? Number(e.target.value) : null)}
+                    className="w-full max-w-[180px] px-4 py-3 bg-white border-4 border-slate-900 rounded-xl text-sm font-black uppercase tracking-tighter italic text-slate-900 focus:border-orange-600 focus:outline-none focus:ring-0 transition-all cursor-pointer shadow-[4px_4px_0px_0px_rgba(15,23,42,1)] hover:shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] hover:translate-y-0.5"
+                    value={houseId ?? ''}
+                    onChange={e => setHouseId(e.target.value ? Number(e.target.value) : null)}
                 >
-                    <option value="">Belum Dilantik</option>
+                    <option value="" className="font-black uppercase">Belum Dilantik</option>
                     {houses.map(h => (
-                        <option key={h.id} value={h.id}>{h.name}</option>
+                        <option key={h.id} value={h.id} className="font-black uppercase">{h.name}</option>
                     ))}
                 </select>
             </td>
@@ -52,12 +71,11 @@ function AssignmentRow({ teacher, houses }) {
                 <button
                     type="button"
                     onClick={handleSave}
-                    disabled={processing}
-                    className="px-4 py-2 bg-slate-900 text-white text-sm font-black uppercase tracking-widest rounded-lg hover:bg-orange-600 transition-all"
+                    disabled={saving}
+                    className="px-4 py-2 bg-slate-900 text-white text-sm font-black uppercase tracking-widest rounded-lg hover:bg-orange-600 transition-all disabled:opacity-50"
                 >
-                    Simpan
+                    {saving ? 'Menyimpan...' : 'Simpan'}
                 </button>
-                {errors.house_id && <div className="text-red-600 text-xs mt-1">{errors.house_id}</div>}
             </td>
         </tr>
     );
@@ -65,6 +83,14 @@ function AssignmentRow({ teacher, houses }) {
 
 export default function TeacherAssignments({ teachers, houses }) {
     const { flash } = usePage().props;
+    const [message, setMessage] = useState(flash?.success || null);
+    const [isError, setIsError] = useState(false);
+
+    const handleSuccess = (msg, error = false) => {
+        setMessage(msg);
+        setIsError(error);
+        setTimeout(() => setMessage(null), 3000);
+    };
 
     return (
         <AdminSekolahLayout
@@ -84,17 +110,17 @@ export default function TeacherAssignments({ teachers, houses }) {
         >
             <Head title="Lantikan Guru" />
 
-            {flash?.success && (
+            {message && !isError && (
                 <div className="p-6 bg-emerald-50 border-l-8 border-emerald-500 rounded-2xl shadow-sm">
                     <div className="text-[10px] font-black uppercase tracking-widest text-emerald-600 mb-1">Berjaya</div>
-                    <div className="text-sm font-bold text-emerald-900 italic">{flash.success}</div>
+                    <div className="text-sm font-bold text-emerald-900 italic">{message}</div>
                 </div>
             )}
 
-            {flash?.error && (
+            {message && isError && (
                 <div className="p-6 bg-red-50 border-l-8 border-red-500 rounded-2xl shadow-sm">
                     <div className="text-[10px] font-black uppercase tracking-widest text-red-600 mb-1">Ralat</div>
-                    <div className="text-sm font-bold text-red-900 italic">{flash.error}</div>
+                    <div className="text-sm font-bold text-red-900 italic">{message}</div>
                 </div>
             )}
 
@@ -120,7 +146,7 @@ export default function TeacherAssignments({ teachers, houses }) {
                                 </tr>
                             ) : (
                                 teachers.map(t => (
-                                    <AssignmentRow key={t.id} teacher={t} houses={houses} />
+                                    <AssignmentRow key={t.id} teacher={t} houses={houses} onSuccess={handleSuccess} />
                                 ))
                             )}
                         </tbody>
