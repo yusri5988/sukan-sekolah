@@ -1,0 +1,12 @@
+{
+  "turn_count": 5,
+  "last_session_id": "433e4419-5c81-4e7f-b191-86d3ef9f6a53",
+  "last_event_key": "433e4419-5c81-4e7f-b191-86d3ef9f6a53:transcript:2d193889777f6503c2e619774e6635f67e9e0a28d10ac5f08fde80aefb86ee27",
+  "last_transcript_hash": "2d193889777f6503c2e619774e6635f67e9e0a28d10ac5f08fde80aefb86ee27",
+  "last_model": "gemini-3-flash-preview",
+  "last_turn_total_tokens": 105949,
+  "last_session_total_tokens": 1801786,
+  "cwd_mode": "parent-leaf",
+  "last_cwd_label": "www/hari-sukan",
+  "updated_at": "2026-04-14T07:42:03.635Z"
+}
