@@ -7,6 +7,7 @@ use App\Models\Student;
 use App\Services\StudentService;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
+use PhpOffice\PhpSpreadsheet\IOFactory;
 
 class StudentController extends Controller
 {
@@ -70,8 +71,7 @@ class StudentController extends Controller
             'ic_number' => 'required|string|max:20|unique:students,ic_number',
             'class' => 'required|string|max:50',
             'year' => 'required|integer|between:1,6',
-            'gender' => 'required|in:male,female',
-            'date_of_birth' => 'required|date|before:today',
+            'gender' => 'required|in:L,P',
             'house_id' => 'nullable|exists:houses,id',
         ]);
 
@@ -95,6 +95,23 @@ class StudentController extends Controller
             'houses' => $houses,
             'sekolah' => $sekolah,
         ]);
+    }
+
+    /**
+     * Download CSV template for student import
+     */
+    public function downloadTemplate()
+    {
+        $headers = [
+            'Content-Type' => 'text/csv',
+            'Content-Disposition' => 'attachment; filename="template_pelajar.csv"',
+        ];
+
+        $content = "name,ic_number,class,year,gender\n";
+        $content .= "Ahmad bin Ali,200112345678,6Bestari,6,L\n";
+        $content .= "Siti binti Ahmad,200212345678,5Bestari,5,P\n";
+
+        return response($content, 200, $headers);
     }
 
     /**
@@ -166,18 +183,36 @@ class StudentController extends Controller
     }
 
     /**
-     * Process Excel import (basic - using PhpSpreadsheet if available)
-     * Note: For Excel support, install phpoffice/phpspreadsheet via composer
+     * Process Excel import
      */
     private function processExcelImport($file, $sekolah): array
     {
-        // Basic validation - for full Excel support, install phpoffice/phpspreadsheet
-        // For now, return error suggesting CSV
-        return [
-            'created' => 0,
-            'updated' => 0,
-            'errors' => ['Sila guna format CSV untuk import. Excel support boleh ditambah dengan install phpoffice/phpspreadsheet.'],
-        ];
+        $spreadsheet = IOFactory::load($file->getRealPath());
+        $worksheet = $spreadsheet->getActiveSheet();
+        $rows = $worksheet->toArray();
+
+        if (empty($rows)) {
+            return [
+                'created' => 0,
+                'updated' => 0,
+                'errors' => ['Fail Excel kosong.'],
+            ];
+        }
+
+        $headers = array_map(function ($h) {
+            return strtolower(trim(str_replace(' ', '_', $h)));
+        }, $rows[0]);
+
+        $dataRows = array_slice($rows, 1);
+
+        $data = [];
+        foreach ($dataRows as $row) {
+            if (array_filter($row)) {
+                $data[] = array_combine($headers, $row);
+            }
+        }
+
+        return $this->studentService->importStudents($data, $sekolah);
     }
 
     /**

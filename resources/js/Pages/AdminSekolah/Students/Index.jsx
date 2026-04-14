@@ -44,6 +44,26 @@ export default function StudentsIndex({ students, houses, selectedHouseId, sekol
                     </div>
                 )}
 
+                {flash?.error && (
+                    <div className="p-6 bg-red-50 border-l-8 border-red-500 rounded-2xl shadow-sm">
+                        <div className="text-[10px] font-black uppercase tracking-widest text-red-600 mb-1">Ralat</div>
+                        <div className="text-sm font-bold text-red-900 italic">{flash.error}</div>
+                    </div>
+                )}
+
+                {flash?.import_errors && flash.import_errors.length > 0 && (
+                    <div className="p-6 bg-red-50 border-4 border-red-200 rounded-2xl shadow-sm">
+                        <div className="text-[10px] font-black uppercase tracking-widest text-red-600 mb-3">Ralat Import ({flash.import_errors.length} baris)</div>
+                        <div className="space-y-2 max-h-60 overflow-y-auto">
+                            {flash.import_errors.map((err, i) => (
+                                <div key={i} className="text-xs font-mono bg-white border border-red-100 rounded px-3 py-2 text-red-800">
+                                    <span className="font-black">Baris {err.row || i + 1}:</span> {err.message}
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                )}
+
                 {/* Filter Tabs */}
                 <div className="flex flex-wrap gap-2 p-2 bg-slate-100 rounded-2xl">
                     <Link
@@ -128,10 +148,10 @@ export default function StudentsIndex({ students, houses, selectedHouseId, sekol
                                             <td className="px-6 py-5">
                                                 <div className="flex flex-col gap-1">
                                                     <span className="text-[10px] font-black uppercase tracking-widest text-slate-900 bg-slate-100 px-2 py-1 rounded w-fit">
-                                                        {student.gender === 'male' ? 'Lelaki' : 'Perempuan'}
+                                                        {student.gender === 'L' ? 'Lelaki' : 'Perempuan'}
                                                     </span>
                                                     <span className="text-[10px] font-black uppercase tracking-widest text-orange-600 italic">
-                                                        {student.age} Tahun
+                                                        {student.year} Tahun
                                                     </span>
                                                 </div>
                                             </td>

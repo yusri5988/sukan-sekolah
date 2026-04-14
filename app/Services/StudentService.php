@@ -10,6 +10,18 @@ use Illuminate\Support\Facades\DB;
 class StudentService
 {
     /**
+     * Normalize gender value to L/P
+     */
+    private function normalizeGender(?string $value): string
+    {
+        if (in_array(strtolower($value), ['l', 'p', 'male', 'female', 'lelaki', 'perempuan'])) {
+            return in_array(strtolower($value), ['p', 'female', 'perempuan']) ? 'P' : 'L';
+        }
+
+        return 'L';
+    }
+
+    /**
      * Create a single student
      */
     public function createStudent(array $data, Sekolah $sekolah): Student
@@ -23,7 +35,6 @@ class StudentService
                 'class' => $data['class'],
                 'year' => $data['year'],
                 'gender' => $data['gender'] ?? 'male',
-                'date_of_birth' => $data['date_of_birth'] ?? now(),
             ]);
         });
     }
@@ -50,7 +61,6 @@ class StudentService
                 'class' => $data['class'],
                 'year' => $data['year'],
                 'gender' => $data['gender'] ?? 'male',
-                'date_of_birth' => $data['date_of_birth'] ?? now(),
             ]);
         });
     }
@@ -73,7 +83,10 @@ class StudentService
 
                 // Validate required fields
                 if (empty($row['name']) || empty($row['ic_number']) || empty($row['class']) || empty($row['year'])) {
-                    $errors[] = 'Row '.($index + 1).': Missing required fields (name, ic_number, class, year)';
+                    $errors[] = [
+                        'row' => $index + 1,
+                        'message' => 'Missing required fields (name, ic_number, class, year)',
+                    ];
 
                     continue;
                 }
@@ -88,8 +101,7 @@ class StudentService
                     $existingStudent->update([
                         'name' => $row['name'],
                         'class' => $row['class'],
-                        'gender' => $row['gender'] ?? $existingStudent->gender,
-                        'date_of_birth' => $row['date_of_birth'] ?? $existingStudent->date_of_birth,
+                        'gender' => $this->normalizeGender($row['gender'] ?? $existingStudent->gender),
                         'house_id' => $row['house_id'] ?? $existingStudent->house_id,
                     ]);
                     $updated++;
@@ -102,13 +114,15 @@ class StudentService
                         'ic_number' => $row['ic_number'],
                         'class' => $row['class'],
                         'year' => $row['year'],
-                        'gender' => $row['gender'] ?? 'male',
-                        'date_of_birth' => $row['date_of_birth'] ?? now(),
+                        'gender' => $this->normalizeGender($row['gender'] ?? 'L'),
                     ]);
                     $created++;
                 }
             } catch (\Exception $e) {
-                $errors[] = 'Row '.($index + 1).': '.$e->getMessage();
+                $errors[] = [
+                    'row' => $index + 1,
+                    'message' => $e->getMessage(),
+                ];
             }
         }
 

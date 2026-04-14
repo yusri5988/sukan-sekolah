@@ -41,7 +41,16 @@ export default function ResultsIndex({ event, results, ranking }) {
                                             <div key={result.id} className="rounded-lg border p-4">
                                                 <div className="flex items-center justify-between">
                                                     <div>
-                                                        <div className="font-medium text-gray-900">{result.house?.name}</div>
+                                                        <div className="font-medium text-gray-900">
+                                                            {result.participant?.student?.name ? (
+                                                                <>
+                                                                    {result.participant.student.name} 
+                                                                    <span className="ml-2 text-sm text-gray-500">({result.house?.name})</span>
+                                                                </>
+                                                            ) : (
+                                                                result.house?.name
+                                                            )}
+                                                        </div>
                                                         <div className="text-sm text-gray-500">Tempat {result.position} · {result.points} mata</div>
                                                         <div className="text-xs text-gray-500">Masa: {result.time_record || '-'}</div>
                                                     </div>

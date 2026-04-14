@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\House;
 use App\Models\Meet;
+use App\Models\Student;
 use App\Services\CikguEventParticipantService;
 use App\Services\StudentService;
 use Illuminate\Http\Request;
@@ -80,9 +81,9 @@ class CikguController extends Controller
     }
 
     /**
-     * Show student creation form.
+     * Show student assignment form.
      */
-    public function studentCreate()
+    public function studentCreate(Request $request)
     {
         $user = auth()->user();
         $sekolah = $user->sekolah;
@@ -95,14 +96,40 @@ class CikguController extends Controller
             return redirect()->route('cikgu.dashboard')->with('error', 'Tiada rumah sukan dihubungkan dengan akaun anda. Sila hubungi pentadbir.');
         }
 
+        $filterYear = $request->query('year');
+        $filterClass = $request->query('class');
+
+        $query = $sekolah->students()->whereNull('house_id');
+
+        if ($filterYear) {
+            $query->where('year', $filterYear);
+        }
+
+        if ($filterClass) {
+            $query->where('class', $filterClass);
+        }
+
+        $unassignedStudents = $query->orderBy('year', 'asc')
+            ->orderBy('class', 'asc')
+            ->orderBy('name', 'asc')
+            ->get();
+
+        $years = $sekolah->students()->whereNull('house_id')->distinct()->pluck('year')->sort()->values();
+        $classes = $sekolah->students()->whereNull('house_id')->distinct()->pluck('class')->sort()->values();
+
         return Inertia::render('Cikgu/Students/Create', [
             'sekolah' => $sekolah,
             'myHouse' => $user->house,
+            'unassignedStudents' => $unassignedStudents,
+            'years' => $years,
+            'classes' => $classes,
+            'filterYear' => $filterYear,
+            'filterClass' => $filterClass,
         ]);
     }
 
     /**
-     * Store a new student.
+     * Assign students to house.
      */
     public function studentStore(Request $request)
     {
@@ -118,21 +145,18 @@ class CikguController extends Controller
         }
 
         $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'ic_number' => 'required|string|max:20|unique:students,ic_number',
-            'class' => 'required|string|max:50',
-            'year' => 'required|integer|between:1,6',
+            'student_ids' => 'required|array|min:1',
+            'student_ids.*' => 'required|exists:students,id',
         ]);
 
-        try {
-            $this->studentService->createStudentForHouse($validated, $sekolah, $user->house_id);
-        } catch (\InvalidArgumentException $e) {
-            return redirect()->route('cikgu.students.index')->with('error', $e->getMessage());
-        }
+        $count = Student::whereIn('id', $validated['student_ids'])
+            ->where('sekolah_id', $sekolah->id)
+            ->whereNull('house_id')
+            ->update(['house_id' => $user->house_id]);
 
         return redirect()
             ->route('cikgu.students.index')
-            ->with('success', 'Pelajar berjaya ditambah.');
+            ->with('success', $count.' pelajar berjaya diperuntukkan kepada Rumah '.$user->house->name.'.');
     }
 
     /**

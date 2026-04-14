@@ -1,15 +1,13 @@
 import AdminSekolahLayout from '@/Layouts/AdminSekolahLayout';
 import { Head, Link, useForm } from '@inertiajs/react';
 
-export default function StudentsCreate({ houses }) {
+export default function StudentsCreate() {
     const { data, setData, post, processing, errors } = useForm({
         name: '',
         ic_number: '',
         class: '',
         year: '',
-        gender: 'male',
-        date_of_birth: '',
-        house_id: '',
+        gender: 'L',
     });
 
     const handleSubmit = (e) => {
@@ -141,52 +139,14 @@ export default function StudentsCreate({ houses }) {
                                             onChange={(e) => setData('gender', e.target.value)}
                                             className="w-full px-6 py-4 bg-slate-50 border-4 border-slate-900 rounded-2xl text-slate-900 font-bold focus:outline-none focus:border-orange-600 focus:ring-4 focus:ring-orange-600/20 transition-all appearance-none"
                                         >
-                                            <option value="male">Lelaki</option>
-                                            <option value="female">Perempuan</option>
+                                            <option value="L">Lelaki</option>
+                                            <option value="P">Perempuan</option>
                                         </select>
                                         {errors.gender && (
                                             <p className="mt-2 text-sm font-bold text-red-600 italic">{errors.gender}</p>
                                         )}
                                     </div>
 
-                                    <div>
-                                        <label className="block text-xs font-black uppercase tracking-[0.3em] text-slate-500 mb-2">
-                                            Tarikh Lahir <span className="text-orange-600">*</span>
-                                        </label>
-                                        <input
-                                            type="date"
-                                            value={data.date_of_birth}
-                                            onChange={(e) => setData('date_of_birth', e.target.value)}
-                                            className="w-full px-6 py-4 bg-slate-50 border-4 border-slate-900 rounded-2xl text-slate-900 font-bold focus:outline-none focus:border-orange-600 focus:ring-4 focus:ring-orange-600/20 transition-all"
-                                        />
-                                        {errors.date_of_birth && (
-                                            <p className="mt-2 text-sm font-bold text-red-600 italic">{errors.date_of_birth}</p>
-                                        )}
-                                    </div>
-
-                                    <div>
-                                        <label className="block text-xs font-black uppercase tracking-[0.3em] text-slate-500 mb-2">
-                                            Rumah Sukan
-                                        </label>
-                                        <select
-                                            value={data.house_id}
-                                            onChange={(e) => setData('house_id', e.target.value)}
-                                            className="w-full px-6 py-4 bg-slate-50 border-4 border-slate-900 rounded-2xl text-slate-900 font-bold focus:outline-none focus:border-orange-600 focus:ring-4 focus:ring-orange-600/20 transition-all appearance-none"
-                                        >
-                                            <option value="">-- Pilih Rumah Sukan --</option>
-                                            {houses.map((house) => (
-                                                <option key={house.id} value={house.id}>
-                                                    {house.name}
-                                                </option>
-                                            ))}
-                                        </select>
-                                        {errors.house_id && (
-                                            <p className="mt-2 text-sm font-bold text-red-600 italic">{errors.house_id}</p>
-                                        )}
-                                        <p className="mt-2 text-xs font-bold text-slate-500 italic">
-                                            Boleh assign nanti juga
-                                        </p>
-                                    </div>
                                 </div>
                             </div>
 

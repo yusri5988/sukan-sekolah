@@ -14,7 +14,7 @@ class MeetController extends Controller
     ) {}
 
     /**
-     * Display list of meets
+     * Display or create the single kejohanan for this sekolah
      */
     public function index()
     {
@@ -25,12 +25,17 @@ class MeetController extends Controller
             return redirect()->route('dashboard')->with('error', 'Tiada sekolah dihubungkan dengan akaun anda.');
         }
 
-        $meets = $this->meetService->getMeets($sekolah);
+        $meet = $sekolah->meets()->first();
 
-        return Inertia::render('AdminSekolah/Meets/Index', [
-            'meets' => $meets,
-            'sekolah' => $sekolah,
-        ]);
+        if (! $meet) {
+            $meet = $this->meetService->createMeet([
+                'name' => 'Hari Sukan '.date('Y'),
+                'date' => date('Y-m-d'),
+                'description' => null,
+            ], $sekolah);
+        }
+
+        return redirect()->route('admin-sekolah.meets.show', $meet->id);
     }
 
     /**
@@ -70,7 +75,7 @@ class MeetController extends Controller
 
         return redirect()
             ->route('admin-sekolah.meets.index')
-            ->with('success', 'Meet berjaya dicipta!');
+            ->with('success', 'Kejohanan berjaya dicipta!');
     }
 
     /**
@@ -130,7 +135,7 @@ class MeetController extends Controller
 
         return redirect()
             ->route('admin-sekolah.meets.show', $meet->id)
-            ->with('success', 'Meet berjaya dikemaskini!');
+            ->with('success', 'Kejohanan berjaya dikemaskini!');
     }
 
     /**
@@ -148,7 +153,7 @@ class MeetController extends Controller
 
         return redirect()
             ->route('admin-sekolah.meets.show', $meet->id)
-            ->with('success', 'Meet diaktifkan!');
+            ->with('success', 'Kejohanan diaktifkan!');
     }
 
     /**
@@ -166,7 +171,7 @@ class MeetController extends Controller
 
         return redirect()
             ->route('admin-sekolah.meets.show', $meet->id)
-            ->with('success', 'Meet ditandakan sebagai selesai!');
+            ->with('success', 'Kejohanan ditandakan sebagai selesai!');
     }
 
     /**
@@ -202,6 +207,6 @@ class MeetController extends Controller
 
         return redirect()
             ->route('admin-sekolah.meets.index')
-            ->with('success', 'Meet berjaya dihapus!');
+            ->with('success', 'Kejohanan berjaya dihapus!');
     }
 }

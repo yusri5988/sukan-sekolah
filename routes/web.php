@@ -87,21 +87,19 @@ Route::middleware(['auth', AdminSekolahMiddleware::class])->prefix('admin-sekola
     Route::get('/students/create', [StudentController::class, 'create'])->name('students.create');
     Route::post('/students', [StudentController::class, 'store'])->name('students.store');
     Route::get('/students/import', [StudentController::class, 'import'])->name('students.import');
+    Route::get('/students/import/template', [StudentController::class, 'downloadTemplate'])->name('students.import.template');
     Route::post('/students/import', [StudentController::class, 'processImport'])->name('students.process-import');
     Route::get('/students/{student}', [StudentController::class, 'show'])->name('students.show');
     Route::delete('/students/{student}', [StudentController::class, 'destroy'])->name('students.destroy');
 
-    // Meets Management
+    // Meets Management - Single kejohanan per sekolah
     Route::get('/meets', [MeetController::class, 'index'])->name('meets.index');
-    Route::get('/meets/create', [MeetController::class, 'create'])->name('meets.create');
-    Route::post('/meets', [MeetController::class, 'store'])->name('meets.store');
     Route::get('/meets/{meet}', [MeetController::class, 'show'])->name('meets.show');
     Route::get('/meets/{meet}/edit', [MeetController::class, 'edit'])->name('meets.edit');
     Route::patch('/meets/{meet}', [MeetController::class, 'update'])->name('meets.update');
     Route::post('/meets/{meet}/activate', [MeetController::class, 'activate'])->name('meets.activate');
     Route::post('/meets/{meet}/complete', [MeetController::class, 'complete'])->name('meets.complete');
     Route::post('/meets/{meet}/toggle-public', [MeetController::class, 'togglePublic'])->name('meets.toggle-public');
-    Route::delete('/meets/{meet}', [MeetController::class, 'destroy'])->name('meets.destroy');
 
     // Events Management
     Route::get('/meets/{meet}/events', [EventController::class, 'index'])->name('events.index');

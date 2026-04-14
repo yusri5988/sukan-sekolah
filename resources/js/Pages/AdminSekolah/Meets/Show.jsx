@@ -22,16 +22,16 @@ export default function MeetsShow({ meet }) {
                             {meet.name}
                         </h2>
                     </div>
-                    <div className="flex flex-wrap gap-3">
+                    <div className="flex flex-wrap items-center gap-4">
                         <Link
                             href={route('admin-sekolah.meets.edit', meet.id)}
-                            className="px-6 py-3 bg-white border-4 border-slate-900 text-slate-900 text-xs font-black uppercase tracking-widest italic rounded-xl hover:bg-slate-50 transition-all shadow-lg shadow-slate-100"
+                            className="inline-flex items-center justify-center px-8 py-4 bg-white border-4 border-slate-900 text-slate-900 text-xs font-black uppercase tracking-widest italic rounded-xl hover:bg-slate-50 transition-all shadow-[4px_4px_0px_0px_rgba(15,23,42,1)] hover:shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none"
                         >
-                            Edit Meet
+                            Edit Kejohanan
                         </Link>
                         <Link
                             href={route('admin-sekolah.events.index', meet.id)}
-                            className="px-6 py-3 bg-slate-900 text-white text-xs font-black uppercase tracking-widest italic rounded-xl hover:bg-orange-600 transition-all shadow-xl shadow-slate-200"
+                            className="inline-flex items-center justify-center px-8 py-4 bg-slate-900 text-white text-xs font-black uppercase tracking-widest italic rounded-xl hover:bg-orange-600 transition-all shadow-[4px_4px_0px_0px_rgba(15,23,42,1)] hover:shadow-[2px_2px_0px_0px_rgba(249,115,22,1)] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none"
                         >
                             Urus Acara
                         </Link>
@@ -215,7 +215,7 @@ export default function MeetsShow({ meet }) {
                                     <div className="text-4xl font-black italic text-white tabular-nums">{meet.events?.length || 0}</div>
                                 </div>
                                 <div className="bg-white/5 border border-white/10 p-6 rounded-2xl">
-                                    <div className="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-1">Status Meet</div>
+                                    <div className="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-1">Status Kejohanan</div>
                                     <div className="text-2xl font-black italic text-orange-500 uppercase tracking-tighter">
                                         {meet.status === 'active' ? 'Kejohanan Berlangsung' :
                                          meet.status === 'completed' ? 'Tamat Sepenuhnya' : 'Persediaan Draf'}

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Event;
+use App\Models\EventParticipant;
 use App\Models\House;
 use App\Models\Result;
 use App\Services\ResultService;
@@ -32,6 +33,7 @@ class ResultController extends Controller
 
         return Inertia::render('AdminSekolah/Results/Create', [
             'event' => $event->load('meet'),
+            'participants' => $event->participants()->with('student.house')->get(),
             'houses' => House::where('sekolah_id', $event->sekolah_id)->orderBy('name')->get(),
         ]);
     }
@@ -41,6 +43,7 @@ class ResultController extends Controller
         $this->authorizeEvent($event, (int) $meetId);
 
         $validated = $request->validate([
+            'event_participant_id' => 'nullable|exists:event_participants,id',
             'house_id' => 'required|exists:houses,id',
             'position' => 'required|integer|min:1|max:10',
             'time_record' => 'nullable|string|max:50',
@@ -63,7 +66,8 @@ class ResultController extends Controller
 
         return Inertia::render('AdminSekolah/Results/Edit', [
             'event' => $event->load('meet'),
-            'result' => $result->load('house'),
+            'result' => $result->load(['house', 'participant.student']),
+            'participants' => $event->participants()->with('student.house')->get(),
             'houses' => House::where('sekolah_id', $event->sekolah_id)->orderBy('name')->get(),
         ]);
     }
@@ -74,6 +78,7 @@ class ResultController extends Controller
         $this->authorizeResult($result, $event);
 
         $validated = $request->validate([
+            'event_participant_id' => 'nullable|exists:event_participants,id',
             'house_id' => 'required|exists:houses,id',
             'position' => 'required|integer|min:1|max:10',
             'time_record' => 'nullable|string|max:50',
@@ -82,8 +87,7 @@ class ResultController extends Controller
             'is_locked' => 'boolean',
         ]);
 
-        $result->update($validated);
-        $this->resultService->recalculateHousePoints($event->sekolah_id);
+        $this->resultService->saveResult($event, $validated);
 
         return redirect()
             ->route('admin-sekolah.results.index', [$meetId, $event->id])

@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\Event;
+use App\Models\EventParticipant;
 use App\Models\House;
 use App\Models\Meet;
 use App\Models\Result;
@@ -16,7 +17,7 @@ class ResultService
      */
     public function getResults(Event $event): Collection
     {
-        return $event->results()->with('house')->orderBy('position')->get();
+        return $event->results()->with(['house', 'participant.student'])->orderBy('position')->get();
     }
 
     /**
@@ -28,12 +29,22 @@ class ResultService
             $meet = $event->meet;
             $points = $meet?->getPointsForPosition((int) $data['position']) ?? 0;
 
+            $participantId = $data['event_participant_id'] ?? null;
+            $houseId = $data['house_id'];
+
+            // If participant is provided, get the house from the participant
+            if ($participantId) {
+                $participant = EventParticipant::findOrFail($participantId);
+                $houseId = $participant->house_id;
+            }
+
             $result = Result::updateOrCreate(
                 [
                     'event_id' => $event->id,
-                    'house_id' => $data['house_id'],
+                    'event_participant_id' => $participantId,
                 ],
                 [
+                    'house_id' => $houseId,
                     'position' => $data['position'],
                     'points' => $points,
                     'time_record' => $data['time_record'] ?? null,

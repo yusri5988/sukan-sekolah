@@ -63,4 +63,12 @@ class Sekolah extends Model
     {
         return $this->hasMany(Student::class);
     }
+
+    /**
+     * Get all meets for this sekolah
+     */
+    public function meets(): HasMany
+    {
+        return $this->hasMany(Meet::class);
+    }
 }

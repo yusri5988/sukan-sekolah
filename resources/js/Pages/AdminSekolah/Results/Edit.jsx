@@ -1,8 +1,9 @@
 import AdminSekolahLayout from '@/Layouts/AdminSekolahLayout';
 import { Head, Link, useForm } from '@inertiajs/react';
 
-export default function ResultsEdit({ event, result, houses }) {
+export default function ResultsEdit({ event, result, participants, houses }) {
     const { data, setData, patch, processing, errors } = useForm({
+        event_participant_id: result.event_participant_id || '',
         house_id: result.house_id,
         position: result.position,
         time_record: result.time_record || '',
@@ -10,6 +11,15 @@ export default function ResultsEdit({ event, result, houses }) {
         is_verified: result.is_verified,
         is_locked: result.is_locked,
     });
+
+    const handleParticipantChange = (participantId) => {
+        const participant = participants.find(p => p.id === parseInt(participantId));
+        setData(prevData => ({
+            ...prevData,
+            event_participant_id: participantId,
+            house_id: participant ? participant.house_id : prevData.house_id,
+        }));
+    };
 
     const handleSubmit = (e) => {
         e.preventDefault();
@@ -27,13 +37,36 @@ export default function ResultsEdit({ event, result, houses }) {
                         <div className="p-6">
                             <form onSubmit={handleSubmit} className="space-y-6">
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">Rumah Sukan</label>
-                                    <select value={data.house_id} onChange={(e) => setData('house_id', e.target.value)} className="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm">
-                                        {houses.map((house) => (
-                                            <option key={house.id} value={house.id}>{house.name}</option>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">Peserta</label>
+                                    <select 
+                                        value={data.event_participant_id} 
+                                        onChange={(e) => handleParticipantChange(e.target.value)} 
+                                        className="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+                                    >
+                                        <option value="">Pilih peserta</option>
+                                        {participants.map((p) => (
+                                            <option key={p.id} value={p.id}>{p.student?.name} ({p.student?.house?.name})</option>
                                         ))}
                                     </select>
+                                    {errors.event_participant_id && <p className="mt-1 text-sm text-red-600">{errors.event_participant_id}</p>}
                                 </div>
+
+                                {!data.event_participant_id && (
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 mb-1">Rumah Sukan (Jika Tiada Peserta Individu)</label>
+                                        <select 
+                                            value={data.house_id} 
+                                            onChange={(e) => setData('house_id', e.target.value)} 
+                                            className="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+                                        >
+                                            <option value="">Pilih rumah</option>
+                                            {houses.map((house) => (
+                                                <option key={house.id} value={house.id}>{house.name}</option>
+                                            ))}
+                                        </select>
+                                        {errors.house_id && <p className="mt-1 text-sm text-red-600">{errors.house_id}</p>}
+                                    </div>
+                                )}
 
                                 <div>
                                     <label className="block text-sm font-medium text-gray-700 mb-1">Tempat</label>

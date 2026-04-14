@@ -20,11 +20,6 @@ class Student extends Model
         'class',
         'year',
         'gender',
-        'date_of_birth',
-    ];
-
-    protected $casts = [
-        'date_of_birth' => 'date',
     ];
 
     /**
@@ -41,31 +36,5 @@ class Student extends Model
     public function house(): BelongsTo
     {
         return $this->belongsTo(House::class);
-    }
-
-    /**
-     * Calculate age from date of birth
-     */
-    public function getAgeAttribute(): int
-    {
-        return $this->date_of_birth->age;
-    }
-
-    /**
-     * Get age category based on age
-     */
-    public function getAgeCategoryAttribute(): string
-    {
-        $age = $this->age;
-
-        if ($age >= 7 && $age <= 9) {
-            return '7-9';
-        } elseif ($age >= 10 && $age <= 12) {
-            return '10-12';
-        } elseif ($age >= 13 && $age <= 15) {
-            return '13-15';
-        } else {
-            return '16+';
-        }
     }
 }

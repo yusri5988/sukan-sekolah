@@ -18,8 +18,7 @@ return new class extends Migration
             $table->string('name');
             $table->string('ic_number')->unique();
             $table->string('class');
-            $table->enum('gender', ['male', 'female']);
-            $table->date('date_of_birth');
+            $table->enum('gender', ['L', 'P']);
             $table->timestamps();
         });
     }
