@@ -16,11 +16,16 @@ class Event extends Model
     protected $fillable = [
         'sekolah_id',
         'meet_id',
+        'event_category_id',
+        'event_template_id',
         'name',
         'category',
         'gender',
         'type',
         'max_participants',
+        'has_qualifying_round',
+        'has_multiple_attempts',
+        'attempts_count',
         'scheduled_time',
         'scheduled_date',
         'order',
@@ -31,6 +36,9 @@ class Event extends Model
         'is_active' => 'boolean',
         'max_participants' => 'integer',
         'order' => 'integer',
+        'has_qualifying_round' => 'boolean',
+        'has_multiple_attempts' => 'boolean',
+        'attempts_count' => 'integer',
     ];
 
     const CATEGORY_7_9 = '7-9';
@@ -67,6 +75,22 @@ class Event extends Model
     public function meet(): BelongsTo
     {
         return $this->belongsTo(Meet::class);
+    }
+
+    /**
+     * Get the event category
+     */
+    public function eventCategory(): BelongsTo
+    {
+        return $this->belongsTo(EventCategory::class, 'event_category_id');
+    }
+
+    /**
+     * Get the event template
+     */
+    public function template(): BelongsTo
+    {
+        return $this->belongsTo(EventTemplate::class, 'event_template_id');
     }
 
     /**
@@ -108,6 +132,25 @@ class Event extends Model
             self::CATEGORY_ALL => 'Semua Umur',
             default => $this->category,
         };
+    }
+
+    /**
+     * Get event category name
+     */
+    public function getEventCategoryNameAttribute(): ?string
+    {
+        if (! $this->event_category_id) {
+            return match ($this->category) {
+                self::CATEGORY_7_9 => '7-9 Tahun',
+                self::CATEGORY_10_12 => '10-12 Tahun',
+                self::CATEGORY_13_15 => '13-15 Tahun',
+                self::CATEGORY_16_PLUS => '16+ Tahun',
+                self::CATEGORY_ALL => 'Semua Umur',
+                default => $this->category,
+            };
+        }
+
+        return $this->eventCategory ? $this->eventCategory->name : null;
     }
 
     /**
