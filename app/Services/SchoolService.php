@@ -84,6 +84,6 @@ class SchoolService
     {
         $count = Sekolah::count() + 1;
 
-        return sprintf('sk%04d@sekolah.com', $count);
+        return sprintf('sk%04d@sukansekolah.com', $count);
     }
 }
