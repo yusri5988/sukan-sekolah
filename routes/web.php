@@ -10,6 +10,7 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\PublicMeetController;
 use App\Http\Controllers\ResultController;
 use App\Http\Controllers\SchoolController;
+use App\Http\Controllers\ScoringController;
 use App\Http\Controllers\StudentController;
 use App\Http\Controllers\SuperAdminController;
 use App\Http\Controllers\TeacherAssignmentController;
@@ -97,11 +98,17 @@ Route::middleware(['auth', AdminSekolahMiddleware::class])->prefix('admin-sekola
     Route::get('/meets/{meet}', [MeetController::class, 'show'])->name('meets.show');
     Route::get('/meets/{meet}/edit', [MeetController::class, 'edit'])->name('meets.edit');
     Route::patch('/meets/{meet}', [MeetController::class, 'update'])->name('meets.update');
+
+    // Scoring Configuration
+    Route::get('/scoring', [ScoringController::class, 'index'])->name('scoring.index');
+    Route::patch('/scoring/{category}', [ScoringController::class, 'update'])->name('scoring.update');
     Route::post('/meets/{meet}/activate', [MeetController::class, 'activate'])->name('meets.activate');
     Route::post('/meets/{meet}/complete', [MeetController::class, 'complete'])->name('meets.complete');
     Route::post('/meets/{meet}/toggle-public', [MeetController::class, 'togglePublic'])->name('meets.toggle-public');
 
     // Events Management
+    Route::get('/meets/{meet}/events/select-templates', [EventController::class, 'selectTemplates'])->name('events.select-templates');
+    Route::post('/meets/{meet}/events/from-templates', [EventController::class, 'storeFromTemplates'])->name('events.store-from-templates');
     Route::get('/meets/{meet}/events', [EventController::class, 'index'])->name('events.index');
     Route::get('/meets/{meet}/events/create', [EventController::class, 'create'])->name('events.create');
     Route::post('/meets/{meet}/events', [EventController::class, 'store'])->name('events.store');
