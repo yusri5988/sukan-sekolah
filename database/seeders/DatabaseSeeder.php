@@ -17,6 +17,10 @@ class DatabaseSeeder extends Seeder
         $this->call([
             SchoolReferenceSeeder::class,
             CreateAdminUsersSeeder::class,
+            EventCategorySeeder::class,
+            EventTemplateSeeder::class,
+            EventFormatSeeder::class,
+            ScoringRuleSeeder::class,
         ]);
     }
 }
