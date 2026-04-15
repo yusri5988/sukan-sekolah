@@ -1,12 +1,20 @@
 {
-  "turn_count": 5,
-  "last_session_id": "433e4419-5c81-4e7f-b191-86d3ef9f6a53",
-  "last_event_key": "433e4419-5c81-4e7f-b191-86d3ef9f6a53:transcript:2d193889777f6503c2e619774e6635f67e9e0a28d10ac5f08fde80aefb86ee27",
-  "last_transcript_hash": "2d193889777f6503c2e619774e6635f67e9e0a28d10ac5f08fde80aefb86ee27",
+  "turn_count": 3,
+  "last_session_id": "9f0ad86e-f887-4f0f-9d7c-8c92cf7e8241",
+  "last_event_key": "9f0ad86e-f887-4f0f-9d7c-8c92cf7e8241:transcript:c5e67de8e57e7c5238f0a30281cdf118aa2742288dc9fe72579bdbac4da364e8",
+  "last_transcript_hash": "c5e67de8e57e7c5238f0a30281cdf118aa2742288dc9fe72579bdbac4da364e8",
   "last_model": "gemini-3-flash-preview",
-  "last_turn_total_tokens": 105949,
-  "last_session_total_tokens": 1801786,
+  "last_provider": "gemini",
+  "last_turn_total_tokens": 54886,
+  "last_session_total_tokens": 1778037,
+  "session_totals_by_model": {
+    "gemini-3.1-pro-preview": 133835,
+    "gemini-3-flash-preview": 1644202
+  },
+  "session_totals_by_provider": {
+    "gemini": 1778037
+  },
   "cwd_mode": "parent-leaf",
   "last_cwd_label": "www/hari-sukan",
-  "updated_at": "2026-04-14T07:42:03.635Z"
+  "updated_at": "2026-04-15T03:30:15.727Z"
 }
