@@ -16,9 +16,9 @@ class SchoolService
     /**
      * Create a new sekolah and auto-generate admin sekolah account
      */
-    public function createSekolahFromReference(int $schoolReferenceId, string $telefon): CreateSekolahResultDTO
+    public function createSekolahFromReference(int $schoolReferenceId, string $nama, string $telefon): CreateSekolahResultDTO
     {
-        return DB::transaction(function () use ($schoolReferenceId, $telefon) {
+        return DB::transaction(function () use ($schoolReferenceId, $nama, $telefon) {
             $reference = SchoolReference::query()
                 ->lockForUpdate()
                 ->findOrFail($schoolReferenceId);
@@ -43,7 +43,7 @@ class SchoolService
             $generatedPassword = '123456';
 
             $adminSekolah = User::create([
-                'name' => 'Admin '.$sekolah->nama,
+                'name' => $nama,
                 'email' => $this->generateAdminEmail($sekolah),
                 'password' => Hash::make($generatedPassword),
                 'role' => User::ROLE_ADMIN_SEKOLAH,

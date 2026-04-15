@@ -4,6 +4,7 @@ import { useState } from 'react';
 
 export default function Register({ referencesByState = {} }) {
     const { data, setData, post, processing, errors } = useForm({
+        nama: '',
         negeri: '',
         school_reference_id: '',
         telefon: '',
@@ -52,6 +53,20 @@ export default function Register({ referencesByState = {} }) {
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-6">
+                <div>
+                    <label className="text-[10px] font-black uppercase tracking-widest text-slate-500 italic block">
+                        Nama Pentadbir <span className="text-orange-600">*</span>
+                    </label>
+                    <input
+                        type="text"
+                        value={data.nama}
+                        onChange={(e) => setData('nama', e.target.value)}
+                        placeholder="Ct: Ahmad bin Ali"
+                        className="mt-2 w-full border-2 border-slate-900 rounded-xl px-4 py-3 font-bold text-slate-900 bg-white"
+                    />
+                    {errors.nama && <p className="text-[10px] font-black uppercase tracking-widest text-red-500 italic mt-2">{errors.nama}</p>}
+                </div>
+
                 <div>
                     <label className="text-[10px] font-black uppercase tracking-widest text-slate-500 italic block">
                         Negeri <span className="text-orange-600">*</span>

@@ -43,6 +43,7 @@ class RegisteredUserController extends Controller
     public function store(Request $request): RedirectResponse
     {
         $validated = $request->validate([
+            'nama' => ['required', 'string', 'max:255'],
             'school_reference_id' => [
                 'required',
                 'integer',
@@ -55,6 +56,7 @@ class RegisteredUserController extends Controller
 
         $result = $this->schoolService->createSekolahFromReference(
             (int) $validated['school_reference_id'],
+            $validated['nama'],
             $telefon
         );
 
