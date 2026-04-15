@@ -44,9 +44,54 @@ class EventController extends Controller
             abort(403, 'Anda tidak mempunyai akses ke meet ini.');
         }
 
+        $templates = $this->eventService->getTemplatesGroupedByCategory();
+
         return Inertia::render('AdminSekolah/Events/Create', [
             'meet' => $meet,
+            'templates' => $templates,
         ]);
+    }
+
+    /**
+     * Show template selection page
+     */
+    public function selectTemplates(Meet $meet)
+    {
+        $user = auth()->user();
+
+        if ($meet->sekolah_id !== $user->sekolah_id) {
+            abort(403, 'Anda tidak mempunyai akses ke meet ini.');
+        }
+
+        $templates = $this->eventService->getTemplatesGroupedByCategory();
+
+        return Inertia::render('AdminSekolah/Events/SelectTemplates', [
+            'meet' => $meet,
+            'templates' => $templates,
+        ]);
+    }
+
+    /**
+     * Store multiple events from selected templates
+     */
+    public function storeFromTemplates(Request $request, Meet $meet)
+    {
+        $user = auth()->user();
+
+        if ($meet->sekolah_id !== $user->sekolah_id) {
+            abort(403, 'Anda tidak mempunyai akses ke meet ini.');
+        }
+
+        $validated = $request->validate([
+            'template_ids' => 'required|array|min:1',
+            'template_ids.*' => 'exists:event_templates,id',
+        ]);
+
+        $events = $this->eventService->createEventsFromTemplates($validated['template_ids'], $meet);
+
+        return redirect()
+            ->route('admin-sekolah.events.index', $meet->id)
+            ->with('success', count($events).' acara berjaya dicipta!');
     }
 
     /**
@@ -61,16 +106,12 @@ class EventController extends Controller
         }
 
         $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'category' => 'required|in:7-9,10-12,13-15,16+,all',
-            'gender' => 'required|in:male,female,mixed',
-            'type' => 'required|in:individual,relay',
-            'max_participants' => 'nullable|integer|min:1|max:20',
+            'event_template_id' => 'required|exists:event_templates,id',
             'scheduled_time' => 'nullable|date_format:H:i',
             'scheduled_date' => 'nullable|date',
         ]);
 
-        $event = $this->eventService->createEvent($validated, $meet);
+        $event = $this->eventService->createEventFromTemplate($validated, $meet);
 
         return redirect()
             ->route('admin-sekolah.events.index', $meet->id)
