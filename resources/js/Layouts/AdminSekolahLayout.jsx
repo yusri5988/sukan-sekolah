@@ -60,6 +60,12 @@ export default function AdminSekolahLayout({ header, children }) {
                             >
                                 Kejohanan
                             </NavLink>
+                            <NavLink
+                                href={route('admin-sekolah.scoring.index')}
+                                active={route().current('admin-sekolah.scoring.*')}
+                            >
+                                Pemarkahan
+                            </NavLink>
                         </div>
                     </div>
 
@@ -191,6 +197,12 @@ export default function AdminSekolahLayout({ header, children }) {
                             active={route().current('admin-sekolah.meets.*')}
                         >
                             Kejohanan
+                        </ResponsiveNavLink>
+                        <ResponsiveNavLink
+                            href={route('admin-sekolah.scoring.index')}
+                            active={route().current('admin-sekolah.scoring.*')}
+                        >
+                            Pemarkahan
                         </ResponsiveNavLink>
                     </div>
 
