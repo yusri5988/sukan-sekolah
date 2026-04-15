@@ -12,7 +12,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        DB::statement("ALTER TABLE students MODIFY COLUMN gender ENUM('L', 'P') NOT NULL");
+        if (DB::getDriverName() !== 'sqlite') {
+            DB::statement("ALTER TABLE students MODIFY COLUMN gender ENUM('L', 'P') NOT NULL");
+        }
     }
 
     /**

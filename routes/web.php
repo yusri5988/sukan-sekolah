@@ -18,7 +18,9 @@ use App\Http\Controllers\TeacherController;
 use App\Http\Middleware\AdminSekolahMiddleware;
 use App\Http\Middleware\CikguMiddleware;
 use App\Http\Middleware\SuperAdminMiddleware;
+use App\Models\User;
 use Illuminate\Foundation\Application;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -32,7 +34,8 @@ Route::get('/', function () {
 });
 
 Route::get('/dashboard', function () {
-    $user = auth()->user();
+    /** @var User $user */
+    $user = Auth::user();
 
     if ($user->isSuperAdmin()) {
         return redirect()->route('super-admin.dashboard');
@@ -79,9 +82,9 @@ Route::middleware(['auth', AdminSekolahMiddleware::class])->prefix('admin-sekola
     Route::get('/houses', [HouseController::class, 'index'])->name('houses.index');
     Route::get('/houses/create', [HouseController::class, 'create'])->name('houses.create');
     Route::post('/houses', [HouseController::class, 'store'])->name('houses.store');
+    Route::post('/houses/auto-assign', [HouseController::class, 'autoAssign'])->name('houses.auto-assign');
     Route::get('/houses/{house}', [HouseController::class, 'show'])->name('houses.show');
     Route::delete('/houses/{house}', [HouseController::class, 'destroy'])->name('houses.destroy');
-    Route::post('/houses/auto-assign', [HouseController::class, 'autoAssign'])->name('houses.auto-assign');
 
     // Students Management
     Route::get('/students', [StudentController::class, 'index'])->name('students.index');

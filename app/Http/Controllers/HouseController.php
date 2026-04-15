@@ -3,9 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Models\House;
-use App\Models\Sekolah;
 use App\Services\HouseService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\Rule;
 use Inertia\Inertia;
 
 class HouseController extends Controller
@@ -19,18 +20,12 @@ class HouseController extends Controller
      */
     public function index()
     {
-        $user = auth()->user();
-        $sekolah = $user->sekolah;
-
-        if (! $sekolah) {
-            return redirect()->route('dashboard')->with('error', 'Tiada sekolah dihubungkan dengan akaun anda.');
-        }
+        $sekolah = Auth::user()->sekolah;
 
         $houses = $this->houseService->getHousesWithCounts($sekolah);
 
         return Inertia::render('AdminSekolah/Houses/Index', [
             'houses' => $houses,
-            'sekolah' => $sekolah,
         ]);
     }
 
@@ -39,12 +34,7 @@ class HouseController extends Controller
      */
     public function create()
     {
-        $user = auth()->user();
-        $sekolah = $user->sekolah;
-
-        return Inertia::render('AdminSekolah/Houses/Create', [
-            'sekolah' => $sekolah,
-        ]);
+        return Inertia::render('AdminSekolah/Houses/Create');
     }
 
     /**
@@ -52,19 +42,19 @@ class HouseController extends Controller
      */
     public function store(Request $request)
     {
-        $user = auth()->user();
-        $sekolah = $user->sekolah;
-
-        if (! $sekolah) {
-            return redirect()->back()->with('error', 'Tiada sekolah dihubungkan dengan akaun anda.');
-        }
+        $sekolah = Auth::user()->sekolah;
 
         $validated = $request->validate([
-            'name' => 'required|string|max:255',
             'color' => 'nullable|string|max:50',
+            'name' => [
+                'required',
+                'string',
+                'max:255',
+                Rule::unique('houses', 'name')->where(fn ($query) => $query->where('sekolah_id', $sekolah->id)),
+            ],
         ]);
 
-        $house = $this->houseService->createHouse($validated, $sekolah);
+        $this->houseService->createHouse($validated, $sekolah);
 
         return redirect()
             ->route('admin-sekolah.houses.index')
@@ -77,16 +67,23 @@ class HouseController extends Controller
      */
     public function show(House $house)
     {
-        $user = auth()->user();
+        $user = Auth::user();
 
         if ($house->sekolah_id !== $user->sekolah_id) {
             abort(403, 'Anda tidak mempunyai akses ke rumah sukan ini.');
         }
 
-        $house->load(['students', 'teachers']);
+        $house->load(['teachers']);
+
+        $students = $house->students()
+            ->select('id', 'name', 'class', 'gender')
+            ->orderBy('name')
+            ->paginate(10)
+            ->withQueryString();
 
         return Inertia::render('AdminSekolah/Houses/Show', [
             'house' => $house,
+            'students' => $students,
         ]);
     }
 
@@ -95,13 +92,17 @@ class HouseController extends Controller
      */
     public function destroy(House $house)
     {
-        $user = auth()->user();
+        $user = Auth::user();
 
         if ($house->sekolah_id !== $user->sekolah_id) {
             abort(403, 'Anda tidak mempunyai akses ke rumah sukan ini.');
         }
 
-        $this->houseService->deleteHouse($house);
+        if (! $this->houseService->deleteHouse($house)) {
+            return redirect()
+                ->route('admin-sekolah.houses.index')
+                ->with('error', 'Rumah sukan ini masih mempunyai pelajar. Sila kosongkan pelajar dahulu.');
+        }
 
         return redirect()
             ->route('admin-sekolah.houses.index')
@@ -113,12 +114,7 @@ class HouseController extends Controller
      */
     public function autoAssign(Request $request)
     {
-        $user = auth()->user();
-        $sekolah = $user->sekolah;
-
-        if (! $sekolah) {
-            return redirect()->back()->with('error', 'Tiada sekolah dihubungkan dengan akaun anda.');
-        }
+        $sekolah = Auth::user()->sekolah;
 
         $result = $this->houseService->autoAssignStudentsToHouses($sekolah);
 

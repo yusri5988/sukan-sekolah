@@ -1,9 +1,14 @@
 import AdminSekolahLayout from '@/Layouts/AdminSekolahLayout';
-import { Head, Link, usePage } from '@inertiajs/react';
-import PrimaryButton from '@/Components/PrimaryButton';
+import { Head, Link, useForm, usePage } from '@inertiajs/react';
 
-export default function HousesIndex({ houses, sekolah }) {
+export default function HousesIndex({ houses }) {
     const { flash } = usePage().props;
+    const { post, processing } = useForm({});
+
+    const handleAutoAssign = (e) => {
+        e.preventDefault();
+        post(route('admin-sekolah.houses.auto-assign'));
+    };
 
     return (
         <AdminSekolahLayout
@@ -52,12 +57,13 @@ export default function HousesIndex({ houses, sekolah }) {
                         </p>
                     </div>
                     <div className="relative z-10 shrink-0 w-full md:w-auto">
-                        <form action={route('admin-sekolah.houses.auto-assign')} method="POST">
+                        <form onSubmit={handleAutoAssign}>
                             <button
                                 type="submit"
-                                className="w-full px-8 py-4 bg-orange-600 text-white text-sm font-black uppercase tracking-widest italic rounded-xl hover:bg-slate-900 transition-all active:scale-95 shadow-xl shadow-orange-100"
+                                disabled={processing}
+                                className="w-full px-8 py-4 bg-orange-600 text-white text-sm font-black uppercase tracking-widest italic rounded-xl hover:bg-slate-900 transition-all active:scale-95 shadow-xl shadow-orange-100 disabled:opacity-50"
                             >
-                                Auto-Assign Sekarang
+                                {processing ? 'MEMPROSES...' : 'Auto-Assign Sekarang'}
                             </button>
                         </form>
                     </div>

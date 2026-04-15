@@ -48,12 +48,4 @@ class House extends Model
     {
         return $this->hasMany(User::class);
     }
-
-    /**
-     * Get total number of students in this house
-     */
-    public function getStudentCountAttribute(): int
-    {
-        return $this->students()->count();
-    }
 }

@@ -26,20 +26,14 @@ class HouseService
     }
 
     /**
-     * Update house details
-     */
-    public function updateHouse(House $house, array $data): House
-    {
-        $house->update($data);
-
-        return $house->fresh();
-    }
-
-    /**
      * Delete a house
      */
     public function deleteHouse(House $house): bool
     {
+        if ($house->students()->exists()) {
+            return false;
+        }
+
         return $house->delete();
     }
 
@@ -85,27 +79,36 @@ class HouseService
             return ['success' => false, 'message' => 'Tiada rumah sukan wujud'];
         }
 
-        $studentsWithoutHouse = $sekolah->students()->whereNull('house_id')->get();
+        $studentsWithoutHouse = $sekolah->students()
+            ->whereNull('house_id')
+            ->orderBy('id')
+            ->get(['id']);
 
         if ($studentsWithoutHouse->isEmpty()) {
             return ['success' => false, 'message' => 'Semua pelajar sudah mempunyai rumah'];
         }
 
-        $studentCountPerHouse = (int) ceil($studentsWithoutHouse->count() / $houses->count());
+        $assignments = [];
+        $houseCounts = $houses->mapWithKeys(function (House $house) {
+            return [$house->id => (int) $house->students_count];
+        })->all();
 
-        $houseIndex = 0;
         $assignedCount = 0;
 
         foreach ($studentsWithoutHouse as $student) {
-            // Find house with least students
-            $minStudentsHouse = $houses->sortBy('students_count')->first();
+            asort($houseCounts);
+            $houseId = array_key_first($houseCounts);
 
-            $student->update(['house_id' => $minStudentsHouse->id]);
+            $assignments[$houseId][] = $student->id;
+            $houseCounts[$houseId]++;
             $assignedCount++;
-
-            // Refresh house counts
-            $houses = $sekolah->houses()->withCount('students')->get();
         }
+
+        DB::transaction(function () use ($assignments) {
+            foreach ($assignments as $houseId => $studentIds) {
+                Student::whereIn('id', $studentIds)->update(['house_id' => $houseId]);
+            }
+        });
 
         return [
             'success' => true,

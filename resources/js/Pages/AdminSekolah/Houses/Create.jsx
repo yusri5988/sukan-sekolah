@@ -1,7 +1,18 @@
 import AdminSekolahLayout from '@/Layouts/AdminSekolahLayout';
 import { Head, Link, useForm } from '@inertiajs/react';
 
-export default function HousesCreate({ sekolah }) {
+const colorOptions = [
+    { name: 'Merah', value: '#ef4444' },
+    { name: 'Biru', value: '#3b82f6' },
+    { name: 'Hijau', value: '#22c55e' },
+    { name: 'Kuning', value: '#eab308' },
+    { name: 'Ungu', value: '#a855f7' },
+    { name: 'Pink', value: '#ec4899' },
+    { name: 'Oren', value: '#f97316' },
+    { name: 'Sian', value: '#06b6d4' },
+];
+
+export default function HousesCreate() {
     const { data, setData, post, processing, errors } = useForm({
         name: '',
         color: '',
@@ -11,17 +22,6 @@ export default function HousesCreate({ sekolah }) {
         e.preventDefault();
         post(route('admin-sekolah.houses.store'));
     };
-
-    const colorOptions = [
-        { name: 'Merah', value: '#ef4444' },
-        { name: 'Biru', value: '#3b82f6' },
-        { name: 'Hijau', value: '#22c55e' },
-        { name: 'Kuning', value: '#eab308' },
-        { name: 'Ungu', value: '#a855f7' },
-        { name: 'Pink', value: '#ec4899' },
-        { name: 'Oren', value: '#f97316' },
-        { name: 'Sian', value: '#06b6d4' },
-    ];
 
     return (
         <AdminSekolahLayout
