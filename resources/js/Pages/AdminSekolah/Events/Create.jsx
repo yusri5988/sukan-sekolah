@@ -9,6 +9,9 @@ export default function EventsCreate({ meet, templates }) {
         gender: 'male',
         type: 'individual',
         scheduled_time: '',
+        settings: {
+            lane_count: 8,
+        },
     });
 
     // Flatten templates to show in a simple selection if needed, 
@@ -80,6 +83,18 @@ export default function EventsCreate({ meet, templates }) {
                         </div>
 
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                            <div>
+                                <label className="block text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 mb-3 ml-1">Bil. Lorong</label>
+                                <input
+                                    type="number"
+                                    value={data.settings.lane_count}
+                                    onChange={e => setData('settings', { ...data.settings, lane_count: parseInt(e.target.value) || 8 })}
+                                    className="w-full bg-slate-50 border-2 border-slate-100 rounded-2xl px-6 py-4 font-bold text-slate-700 focus:border-orange-600 focus:ring-0 transition-all"
+                                    min="4"
+                                    max="12"
+                                />
+                                <p className="mt-2 text-xs font-bold text-slate-400 italic ml-1">Peserta melebihi lorong akan masuk saringan</p>
+                            </div>
                             <div>
                                 <label className="block text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 mb-3 ml-1">Waktu Mula (Opsional)</label>
                                 <input

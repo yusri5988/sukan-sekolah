@@ -6,19 +6,18 @@ export default function EventsShow({ meet, event }) {
         <AdminSekolahLayout>
             <Head title={`${event.name} - Perincian`} />
 
-            <div className="max-w-7xl mx-auto px-4 sm:px-0 pt-2 pb-10 md:py-10 space-y-6 mb-20">
+            <div className="max-w-7xl mx-auto px-4 sm:px-0 -mt-2 pb-10 md:py-10 space-y-6 mb-20">
                 {/* Breadcrumb & Navigation */}
                 <div className="flex items-center justify-between">
                     <Link 
                         href={route('admin-sekolah.events.index')}
-                        className="group flex items-center gap-2 text-slate-400 hover:text-orange-600 transition-colors"
+                        className="group transition-all active:scale-95"
                     >
-                        <div className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center group-hover:bg-orange-50 transition-colors">
-                            <svg className="w-4 h-4 transition-transform group-hover:-translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <div className="w-10 h-10 rounded-xl bg-white border-2 border-slate-900 flex items-center justify-center shadow-[3px_3px_0px_0px_rgba(15,23,42,1)] group-hover:bg-orange-600 group-hover:border-orange-600 group-hover:text-white group-hover:-translate-x-0.5 group-hover:-translate-y-0.5 group-hover:shadow-[5px_5px_0px_0px_rgba(15,23,42,1)] transition-all">
+                            <svg className="w-5 h-5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M15 19l-7-7 7-7" />
                             </svg>
                         </div>
-                        <span className="text-xs font-black uppercase tracking-widest italic">Kembali ke Senarai Acara</span>
                     </Link>
 
                     <div className="flex items-center gap-3">

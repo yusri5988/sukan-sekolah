@@ -63,7 +63,7 @@ class EventController extends Controller
     public function configureTemplates(Request $request)
     {
         $meet = $this->getMeetForCurrentUser();
-        
+
         $validated = $request->validate([
             'names' => 'required|array|min:1',
             'names.*' => 'string',
@@ -107,6 +107,8 @@ class EventController extends Controller
             'event_template_id' => 'required|exists:event_templates,id',
             'scheduled_time' => 'nullable|date_format:H:i',
             'scheduled_date' => 'nullable|date',
+            'settings' => 'nullable|array',
+            'settings.lane_count' => 'nullable|integer|min:4|max:12',
         ]);
 
         $event = $this->eventService->createEventFromTemplate($validated, $meet->sekolah);

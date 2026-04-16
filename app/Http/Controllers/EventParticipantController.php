@@ -23,11 +23,13 @@ class EventParticipantController extends Controller
 
         $participants = $this->participantService->getParticipants($event);
         $eligibleStudents = $this->participantService->getEligibleStudents($event);
+        $heats = $this->participantService->getHeats($event);
 
         return Inertia::render('AdminSekolah/Events/Participants/Index', [
             'event' => $event,
             'participants' => $participants,
             'eligibleStudents' => $eligibleStudents,
+            'heats' => $heats,
         ]);
     }
 

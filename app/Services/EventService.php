@@ -20,6 +20,11 @@ class EventService
             $template = EventTemplate::findOrFail($data['event_template_id']);
             $maxOrder = Event::query()->where('sekolah_id', $sekolah->id)->max('order') ?? 0;
 
+            $settings = $data['settings'] ?? null;
+            if ($settings && isset($settings['lane_count'])) {
+                $settings = ['lane_count' => (int) $settings['lane_count']];
+            }
+
             return Event::create([
                 'sekolah_id' => $sekolah->id,
                 'event_category_id' => $template->event_category_id,
@@ -36,6 +41,7 @@ class EventService
                 'scheduled_date' => $data['scheduled_date'] ?? null,
                 'order' => $maxOrder + 1,
                 'is_active' => true,
+                'settings' => $settings,
             ]);
         });
     }

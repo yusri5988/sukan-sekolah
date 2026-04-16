@@ -119,6 +119,22 @@ class ResultService
     }
 
     /**
+     * Get qualifiers for final based on saringan results
+     * Uses lane_count as the number of finalists
+     */
+    public function getQualifiersForFinal(Event $event): Collection
+    {
+        $laneCount = $event->lane_count;
+
+        return $event->results()
+            ->whereNotNull('time_record')
+            ->orderBy('time_record', 'asc')
+            ->limit($laneCount)
+            ->with(['participant.student', 'house'])
+            ->get();
+    }
+
+    /**
      * Recalculate all house points for a sekolah based on locked results
      */
     public function recalculateHousePoints(int $sekolahId): void

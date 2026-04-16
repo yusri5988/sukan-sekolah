@@ -1,8 +1,10 @@
 import AdminSekolahLayout from '@/Layouts/AdminSekolahLayout';
 import { Head, Link, usePage } from '@inertiajs/react';
 
-export default function ResultsIndex({ event, results, ranking }) {
+export default function ResultsIndex({ event, results, ranking, heats, qualifiers }) {
     const { flash } = usePage().props;
+
+    const hasHeats = heats && heats.length > 0;
 
     return (
         <AdminSekolahLayout
@@ -23,6 +25,70 @@ export default function ResultsIndex({ event, results, ranking }) {
             <div className="py-12">
                 <div className="mx-auto max-w-7xl sm:px-6 lg:px-8">
                     {flash?.success && <div className="mb-4 rounded-md bg-green-50 p-4 text-sm text-green-700">{flash.success}</div>}
+
+                    {hasHeats && (
+                        <div className="mb-8 overflow-hidden bg-white shadow-sm sm:rounded-lg">
+                            <div className="border-b border-gray-200 bg-orange-50 px-6 py-4">
+                                <h3 className="text-lg font-semibold text-orange-900">Saringan (Heats)</h3>
+                                <p className="text-sm text-orange-700">{heats.length} saringan · {event.lane_count} lorong setiap saringan</p>
+                            </div>
+                            <div className="p-6">
+                                <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+                                    {heats.map((heat) => (
+                                        <div key={heat.heat_number} className="rounded-lg border p-4">
+                                            <div className="mb-3 flex items-center justify-between">
+                                                <h4 className="font-bold text-gray-900">Saringan {heat.heat_number}</h4>
+                                                <span className={`rounded-full px-2 py-1 text-xs font-semibold ${heat.is_full ? 'bg-red-100 text-red-800' : 'bg-green-100 text-green-800'}`}>
+                                                    {heat.participants.length}/{event.lane_count} lorong
+                                                </span>
+                                            </div>
+                                            <div className="space-y-2">
+                                                {heat.participants.map((p) => (
+                                                    <div key={p.id} className="flex items-center justify-between rounded bg-gray-50 px-3 py-2 text-sm">
+                                                        <div>
+                                                            <span className="font-medium text-gray-900">Lorong {p.lane_number}</span>
+                                                            <span className="ml-2 text-gray-600">{p.student?.name}</span>
+                                                        </div>
+                                                        <span className="text-xs text-gray-500">{p.house?.name}</span>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
+                    {hasHeats && qualifiers && qualifiers.length > 0 && (
+                        <div className="mb-8 overflow-hidden bg-white shadow-sm sm:rounded-lg">
+                            <div className="border-b border-gray-200 bg-green-50 px-6 py-4">
+                                <h3 className="text-lg font-semibold text-green-900">Layak ke Final ({qualifiers.length}/{event.lane_count})</h3>
+                                <p className="text-sm text-green-700">Peserta dengan masa terpantas dari semua saringan</p>
+                            </div>
+                            <div className="p-6">
+                                <div className="space-y-3">
+                                    {qualifiers.map((result, index) => (
+                                        <div key={result.id} className="flex items-center justify-between rounded-lg border p-4">
+                                            <div className="flex items-center gap-4">
+                                                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-green-600 font-bold text-white">{index + 1}</div>
+                                                <div>
+                                                    <div className="font-medium text-gray-900">
+                                                        {result.participant?.student?.name ?? '-'}
+                                                    </div>
+                                                    <div className="text-sm text-gray-500">{result.house?.name}</div>
+                                                </div>
+                                            </div>
+                                            <div className="text-right">
+                                                <div className="text-lg font-bold text-gray-900">{result.time_record}</div>
+                                                <div className="text-xs text-gray-500">Masa</div>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        </div>
+                    )}
 
                     <div className="mb-6 grid grid-cols-1 gap-6 lg:grid-cols-2">
                         <div className="overflow-hidden bg-white shadow-sm sm:rounded-lg">

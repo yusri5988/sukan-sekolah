@@ -19,12 +19,13 @@ export default function EventsIndex({ meet, events }) {
                     </div>
                     <Link
                         href={route('admin-sekolah.meets.show')}
-                        className="group flex items-center gap-2 px-5 py-2.5 text-slate-500 hover:text-orange-600 font-bold transition-all"
+                        className="group transition-all active:scale-95"
                     >
-                        <svg className="w-5 h-5 transition-transform group-hover:-translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M15 19l-7-7 7-7" />
-                        </svg>
-                        <span className="text-sm uppercase tracking-wider">Kembali</span>
+                        <div className="w-10 h-10 rounded-xl bg-white border-2 border-slate-900 flex items-center justify-center shadow-[3px_3px_0px_0px_rgba(15,23,42,1)] group-hover:bg-orange-600 group-hover:border-orange-600 group-hover:text-white group-hover:-translate-x-0.5 group-hover:-translate-y-0.5 group-hover:shadow-[5px_5px_0px_0px_rgba(15,23,42,1)] transition-all">
+                            <svg className="w-5 h-5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M15 19l-7-7 7-7" />
+                            </svg>
+                        </div>
                     </Link>
                 </div>
             }

@@ -91,10 +91,75 @@ class EventParticipantService
             }
         }
 
+        if ($created > 0) {
+            $this->autoAssignHeats($event);
+        }
+
         return [
             'created' => $created,
             'errors' => $errors,
         ];
+    }
+
+    /**
+     * Auto-assign heats when participants exceed lane_count
+     */
+    public function autoAssignHeats(Event $event): void
+    {
+        $laneCount = $event->settings['lane_count'] ?? 8;
+        $participants = $event->participants()
+            ->whereNull('heat')
+            ->orderBy('id')
+            ->get();
+
+        if ($participants->isEmpty()) {
+            return;
+        }
+
+        $totalParticipants = $event->participants()->count();
+        $heatCount = (int) ceil($totalParticipants / $laneCount);
+
+        $unassigned = $event->participants()->whereNull('heat')->orderBy('id')->get();
+
+        $index = 0;
+        foreach ($unassigned as $participant) {
+            $heat = (int) floor($index / $laneCount) + 1;
+            $lane = ($index % $laneCount) + 1;
+
+            if ($heat > $heatCount) {
+                $heat = $heatCount;
+            }
+
+            $participant->update([
+                'heat' => $heat,
+                'lane_number' => $lane,
+            ]);
+
+            $index++;
+        }
+    }
+
+    /**
+     * Get heats for an event
+     */
+    public function getHeats(Event $event): Collection
+    {
+        $laneCount = $event->settings['lane_count'] ?? 8;
+
+        return $event->participants()
+            ->with(['student.house', 'house'])
+            ->orderBy('heat')
+            ->orderBy('lane_number')
+            ->get()
+            ->groupBy('heat')
+            ->map(function ($heatParticipants, $heatNumber) use ($laneCount) {
+                return [
+                    'heat_number' => (int) $heatNumber,
+                    'participants' => $heatParticipants->sortBy('lane_number')->values(),
+                    'is_full' => $heatParticipants->count() >= $laneCount,
+                ];
+            })
+            ->values();
     }
 
     /**

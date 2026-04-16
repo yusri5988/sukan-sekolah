@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Event;
 use App\Models\House;
 use App\Models\Result;
+use App\Services\EventParticipantService;
 use App\Services\ResultService;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -19,10 +20,21 @@ class ResultController extends Controller
     {
         $this->authorizeEvent($event);
 
+        $heats = collect();
+        $qualifiers = collect();
+
+        if ($event->hasHeats()) {
+            $participantService = app(EventParticipantService::class);
+            $heats = $participantService->getHeats($event);
+            $qualifiers = $this->resultService->getQualifiersForFinal($event);
+        }
+
         return Inertia::render('AdminSekolah/Results/Index', [
             'event' => $event,
             'results' => $this->resultService->getResults($event),
             'ranking' => $this->resultService->getRanking($event->sekolah),
+            'heats' => $heats,
+            'qualifiers' => $qualifiers,
         ]);
     }
 
@@ -121,6 +133,23 @@ class ResultController extends Controller
             'event' => $event,
             'ranking' => $this->resultService->getRanking($event->sekolah),
         ]);
+    }
+
+    public function processQualification(Event $event)
+    {
+        $this->authorizeEvent($event);
+
+        if (! $event->hasHeats()) {
+            return back()->with('error', 'Acara ini tidak mempunyai saringan.');
+        }
+
+        $qualifiers = $this->resultService->getQualifiersForFinal($event);
+
+        if ($qualifiers->isEmpty()) {
+            return back()->with('error', 'Tiada keputusan saringan untuk diproses.');
+        }
+
+        return back()->with('success', "{$qualifiers->count()} peserta layak ke final (masa terpantas).");
     }
 
     private function authorizeEvent(Event $event): void

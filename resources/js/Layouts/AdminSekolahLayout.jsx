@@ -255,7 +255,7 @@ export default function AdminSekolahLayout({ header, children }) {
             <div className="pt-20">
                 {header && (
                     <header className="bg-white border-b-8 border-slate-900">
-                        <div className="max-w-7xl mx-auto px-4 py-12 lg:px-8">
+                        <div className="max-w-7xl mx-auto px-4 py-6 lg:px-8">
                             {typeof header === 'string' ? (
                                 <h2 className="text-4xl lg:text-6xl font-black italic uppercase tracking-tighter text-slate-900 leading-none">
                                     {header}
@@ -267,7 +267,7 @@ export default function AdminSekolahLayout({ header, children }) {
                     </header>
                 )}
 
-                <main className="py-12 bg-white relative overflow-hidden min-h-[calc(100vh-80px)]">
+                <main className="py-6 md:py-12 bg-white relative overflow-hidden min-h-[calc(100vh-80px)]">
                     {/* Background Texture */}
                     <div className="absolute inset-0 opacity-[0.01] pointer-events-none select-none overflow-hidden uppercase font-black text-[15vw] leading-none text-slate-900 flex flex-col gap-0 items-center justify-center rotate-[-10deg] -z-10">
                         <div>Faster</div>

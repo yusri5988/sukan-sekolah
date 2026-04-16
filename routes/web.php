@@ -139,6 +139,7 @@ Route::middleware(['auth', AdminSekolahMiddleware::class])->prefix('admin-sekola
     Route::delete('/events/{event}/results/{result}', [ResultController::class, 'destroy'])->name('results.destroy');
     Route::post('/events/{event}/results/{result}/toggle-lock', [ResultController::class, 'toggleLock'])->name('results.toggle-lock');
     Route::get('/events/{event}/ranking', [ResultController::class, 'ranking'])->name('results.ranking');
+    Route::post('/events/{event}/results/process-qualification', [ResultController::class, 'processQualification'])->name('results.process-qualification');
 });
 
 // Cikgu Routes

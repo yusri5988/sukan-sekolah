@@ -193,4 +193,32 @@ class Event extends Model
             default => $this->type,
         };
     }
+
+    /**
+     * Get lane count from settings
+     */
+    public function getLaneCountAttribute(): int
+    {
+        return $this->settings['lane_count'] ?? 8;
+    }
+
+    /**
+     * Check if event has heats
+     */
+    public function hasHeats(): bool
+    {
+        return $this->participants()->count() > $this->lane_count;
+    }
+
+    /**
+     * Get heat count
+     */
+    public function getHeatCountAttribute(): int
+    {
+        if ($this->participants()->count() === 0) {
+            return 0;
+        }
+
+        return (int) ceil($this->participants()->count() / $this->lane_count);
+    }
 }
