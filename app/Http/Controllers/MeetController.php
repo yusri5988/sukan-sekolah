@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Meet;
 use App\Services\MeetService;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -35,7 +34,7 @@ class MeetController extends Controller
             ], $sekolah);
         }
 
-        return redirect()->route('admin-sekolah.meets.show', $meet->id);
+        return redirect()->route('admin-sekolah.meets.show');
     }
 
     /**
@@ -66,6 +65,7 @@ class MeetController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'date' => 'required|date',
+            'closing_date' => 'nullable|date|before_or_equal:date',
             'description' => 'nullable|string',
             'point_config' => 'nullable|array',
             'point_config.*' => 'integer|min:0',
@@ -74,20 +74,16 @@ class MeetController extends Controller
         $meet = $this->meetService->createMeet($validated, $sekolah);
 
         return redirect()
-            ->route('admin-sekolah.meets.index')
+            ->route('admin-sekolah.meets.show')
             ->with('success', 'Kejohanan berjaya dicipta!');
     }
 
     /**
      * Show single meet details with events
      */
-    public function show(Meet $meet)
+    public function show()
     {
-        $user = auth()->user();
-
-        if ($meet->sekolah_id !== $user->sekolah_id) {
-            abort(403, 'Anda tidak mempunyai akses ke meet ini.');
-        }
+        $meet = $this->getMeetForCurrentUser();
 
         $meet->load('events');
 
@@ -99,13 +95,9 @@ class MeetController extends Controller
     /**
      * Edit meet
      */
-    public function edit(Meet $meet)
+    public function edit()
     {
-        $user = auth()->user();
-
-        if ($meet->sekolah_id !== $user->sekolah_id) {
-            abort(403, 'Anda tidak mempunyai akses ke meet ini.');
-        }
+        $meet = $this->getMeetForCurrentUser();
 
         return Inertia::render('AdminSekolah/Meets/Edit', [
             'meet' => $meet,
@@ -115,17 +107,14 @@ class MeetController extends Controller
     /**
      * Update meet
      */
-    public function update(Request $request, Meet $meet)
+    public function update(Request $request)
     {
-        $user = auth()->user();
-
-        if ($meet->sekolah_id !== $user->sekolah_id) {
-            abort(403, 'Anda tidak mempunyai akses ke meet ini.');
-        }
+        $meet = $this->getMeetForCurrentUser();
 
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'date' => 'required|date',
+            'closing_date' => 'nullable|date|before_or_equal:date',
             'description' => 'nullable|string',
             'point_config' => 'nullable|array',
             'point_config.*' => 'integer|min:0',
@@ -134,79 +123,104 @@ class MeetController extends Controller
         $this->meetService->updateMeet($meet, $validated);
 
         return redirect()
-            ->route('admin-sekolah.meets.show', $meet->id)
+            ->route('admin-sekolah.meets.show')
             ->with('success', 'Kejohanan berjaya dikemaskini!');
+    }
+
+    /**
+     * Update meet dates only
+     */
+    public function updateDates(Request $request)
+    {
+        $meet = $this->getMeetForCurrentUser();
+
+        $validated = $request->validate([
+            'date' => 'required|date',
+            'closing_date' => 'nullable|date|before_or_equal:date',
+        ]);
+
+        $this->meetService->updateMeet($meet, $validated);
+
+        return redirect()
+            ->route('admin-sekolah.meets.show')
+            ->with('success', 'Tarikh kejohanan berjaya dikemaskini!');
     }
 
     /**
      * Activate meet
      */
-    public function activate(Meet $meet)
+    public function activate()
     {
-        $user = auth()->user();
-
-        if ($meet->sekolah_id !== $user->sekolah_id) {
-            abort(403, 'Anda tidak mempunyai akses ke meet ini.');
-        }
+        $meet = $this->getMeetForCurrentUser();
 
         $this->meetService->activateMeet($meet);
 
         return redirect()
-            ->route('admin-sekolah.meets.show', $meet->id)
+            ->route('admin-sekolah.meets.show')
             ->with('success', 'Kejohanan diaktifkan!');
     }
 
     /**
      * Complete meet
      */
-    public function complete(Meet $meet)
+    public function complete()
     {
-        $user = auth()->user();
-
-        if ($meet->sekolah_id !== $user->sekolah_id) {
-            abort(403, 'Anda tidak mempunyai akses ke meet ini.');
-        }
+        $meet = $this->getMeetForCurrentUser();
 
         $this->meetService->completeMeet($meet);
 
         return redirect()
-            ->route('admin-sekolah.meets.show', $meet->id)
+            ->route('admin-sekolah.meets.show')
             ->with('success', 'Kejohanan ditandakan sebagai selesai!');
     }
 
     /**
      * Toggle public visibility
      */
-    public function togglePublic(Meet $meet)
+    public function togglePublic()
     {
-        $user = auth()->user();
-
-        if ($meet->sekolah_id !== $user->sekolah_id) {
-            abort(403, 'Anda tidak mempunyai akses ke meet ini.');
-        }
+        $meet = $this->getMeetForCurrentUser();
 
         $this->meetService->togglePublic($meet);
 
         return redirect()
-            ->route('admin-sekolah.meets.show', $meet->id)
+            ->route('admin-sekolah.meets.show')
             ->with('success', $meet->is_public ? 'Paparan awam disembunyikan.' : 'Paparan awam diaktifkan.');
     }
 
     /**
      * Delete meet
      */
-    public function destroy(Meet $meet)
+    public function destroy()
     {
-        $user = auth()->user();
-
-        if ($meet->sekolah_id !== $user->sekolah_id) {
-            abort(403, 'Anda tidak mempunyai akses ke meet ini.');
-        }
+        $meet = $this->getMeetForCurrentUser();
 
         $this->meetService->deleteMeet($meet);
 
         return redirect()
             ->route('admin-sekolah.meets.index')
             ->with('success', 'Kejohanan berjaya dihapus!');
+    }
+
+    private function getMeetForCurrentUser()
+    {
+        $user = auth()->user();
+        $sekolah = $user->sekolah;
+
+        if (! $sekolah) {
+            abort(403, 'Tiada sekolah dihubungkan dengan akaun anda.');
+        }
+
+        $meet = $sekolah->meet()->first();
+
+        if (! $meet) {
+            $meet = $this->meetService->createMeet([
+                'name' => 'Hari Sukan '.date('Y'),
+                'date' => date('Y-m-d'),
+                'description' => null,
+            ], $sekolah);
+        }
+
+        return $meet;
     }
 }

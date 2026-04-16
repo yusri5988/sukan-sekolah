@@ -45,7 +45,7 @@ class HouseController extends Controller
         $sekolah = Auth::user()->sekolah;
 
         $validated = $request->validate([
-            'color' => 'nullable|string|max:50',
+            'color' => ['required', Rule::in(['#ef4444', '#3b82f6', '#22c55e', '#eab308'])],
             'name' => [
                 'required',
                 'string',

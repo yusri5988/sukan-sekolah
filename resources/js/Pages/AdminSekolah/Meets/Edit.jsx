@@ -5,6 +5,7 @@ export default function MeetsEdit({ meet }) {
     const { data, setData, patch, processing, errors } = useForm({
         name: meet.name || '',
         date: meet.date || '',
+        closing_date: meet.closing_date || '',
         description: meet.description || '',
         point_config: meet.point_config || {
             '1': 5,
@@ -15,7 +16,7 @@ export default function MeetsEdit({ meet }) {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        patch(route('admin-sekolah.meets.update', meet.id));
+        patch(route('admin-sekolah.meets.update'));
     };
 
     const updatePointConfig = (position, value) => {
@@ -39,7 +40,7 @@ export default function MeetsEdit({ meet }) {
                         </h2>
                     </div>
                     <Link
-                        href={route('admin-sekolah.meets.show', meet.id)}
+                        href={route('admin-sekolah.meets.show')}
                         className="px-6 py-3 bg-white border-4 border-slate-900 text-slate-900 text-xs font-black uppercase tracking-widest italic rounded-xl hover:bg-slate-50 transition-all inline-flex items-center gap-2"
                     >
                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -100,6 +101,21 @@ export default function MeetsEdit({ meet }) {
                                         />
                                         {errors.date && (
                                             <p className="mt-2 text-sm font-bold text-red-600 italic">{errors.date}</p>
+                                        )}
+                                    </div>
+
+                                    <div>
+                                        <label className="block text-xs font-black uppercase tracking-[0.3em] text-slate-500 mb-2">
+                                            Tarikh Tutup Pendaftaran
+                                        </label>
+                                        <input
+                                            type="date"
+                                            value={data.closing_date}
+                                            onChange={(e) => setData('closing_date', e.target.value)}
+                                            className="w-full px-6 py-4 bg-slate-50 border-4 border-slate-900 rounded-2xl text-slate-900 font-bold focus:outline-none focus:border-orange-600 focus:ring-4 focus:ring-orange-600/20 transition-all"
+                                        />
+                                        {errors.closing_date && (
+                                            <p className="mt-2 text-sm font-bold text-red-600 italic">{errors.closing_date}</p>
                                         )}
                                     </div>
                                 </div>

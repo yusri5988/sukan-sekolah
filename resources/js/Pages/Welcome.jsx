@@ -124,36 +124,35 @@ export default function Welcome({ auth }) {
                             <div className="relative z-20 bg-slate-900 rounded-3xl p-1 overflow-hidden shadow-[0_50px_100px_-20px_rgba(0,0,0,0.3)] rotate-2 group hover:rotate-0 transition-all duration-500">
                                 <div className="bg-slate-800 rounded-[22px] p-6 border border-white/10">
                                     <div className="flex justify-between items-center mb-8">
-                                        <div className="flex items-center gap-2">
-                                            <div className="w-3 h-3 rounded-full bg-red-500 animate-pulse" />
-                                            <span className="text-xs font-black uppercase tracking-widest text-white">Live Leaderboard</span>
-                                        </div>
-                                        <span className="text-[10px] font-bold text-slate-400">14 APR 2026 • 10:45 AM</span>
+                                    <div className="flex items-center gap-2">
+                                        <div className="w-3 h-3 rounded-full bg-red-500 animate-pulse" />
+                                        <span className="text-xs font-black uppercase tracking-widest text-white">Ranking Secara Langsung</span>
+                                    </div>
+                                    <span className="text-[10px] font-bold text-slate-400">14 APR 2026 • 10:45 AM</span>
                                     </div>
 
                                     <div className="space-y-4">
-                                        {[
-                                            { r: 'Red House', p: '1,240', w: 'w-[95%]', c: 'bg-red-600' },
-                                            { r: 'Blue House', p: '1,120', w: 'w-[85%]', c: 'bg-blue-600' },
-                                            { r: 'Yellow House', p: '980', w: 'w-[75%]', c: 'bg-yellow-500' },
-                                            { r: 'Green House', p: '850', w: 'w-[65%]', c: 'bg-emerald-600' }
-                                        ].map((house, i) => (
-                                            <div key={i} className="relative">
-                                                <div className="flex justify-between items-end mb-2">
-                                                    <span className="text-sm font-black uppercase text-white italic">{house.r}</span>
-                                                    <span className="text-lg font-black text-white tabular-nums">{house.p}</span>
-                                                </div>
-                                                <div className="h-3 bg-slate-700 rounded-full overflow-hidden p-0.5">
-                                                    <div className={`h-full ${house.c} rounded-full ${house.w} transition-all duration-1000 delay-300`} />
-                                                </div>
+                                    {[
+                                        { r: 'Rumah Merah', p: '1,240', w: 'w-[95%]', c: 'bg-red-600' },
+                                        { r: 'Rumah Biru', p: '1,120', w: 'w-[85%]', c: 'bg-blue-600' },
+                                        { r: 'Rumah Kuning', p: '980', w: 'w-[75%]', c: 'bg-yellow-500' },
+                                        { r: 'Rumah Hijau', p: '850', w: 'w-[65%]', c: 'bg-emerald-600' }
+                                    ].map((house, i) => (
+                                        <div key={i} className="relative">
+                                            <div className="flex justify-between items-end mb-2">
+                                                <span className="text-sm font-black uppercase text-white italic">{house.r}</span>
+                                                <span className="text-lg font-black text-white tabular-nums">{house.p}</span>
                                             </div>
-                                        ))}
+                                            <div className="h-3 bg-slate-700 rounded-full overflow-hidden p-0.5">
+                                                <div className={`h-full ${house.c} rounded-full ${house.w} transition-all duration-1000 delay-300`} />
+                                            </div>
+                                        </div>
+                                    ))}
                                     </div>
 
                                     <div className="mt-8 pt-6 border-t border-white/10 text-center">
-                                        <span className="text-[10px] font-black uppercase tracking-[0.3em] text-orange-500">Updated Automatically</span>
-                                    </div>
-                                </div>
+                                    <span className="text-[10px] font-black uppercase tracking-[0.3em] text-orange-500">Dikemaskini Automatik</span>
+                                    </div>                                </div>
                             </div>
 
                             {/* Decorative Elements */}

@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Event;
 use App\Models\House;
-use App\Models\Meet;
 use App\Models\Student;
 use App\Services\CikguEventParticipantService;
 use App\Services\StudentService;
@@ -163,7 +163,7 @@ class CikguController extends Controller
      * List participants for an event.
      * Cikgu hanya melihat pelajar yang layak dari rumahnya sendiri.
      */
-    public function participantIndex($meetId, $eventId)
+    public function participantIndex(Event $event)
     {
         $user = auth()->user();
         $sekolah = $user->sekolah;
@@ -176,15 +176,16 @@ class CikguController extends Controller
             return redirect()->route('cikgu.dashboard')->with('error', 'Anda belum dilantik kepada rumah sukan atau rumah anda telah dipadam. Sila hubungi pentadbir sekolah.');
         }
 
-        $meet = Meet::where('id', $meetId)->where('sekolah_id', $sekolah->id)->firstOrFail();
-        $event = $meet->events()->where('id', $eventId)->firstOrFail();
+        if ($event->sekolah_id !== $sekolah->id) {
+            abort(403, 'Anda tidak mempunyai akses ke acara ini.');
+        }
 
         // Gunakan service yang telah ditapis untuk cikgu
         $participants = $this->participantService->getParticipants($event, $user);
         $eligibleStudents = $this->participantService->getEligibleStudents($event, $user);
 
         return Inertia::render('Cikgu/Events/Participants/Index', [
-            'event' => $event->load('meet'),
+            'event' => $event,
             'participants' => $participants,
             'eligibleStudents' => $eligibleStudents,
             'myHouse' => $user->house,
@@ -196,7 +197,7 @@ class CikguController extends Controller
      * Cikgu hanya boleh daftarkan pelajar dari rumahnya sendiri.
      * Semakan backend memastikan setiap pelajar dari rumah cikgu.
      */
-    public function participantStore(Request $request, $meetId, $eventId)
+    public function participantStore(Request $request, Event $event)
     {
         $user = auth()->user();
         $sekolah = $user->sekolah;
@@ -209,8 +210,9 @@ class CikguController extends Controller
             return redirect()->route('cikgu.dashboard')->with('error', 'Anda belum dilantik kepada rumah sukan atau rumah anda telah dipadam. Sila hubungi pentadbir sekolah.');
         }
 
-        $meet = Meet::where('id', $meetId)->where('sekolah_id', $sekolah->id)->firstOrFail();
-        $event = $meet->events()->where('id', $eventId)->firstOrFail();
+        if ($event->sekolah_id !== $sekolah->id) {
+            abort(403, 'Anda tidak mempunyai akses ke acara ini.');
+        }
 
         $validated = $request->validate([
             'student_ids' => 'required|array|min:1',
@@ -221,7 +223,7 @@ class CikguController extends Controller
         $result = $this->participantService->bulkRegister($event, $user, $validated['student_ids']);
 
         return redirect()
-            ->route('cikgu.events.participants.index', [$meetId, $eventId])
+            ->route('cikgu.events.participants.index', $event->id)
             ->with('success', "{$result['created']} peserta berjaya didaftarkan.")
             ->with('registration_errors', $result['errors']);
     }

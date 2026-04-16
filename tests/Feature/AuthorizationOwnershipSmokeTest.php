@@ -65,7 +65,6 @@ class AuthorizationOwnershipSmokeTest extends TestCase
     {
         return Event::create(array_merge([
             'sekolah_id' => $school->id,
-            'meet_id' => $meet->id,
             'name' => '100m Lelaki',
             'category' => Event::CATEGORY_7_9,
             'gender' => Event::GENDER_MALE,
@@ -198,7 +197,7 @@ class AuthorizationOwnershipSmokeTest extends TestCase
         $biru = $this->student($school, $houseBiru, 'Peserta Biru');
 
         $response = $this->actingAs($cikgu)
-            ->post(route('cikgu.events.participants.store', [$meet->id, $event->id]), [
+            ->post(route('cikgu.events.participants.store', $event->id), [
                 'student_ids' => [$merah->id, $biru->id],
             ]);
 
@@ -232,7 +231,7 @@ class AuthorizationOwnershipSmokeTest extends TestCase
             'date_of_birth' => '2015-01-01',
         ]);
 
-        $participantResponse = $this->actingAs($cikgu)->post(route('cikgu.events.participants.store', [$meet->id, $event->id]), [
+        $participantResponse = $this->actingAs($cikgu)->post(route('cikgu.events.participants.store', $event->id), [
             'student_ids' => [$student->id],
         ]);
 

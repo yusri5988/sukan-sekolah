@@ -14,7 +14,7 @@ export default function PublicMeet({ meet, events, ranking }) {
                             <p className="mt-1 text-sm text-slate-500">{new Date(meet.date).toLocaleDateString('ms-MY')}</p>
                         </div>
                         <div className="flex gap-3">
-                            <Link href={route('public.meets.ranking', meet.id)} className="rounded-md bg-slate-900 px-4 py-2 text-sm font-medium text-white hover:bg-slate-700">
+                            <Link href={route('public.meets.ranking', meet.sekolah_code)} className="rounded-md bg-slate-900 px-4 py-2 text-sm font-medium text-white hover:bg-slate-700">
                                 Live Ranking
                             </Link>
                         </div>
@@ -79,7 +79,7 @@ export default function PublicMeet({ meet, events, ranking }) {
                     <div className="rounded-2xl bg-white p-6 shadow-sm ring-1 ring-slate-200">
                         <div className="mb-4 flex items-center justify-between">
                             <h2 className="text-xl font-semibold">Ranking Rumah Sukan</h2>
-                            <Link href={route('public.meets.ranking', meet.id)} className="text-sm text-blue-600 hover:text-blue-800">Buka penuh</Link>
+                            <Link href={route('public.meets.ranking', meet.sekolah_code)} className="text-sm text-blue-600 hover:text-blue-800">Buka penuh</Link>
                         </div>
                         <div className="space-y-3">
                             {ranking.map((house, index) => (

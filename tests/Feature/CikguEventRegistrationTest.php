@@ -50,7 +50,6 @@ class CikguEventRegistrationTest extends TestCase
     {
         $defaults = [
             'sekolah_id' => $school->id,
-            'meet_id' => $meet->id,
             'name' => 'Test Event',
             'category' => Event::CATEGORY_7_9,
             'gender' => Event::GENDER_MIXED,
@@ -102,7 +101,7 @@ class CikguEventRegistrationTest extends TestCase
         ]);
 
         $response = $this->actingAs($cikguMerah)
-            ->get(route('cikgu.events.participants.index', [$meet->id, $event->id]));
+            ->get(route('cikgu.events.participants.index', $event->id));
 
         $response->assertStatus(200);
         // Pelajar Merah mesti ada
@@ -121,7 +120,7 @@ class CikguEventRegistrationTest extends TestCase
         $event = $this->createEvent($school, $meet);
 
         $response = $this->actingAs($cikguTanpaRumah)
-            ->get(route('cikgu.events.participants.index', [$meet->id, $event->id]));
+            ->get(route('cikgu.events.participants.index', $event->id));
 
         $response->assertRedirect(route('cikgu.dashboard'));
         $response->assertSessionHas('error');
@@ -151,7 +150,7 @@ class CikguEventRegistrationTest extends TestCase
         ]);
 
         $response = $this->actingAs($cikgu)
-            ->get(route('cikgu.events.participants.index', [$meet->id, $event->id]));
+            ->get(route('cikgu.events.participants.index', $event->id));
 
         $response->assertStatus(200);
         $response->assertSee('Student 8yo', false);
@@ -186,7 +185,7 @@ class CikguEventRegistrationTest extends TestCase
         ]);
 
         $response = $this->actingAs($cikgu)
-            ->get(route('cikgu.events.participants.index', [$meet->id, $event->id]));
+            ->get(route('cikgu.events.participants.index', $event->id));
 
         $response->assertStatus(200);
         $response->assertSee('Student Male', false);
@@ -218,7 +217,7 @@ class CikguEventRegistrationTest extends TestCase
         ]);
 
         $response = $this->actingAs($cikgu)
-            ->get(route('cikgu.events.participants.index', [$meet->id, $event->id]));
+            ->get(route('cikgu.events.participants.index', $event->id));
 
         $response->assertStatus(200);
         // Pelajar yang sudah didaftarkan tidak ada dalam senarai eligible
@@ -246,7 +245,7 @@ class CikguEventRegistrationTest extends TestCase
         ]);
 
         $response = $this->actingAs($cikgu)
-            ->get(route('cikgu.events.participants.index', [$meet->id, $event->id]));
+            ->get(route('cikgu.events.participants.index', $event->id));
 
         $response->assertStatus(200);
         $response->assertDontSee('No House Student', false);
@@ -271,7 +270,7 @@ class CikguEventRegistrationTest extends TestCase
         ]);
 
         $response = $this->actingAs($cikgu)
-            ->post(route('cikgu.events.participants.store', [$meet->id, $event->id]), [
+            ->post(route('cikgu.events.participants.store', $event->id), [
                 'student_ids' => [$student->id],
             ]);
 
@@ -303,7 +302,7 @@ class CikguEventRegistrationTest extends TestCase
         ]);
 
         $response = $this->actingAs($cikguMerah)
-            ->post(route('cikgu.events.participants.store', [$meet->id, $event->id]), [
+            ->post(route('cikgu.events.participants.store', $event->id), [
                 'student_ids' => [$studentBiru->id],
             ]);
 
@@ -333,7 +332,7 @@ class CikguEventRegistrationTest extends TestCase
         ]);
 
         $response = $this->actingAs($cikgu)
-            ->post(route('cikgu.events.participants.store', [$meet->id, $event->id]), [
+            ->post(route('cikgu.events.participants.store', $event->id), [
                 'student_ids' => [$studentNoHouse->id],
             ]);
 
@@ -365,7 +364,7 @@ class CikguEventRegistrationTest extends TestCase
         ]);
 
         $response = $this->actingAs($cikgu)
-            ->post(route('cikgu.events.participants.store', [$meet->id, $event->id]), [
+            ->post(route('cikgu.events.participants.store', $event->id), [
                 'student_ids' => [$studentOtherSchool->id],
             ]);
 
@@ -421,7 +420,7 @@ class CikguEventRegistrationTest extends TestCase
         ]);
 
         $response = $this->actingAs($cikgu)
-            ->post(route('cikgu.events.participants.store', [$meet->id, $event->id]), [
+            ->post(route('cikgu.events.participants.store', $event->id), [
                 'student_ids' => [$student3->id],
             ]);
 
@@ -451,7 +450,7 @@ class CikguEventRegistrationTest extends TestCase
         ]);
 
         $response = $this->actingAs($cikguTanpaRumah)
-            ->post(route('cikgu.events.participants.store', [$meet->id, $event->id]), [
+            ->post(route('cikgu.events.participants.store', $event->id), [
                 'student_ids' => [$student->id],
             ]);
 
@@ -482,7 +481,7 @@ class CikguEventRegistrationTest extends TestCase
         ]);
 
         $response = $this->actingAs($cikgu)
-            ->post(route('cikgu.events.participants.store', [$meet->id, $event->id]), [
+            ->post(route('cikgu.events.participants.store', $event->id), [
                 'student_ids' => [$student12yo->id],
             ]);
 
@@ -518,7 +517,7 @@ class CikguEventRegistrationTest extends TestCase
 
         // Cikgu Merah cuba daftar pelajar Biru (melalui manipulasi request)
         $response = $this->actingAs($cikguMerah)
-            ->post(route('cikgu.events.participants.store', [$meet->id, $event->id]), [
+            ->post(route('cikgu.events.participants.store', $event->id), [
                 'student_ids' => [$studentBiru->id], // ID pelajar Biru
             ]);
 
@@ -566,7 +565,7 @@ class CikguEventRegistrationTest extends TestCase
         ]);
 
         $response = $this->actingAs($cikguMerah)
-            ->get(route('cikgu.events.participants.index', [$meet->id, $event->id]));
+            ->get(route('cikgu.events.participants.index', $event->id));
 
         $response->assertStatus(200);
         // Cikgu Merah hanya nampak peserta Merah
@@ -595,7 +594,7 @@ class CikguEventRegistrationTest extends TestCase
         ]);
 
         $response = $this->actingAs($cikgu)
-            ->post(route('cikgu.events.participants.store', [$meet->id, $event->id]), [
+            ->post(route('cikgu.events.participants.store', $event->id), [
                 'student_ids' => [$student1->id, $student2->id],
             ]);
 
@@ -634,7 +633,7 @@ class CikguEventRegistrationTest extends TestCase
         ]);
 
         $response = $this->actingAs($cikguMerah)
-            ->post(route('cikgu.events.participants.store', [$meet->id, $event->id]), [
+            ->post(route('cikgu.events.participants.store', $event->id), [
                 'student_ids' => [$studentMerah->id, $studentBiru->id],
             ]);
 
@@ -663,7 +662,7 @@ class CikguEventRegistrationTest extends TestCase
         $event = $this->createEvent($school, $meet);
 
         $response = $this->actingAs($cikgu)
-            ->get(route('cikgu.events.participants.index', [$meet->id, $event->id]));
+            ->get(route('cikgu.events.participants.index', $event->id));
 
         $response->assertStatus(200);
         $response->assertInertia(fn ($page) => $page

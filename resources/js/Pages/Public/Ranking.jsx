@@ -11,7 +11,7 @@ export default function PublicRanking({ meet, ranking }) {
                         <p className="text-sm uppercase tracking-[0.25em] text-slate-400">Live Ranking</p>
                         <h1 className="text-3xl font-semibold">{meet.name}</h1>
                     </div>
-                    <Link href={route('public.meets.show', meet.id)} className="rounded-md bg-white px-4 py-2 text-sm font-medium text-slate-900 hover:bg-slate-200">
+                    <Link href={route('public.meets.show', meet.sekolah_code)} className="rounded-md bg-white px-4 py-2 text-sm font-medium text-slate-900 hover:bg-slate-200">
                         Kembali
                     </Link>
                 </div>

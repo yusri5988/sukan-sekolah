@@ -18,7 +18,7 @@ export default function CikguParticipantsIndex({ event, participants, eligibleSt
 
     const handleRegister = (e) => {
         e.preventDefault();
-        post(route('cikgu.events.participants.store', [event.meet_id, event.id]));
+        post(route('cikgu.events.participants.store', event.id));
     };
 
     return (

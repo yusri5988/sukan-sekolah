@@ -15,7 +15,6 @@ class Event extends Model
 
     protected $fillable = [
         'sekolah_id',
-        'meet_id',
         'event_category_id',
         'event_template_id',
         'name',
@@ -30,6 +29,7 @@ class Event extends Model
         'scheduled_date',
         'order',
         'is_active',
+        'settings',
     ];
 
     protected $casts = [
@@ -39,6 +39,7 @@ class Event extends Model
         'has_qualifying_round' => 'boolean',
         'has_multiple_attempts' => 'boolean',
         'attempts_count' => 'integer',
+        'settings' => 'array',
     ];
 
     const CATEGORY_7_9 = '7-9';
@@ -48,6 +49,18 @@ class Event extends Model
     const CATEGORY_13_15 = '13-15';
 
     const CATEGORY_16_PLUS = '16+';
+
+    const CATEGORY_TAHUN_1 = 'tahun_1';
+
+    const CATEGORY_TAHUN_2 = 'tahun_2';
+
+    const CATEGORY_TAHUN_3 = 'tahun_3';
+
+    const CATEGORY_TAHUN_4 = 'tahun_4';
+
+    const CATEGORY_TAHUN_5 = 'tahun_5';
+
+    const CATEGORY_TAHUN_6 = 'tahun_6';
 
     const CATEGORY_ALL = 'all';
 
@@ -67,14 +80,6 @@ class Event extends Model
     public function sekolah(): BelongsTo
     {
         return $this->belongsTo(Sekolah::class);
-    }
-
-    /**
-     * Get the meet that owns the event
-     */
-    public function meet(): BelongsTo
-    {
-        return $this->belongsTo(Meet::class);
     }
 
     /**
@@ -129,6 +134,12 @@ class Event extends Model
             self::CATEGORY_10_12 => '10-12 Tahun',
             self::CATEGORY_13_15 => '13-15 Tahun',
             self::CATEGORY_16_PLUS => '16+ Tahun',
+            self::CATEGORY_TAHUN_1 => 'Tahun 1',
+            self::CATEGORY_TAHUN_2 => 'Tahun 2',
+            self::CATEGORY_TAHUN_3 => 'Tahun 3',
+            self::CATEGORY_TAHUN_4 => 'Tahun 4',
+            self::CATEGORY_TAHUN_5 => 'Tahun 5',
+            self::CATEGORY_TAHUN_6 => 'Tahun 6',
             self::CATEGORY_ALL => 'Semua Umur',
             default => $this->category,
         };
@@ -143,8 +154,13 @@ class Event extends Model
             return match ($this->category) {
                 self::CATEGORY_7_9 => '7-9 Tahun',
                 self::CATEGORY_10_12 => '10-12 Tahun',
-                self::CATEGORY_13_15 => '13-15 Tahun',
                 self::CATEGORY_16_PLUS => '16+ Tahun',
+                self::CATEGORY_TAHUN_1 => 'Tahun 1',
+                self::CATEGORY_TAHUN_2 => 'Tahun 2',
+                self::CATEGORY_TAHUN_3 => 'Tahun 3',
+                self::CATEGORY_TAHUN_4 => 'Tahun 4',
+                self::CATEGORY_TAHUN_5 => 'Tahun 5',
+                self::CATEGORY_TAHUN_6 => 'Tahun 6',
                 self::CATEGORY_ALL => 'Semua Umur',
                 default => $this->category,
             };

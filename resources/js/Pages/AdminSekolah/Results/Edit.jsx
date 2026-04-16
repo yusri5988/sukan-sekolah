@@ -23,7 +23,7 @@ export default function ResultsEdit({ event, result, participants, houses }) {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        patch(route('admin-sekolah.results.update', [event.meet_id, event.id, result.id]));
+        patch(route('admin-sekolah.results.update', [event.id, result.id]));
     };
 
     return (
@@ -94,7 +94,7 @@ export default function ResultsEdit({ event, result, participants, houses }) {
                                 </div>
 
                                 <div className="flex justify-end gap-3 border-t pt-6">
-                                    <Link href={route('admin-sekolah.results.index', [event.meet_id, event.id])} className="rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50">Batal</Link>
+                                    <Link href={route('admin-sekolah.results.index', event.id)} className="rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50">Batal</Link>
                                     <button type="submit" disabled={processing} className="rounded-md bg-green-600 px-4 py-2 text-sm font-medium text-white hover:bg-green-700 disabled:opacity-50">Simpan</button>
                                 </div>
                             </form>

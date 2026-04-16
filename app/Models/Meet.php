@@ -17,6 +17,7 @@ class Meet extends Model
         'sekolah_id',
         'name',
         'date',
+        'closing_date',
         'description',
         'status',
         'point_config',
@@ -25,6 +26,7 @@ class Meet extends Model
 
     protected $casts = [
         'date' => 'date',
+        'closing_date' => 'date',
         'point_config' => 'array',
         'is_public' => 'boolean',
     ];
@@ -48,7 +50,7 @@ class Meet extends Model
      */
     public function events(): HasMany
     {
-        return $this->hasMany(Event::class)->orderBy('order');
+        return $this->hasMany(Event::class, 'sekolah_id', 'sekolah_id')->orderBy('order');
     }
 
     /**
@@ -56,7 +58,7 @@ class Meet extends Model
      */
     public function activeEvents(): HasMany
     {
-        return $this->hasMany(Event::class)->where('is_active', true)->orderBy('order');
+        return $this->hasMany(Event::class, 'sekolah_id', 'sekolah_id')->where('is_active', true)->orderBy('order');
     }
 
     /**

@@ -18,11 +18,11 @@ export default function EventParticipantsIndex({ event, participants, eligibleSt
 
     const handleRegister = (e) => {
         e.preventDefault();
-        post(route('admin-sekolah.events.participants.store', [event.meet_id, event.id]));
+        post(route('admin-sekolah.events.participants.store', event.id));
     };
 
     const handleLaneSubmit = (participant, form) => {
-        router.post(route('admin-sekolah.events.participants.assign-lane', [event.meet_id, event.id, participant.id]), form, {
+        router.post(route('admin-sekolah.events.participants.assign-lane', [event.id, participant.id]), form, {
             preserveScroll: true,
         });
     };
@@ -35,7 +35,7 @@ export default function EventParticipantsIndex({ event, participants, eligibleSt
                         <h2 className="text-xl font-semibold leading-tight text-gray-800">Peserta - {event.name}</h2>
                         <p className="text-sm text-gray-500">Pendaftaran dan pengurusan lane</p>
                     </div>
-                    <Link href={route('admin-sekolah.events.show', [event.meet_id, event.id])} className="text-sm text-blue-600 hover:text-blue-900">
+                    <Link href={route('admin-sekolah.events.show', event.id)} className="text-sm text-blue-600 hover:text-blue-900">
                         ← Kembali ke Acara
                     </Link>
                 </div>
@@ -81,7 +81,7 @@ export default function EventParticipantsIndex({ event, participants, eligibleSt
                                         </div>
 
                                         <div className="mt-6 flex items-center justify-end gap-3 border-t pt-6">
-                                            <Link href={route('admin-sekolah.events.show', [event.meet_id, event.id])} className="rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50">
+                                            <Link href={route('admin-sekolah.events.show', event.id)} className="rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50">
                                                 Batal
                                             </Link>
                                             <button

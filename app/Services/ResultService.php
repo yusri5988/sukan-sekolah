@@ -5,8 +5,8 @@ namespace App\Services;
 use App\Models\Event;
 use App\Models\EventParticipant;
 use App\Models\House;
-use App\Models\Meet;
 use App\Models\Result;
+use App\Models\Sekolah;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 
@@ -26,7 +26,7 @@ class ResultService
     public function saveResult(Event $event, array $data): Result
     {
         return DB::transaction(function () use ($event, $data) {
-            $meet = $event->meet;
+            $meet = $event->sekolah?->meet;
             $points = $meet?->getPointsForPosition((int) $data['position']) ?? 0;
 
             $participantId = $data['event_participant_id'] ?? null;
@@ -90,15 +90,31 @@ class ResultService
     }
 
     /**
-     * Get live ranking for a meet
+     * Get live ranking for a sekolah
      */
-    public function getRanking(Meet $meet): Collection
+    public function getRanking(Sekolah $sekolah): Collection
     {
         return House::query()
-            ->where('sekolah_id', $meet->sekolah_id)
+            ->where('sekolah_id', $sekolah->id)
             ->withCount('students')
             ->orderByDesc('points')
             ->orderBy('name')
+            ->get();
+    }
+
+    /**
+     * Process qualification based on event settings
+     */
+    public function processQualification(Event $event): Collection
+    {
+        $settings = $event->settings;
+        $qualifierCount = $settings['qualifier_count'] ?? 4;
+
+        // Ambil semua result balapan, sort ikut masa terpantas
+        return $event->results()
+            ->whereNotNull('time_record')
+            ->orderBy('time_record', 'asc')
+            ->limit($qualifierCount)
             ->get();
     }
 

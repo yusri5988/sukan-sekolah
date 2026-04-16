@@ -11,11 +11,16 @@ export default function EventsEdit({ meet, event }) {
         scheduled_time: event.scheduled_time || '',
         scheduled_date: event.scheduled_date || '',
         is_active: event.is_active ?? true,
+        settings: {
+            lane_count: event.settings?.lane_count || 8,
+            qualifier_count: event.settings?.qualifier_count || 4,
+            max_participants_per_house: event.settings?.max_participants_per_house || 2,
+        }
     });
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        patch(route('admin-sekolah.events.update', [meet.id, event.id]));
+        patch(route('admin-sekolah.events.update', event.id));
     };
 
     return (
@@ -32,7 +37,7 @@ export default function EventsEdit({ meet, event }) {
                         </h2>
                     </div>
                     <Link
-                        href={route('admin-sekolah.events.show', [meet.id, event.id])}
+                        href={route('admin-sekolah.events.show', event.id)}
                         className="px-6 py-3 bg-white border-4 border-slate-900 text-slate-900 text-xs font-black uppercase tracking-widest italic rounded-xl hover:bg-slate-50 transition-all inline-flex items-center gap-2"
                     >
                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -156,6 +161,37 @@ export default function EventsEdit({ meet, event }) {
                                     </div>
                                 </div>
 
+                                {/* Dynamic Settings */}
+                                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pt-6 border-t-2 border-slate-100">
+                                    <div>
+                                        <label className="block text-xs font-black uppercase tracking-widest text-slate-500 mb-2">Bil. Lorong</label>
+                                        <input
+                                            type="number"
+                                            value={data.settings.lane_count}
+                                            onChange={e => setData('settings', { ...data.settings, lane_count: parseInt(e.target.value) || 8 })}
+                                            className="w-full px-6 py-4 bg-slate-50 border-4 border-slate-900 rounded-2xl text-slate-900 font-bold focus:border-orange-600"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="block text-xs font-black uppercase tracking-widest text-slate-500 mb-2">Kuota Final</label>
+                                        <input
+                                            type="number"
+                                            value={data.settings.qualifier_count}
+                                            onChange={e => setData('settings', { ...data.settings, qualifier_count: parseInt(e.target.value) || 4 })}
+                                            className="w-full px-6 py-4 bg-slate-50 border-4 border-slate-900 rounded-2xl text-slate-900 font-bold focus:border-orange-600"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="block text-xs font-black uppercase tracking-widest text-slate-500 mb-2">Had/Rumah</label>
+                                        <input
+                                            type="number"
+                                            value={data.settings.max_participants_per_house}
+                                            onChange={e => setData('settings', { ...data.settings, max_participants_per_house: parseInt(e.target.value) || 2 })}
+                                            className="w-full px-6 py-4 bg-slate-50 border-4 border-slate-900 rounded-2xl text-slate-900 font-bold focus:border-orange-600"
+                                        />
+                                    </div>
+                                </div>
+
                                 <div className="bg-slate-50 border-4 border-slate-900 p-8 rounded-2xl">
                                     <div className="flex items-center gap-4 mb-6">
                                         <div className="w-10 h-10 rounded-xl bg-slate-900 flex items-center justify-center">
@@ -207,7 +243,7 @@ export default function EventsEdit({ meet, event }) {
 
                             <div className="flex items-center justify-end gap-6 pt-8 border-t-4 border-slate-100">
                                 <Link
-                                    href={route('admin-sekolah.events.show', [meet.id, event.id])}
+                                    href={route('admin-sekolah.events.show', event.id)}
                                     className="px-8 py-4 bg-white border-4 border-slate-900 text-slate-900 text-sm font-black uppercase tracking-widest italic rounded-xl hover:bg-slate-50 transition-all active:scale-95 inline-block"
                                 >
                                     Batal

@@ -17,15 +17,15 @@ class EventParticipantController extends Controller
     /**
      * List participants for an event
      */
-    public function index(Request $request, $meetId, Event $event)
+    public function index(Request $request, Event $event)
     {
-        $this->authorizeEvent($event, (int) $meetId);
+        $this->authorizeEvent($event);
 
         $participants = $this->participantService->getParticipants($event);
         $eligibleStudents = $this->participantService->getEligibleStudents($event);
 
         return Inertia::render('AdminSekolah/Events/Participants/Index', [
-            'event' => $event->load('meet'),
+            'event' => $event,
             'participants' => $participants,
             'eligibleStudents' => $eligibleStudents,
         ]);
@@ -34,14 +34,14 @@ class EventParticipantController extends Controller
     /**
      * Show registration form
      */
-    public function create($meetId, Event $event)
+    public function create(Event $event)
     {
-        $this->authorizeEvent($event, (int) $meetId);
+        $this->authorizeEvent($event);
 
         $eligibleStudents = $this->participantService->getEligibleStudents($event);
 
         return Inertia::render('AdminSekolah/Events/Participants/Create', [
-            'event' => $event->load('meet'),
+            'event' => $event,
             'eligibleStudents' => $eligibleStudents,
         ]);
     }
@@ -49,9 +49,9 @@ class EventParticipantController extends Controller
     /**
      * Register selected students
      */
-    public function store(Request $request, $meetId, Event $event)
+    public function store(Request $request, Event $event)
     {
-        $this->authorizeEvent($event, (int) $meetId);
+        $this->authorizeEvent($event);
 
         $validated = $request->validate([
             'student_ids' => 'required|array|min:1',
@@ -61,7 +61,7 @@ class EventParticipantController extends Controller
         $result = $this->participantService->bulkRegister($event, $validated['student_ids']);
 
         return redirect()
-            ->route('admin-sekolah.events.participants.index', [$meetId, $event->id])
+            ->route('admin-sekolah.events.participants.index', $event->id)
             ->with('success', "{$result['created']} pelajar berjaya didaftarkan.")
             ->with('registration_errors', $result['errors']);
     }
@@ -69,9 +69,9 @@ class EventParticipantController extends Controller
     /**
      * Assign lane
      */
-    public function assignLane(Request $request, $meetId, Event $event, EventParticipant $participant)
+    public function assignLane(Request $request, Event $event, EventParticipant $participant)
     {
-        $this->authorizeEvent($event, (int) $meetId);
+        $this->authorizeEvent($event);
 
         $validated = $request->validate([
             'lane_number' => 'required|integer|min:1',
@@ -88,9 +88,9 @@ class EventParticipantController extends Controller
     /**
      * Remove participant
      */
-    public function destroy($meetId, Event $event, EventParticipant $participant)
+    public function destroy(Event $event, EventParticipant $participant)
     {
-        $this->authorizeEvent($event, (int) $meetId);
+        $this->authorizeEvent($event);
         $this->authorizeParticipant($participant, $event);
 
         $this->participantService->removeParticipant($participant);
@@ -98,11 +98,11 @@ class EventParticipantController extends Controller
         return back()->with('success', 'Peserta berjaya dibuang.');
     }
 
-    private function authorizeEvent(Event $event, int $meetId): void
+    private function authorizeEvent(Event $event): void
     {
         $user = auth()->user();
 
-        if (! $user || $event->sekolah_id !== $user->sekolah_id || $event->meet_id !== $meetId) {
+        if (! $user || $event->sekolah_id !== $user->sekolah_id) {
             abort(403, 'Anda tidak mempunyai akses ke acara ini.');
         }
     }

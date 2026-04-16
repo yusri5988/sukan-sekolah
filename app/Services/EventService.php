@@ -5,8 +5,8 @@ namespace App\Services;
 use App\Models\Event;
 use App\Models\EventCategory;
 use App\Models\EventTemplate;
-use App\Models\Meet;
 use App\Models\ScoringRule;
+use App\Models\Sekolah;
 use Illuminate\Support\Facades\DB;
 
 class EventService
@@ -14,15 +14,14 @@ class EventService
     /**
      * Create a new event from template
      */
-    public function createEventFromTemplate(array $data, Meet $meet): Event
+    public function createEventFromTemplate(array $data, Sekolah $sekolah): Event
     {
-        return DB::transaction(function () use ($data, $meet) {
+        return DB::transaction(function () use ($data, $sekolah) {
             $template = EventTemplate::findOrFail($data['event_template_id']);
-            $maxOrder = $meet->events()->max('order') ?? 0;
+            $maxOrder = Event::query()->where('sekolah_id', $sekolah->id)->max('order') ?? 0;
 
             return Event::create([
-                'sekolah_id' => $meet->sekolah_id,
-                'meet_id' => $meet->id,
+                'sekolah_id' => $sekolah->id,
                 'event_category_id' => $template->event_category_id,
                 'event_template_id' => $template->id,
                 'name' => $template->name,
@@ -44,14 +43,14 @@ class EventService
     /**
      * Create multiple events from selected templates
      */
-    public function createEventsFromTemplates(array $templateIds, Meet $meet): array
+    public function createEventsFromTemplates(array $templateIds, Sekolah $sekolah): array
     {
         $createdEvents = [];
 
         foreach ($templateIds as $templateId) {
             $createdEvents[] = $this->createEventFromTemplate([
                 'event_template_id' => $templateId,
-            ], $meet);
+            ], $sekolah);
         }
 
         return $createdEvents;
@@ -60,14 +59,13 @@ class EventService
     /**
      * Create a new event (legacy method for custom events)
      */
-    public function createEvent(array $data, Meet $meet): Event
+    public function createEvent(array $data, Sekolah $sekolah): Event
     {
-        return DB::transaction(function () use ($data, $meet) {
-            $maxOrder = $meet->events()->max('order') ?? 0;
+        return DB::transaction(function () use ($data, $sekolah) {
+            $maxOrder = Event::query()->where('sekolah_id', $sekolah->id)->max('order') ?? 0;
 
             return Event::create([
-                'sekolah_id' => $meet->sekolah_id,
-                'meet_id' => $meet->id,
+                'sekolah_id' => $sekolah->id,
                 'event_category_id' => $data['event_category_id'] ?? null,
                 'name' => $data['name'],
                 'category' => $data['category'],
@@ -116,11 +114,11 @@ class EventService
     /**
      * Reorder events within a meet
      */
-    public function reorderEvents(Meet $meet, array $eventIds): void
+    public function reorderEvents(Sekolah $sekolah, array $eventIds): void
     {
         foreach ($eventIds as $order => $eventId) {
             Event::where('id', $eventId)
-                ->where('meet_id', $meet->id)
+                ->where('sekolah_id', $sekolah->id)
                 ->update(['order' => $order + 1]);
         }
     }
@@ -128,9 +126,10 @@ class EventService
     /**
      * Get events for a meet
      */
-    public function getEventsForMeet(Meet $meet)
+    public function getEventsForSekolah(Sekolah $sekolah)
     {
-        return $meet->events()
+        return Event::query()
+            ->where('sekolah_id', $sekolah->id)
             ->with('eventCategory')
             ->orderBy('order')
             ->get();
@@ -139,9 +138,9 @@ class EventService
     /**
      * Get events grouped by category
      */
-    public function getEventsGroupedByCategory(Meet $meet)
+    public function getEventsGroupedByCategory(Sekolah $sekolah)
     {
-        $events = $this->getEventsForMeet($meet);
+        $events = $this->getEventsForSekolah($sekolah);
 
         return $events->groupBy('category')->map(function ($group) {
             return $group->groupBy('gender');
@@ -151,17 +150,65 @@ class EventService
     /**
      * Get all available event templates grouped by category
      */
-    public function getTemplatesGroupedByCategory()
+    public function getTemplatesGroupedByCategory($excludeQualifying = false)
     {
         $categories = EventCategory::where('is_active', true)
             ->orderBy('order')
-            ->with(['templates' => function ($query) {
-                $query->where('is_active', true)
-                    ->orderBy('order');
+            ->with(['templates' => function ($query) use ($excludeQualifying) {
+                $query->where('is_active', true);
+
+                if ($excludeQualifying) {
+                    $query->where('has_qualifying_round', false);
+                }
+
+                $query->orderBy('order');
             }])
             ->get();
 
         return $categories;
+    }
+
+    /**
+     * Get master templates (grouped by name and category)
+     */
+    public function getMasterTemplatesGroupedByCategory()
+    {
+        $categories = EventCategory::where('is_active', true)
+            ->orderBy('order')
+            ->get();
+
+        return $categories->map(function ($category) {
+            $templates = EventTemplate::where('event_category_id', $category->id)
+                ->where('is_active', true)
+                ->get();
+
+            $category->master_templates = $templates->groupBy('name')->map(function ($items, $name) {
+                return [
+                    'name' => $name,
+                    'type' => $items->first()->type,
+                    'is_relay' => $items->first()->is_relay,
+                    'has_qualifying_round' => $items->first()->has_qualifying_round,
+                    'has_multiple_attempts' => $items->first()->has_multiple_attempts,
+                    'attempts_count' => $items->first()->attempts_count,
+                    'available_genders' => $items->pluck('gender')->unique()->values()->toArray(),
+                    'available_categories' => $items->pluck('category')->unique()->values()->toArray(),
+                    'template_ids' => $items->pluck('id')->toArray(),
+                ];
+            })->values();
+
+            return $category;
+        });
+    }
+
+    /**
+     * Get specific templates by names and category filters
+     */
+    public function getTemplatesByNames(array $names)
+    {
+        return EventTemplate::whereIn('name', $names)
+            ->where('is_active', true)
+            ->get()
+            ->groupBy('name');
     }
 
     /**

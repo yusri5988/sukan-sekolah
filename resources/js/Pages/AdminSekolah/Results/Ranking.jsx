@@ -7,7 +7,7 @@ export default function ResultsRanking({ event, ranking }) {
             header={
                 <div className="flex items-center justify-between">
                     <h2 className="text-xl font-semibold leading-tight text-gray-800">Ranking - {event.name}</h2>
-                    <Link href={route('admin-sekolah.results.index', [event.meet_id, event.id])} className="text-sm text-blue-600 hover:text-blue-900">← Kembali</Link>
+                    <Link href={route('admin-sekolah.results.index', event.id)} className="text-sm text-blue-600 hover:text-blue-900">← Kembali</Link>
                 </div>
             }
         >

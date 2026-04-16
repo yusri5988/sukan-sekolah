@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class Sekolah extends Model
 {
@@ -70,5 +71,13 @@ class Sekolah extends Model
     public function meets(): HasMany
     {
         return $this->hasMany(Meet::class);
+    }
+
+    /**
+     * Get singleton meet for this sekolah
+     */
+    public function meet(): HasOne
+    {
+        return $this->hasOne(Meet::class);
     }
 }

@@ -16,7 +16,7 @@ export default function EventParticipantsCreate({ event, eligibleStudents }) {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        post(route('admin-sekolah.events.participants.store', [event.meet_id, event.id]));
+        post(route('admin-sekolah.events.participants.store', event.id));
     };
 
     return (
@@ -27,7 +27,7 @@ export default function EventParticipantsCreate({ event, eligibleStudents }) {
                         <h2 className="text-xl font-semibold leading-tight text-gray-800">Daftar Peserta - {event.name}</h2>
                         <p className="text-sm text-gray-500">Pilih pelajar untuk didaftarkan ke event</p>
                     </div>
-                    <Link href={route('admin-sekolah.events.participants.index', [event.meet_id, event.id])} className="text-sm text-blue-600 hover:text-blue-900">
+                    <Link href={route('admin-sekolah.events.participants.index', event.id)} className="text-sm text-blue-600 hover:text-blue-900">
                         ← Kembali
                     </Link>
                 </div>
@@ -64,7 +64,7 @@ export default function EventParticipantsCreate({ event, eligibleStudents }) {
                                 {errors.student_ids && <p className="mt-2 text-sm text-red-600">{errors.student_ids}</p>}
 
                                 <div className="mt-6 flex items-center justify-end gap-3 border-t pt-6">
-                                    <Link href={route('admin-sekolah.events.participants.index', [event.meet_id, event.id])} className="rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50">
+                                    <Link href={route('admin-sekolah.events.participants.index', event.id)} className="rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50">
                                         Batal
                                     </Link>
                                     <button

@@ -30,42 +30,48 @@ export default function AdminSekolahLayout({ header, children }) {
                             >
                                 Dashboard
                             </NavLink>
-                            <NavLink
-                                href={route('admin-sekolah.houses.index')}
-                                active={route().current('admin-sekolah.houses.*')}
-                            >
-                                Rumah Sukan
-                            </NavLink>
-<NavLink
-                             href={route('admin-sekolah.teachers.index')}
-                             active={route().current('admin-sekolah.teachers.*')}
-                         >
-                             Guru
-                         </NavLink>
-                         <NavLink
-                             href={route('admin-sekolah.teachers.assignments.index')}
-                             active={route().current('admin-sekolah.teachers.assignments')}
-                         >
-                             Lantikan Guru
-                         </NavLink>
-                            <NavLink
-                                href={route('admin-sekolah.students.index')}
-                                active={route().current('admin-sekolah.students.*')}
-                            >
-                                Pelajar
-                            </NavLink>
-                            <NavLink
-                                href={route('admin-sekolah.meets.index')}
-                                active={route().current('admin-sekolah.meets.*')}
-                            >
-                                Kejohanan
-                            </NavLink>
-                            <NavLink
-                                href={route('admin-sekolah.scoring.index')}
-                                active={route().current('admin-sekolah.scoring.*')}
-                            >
-                                Pemarkahan
-                            </NavLink>
+                            
+                            <Dropdown>
+                                <Dropdown.Trigger>
+                                    <span className="inline-flex rounded-md">
+                                        <button
+                                            type="button"
+                                            className="inline-flex items-center px-1 pt-1 border-b-2 border-transparent text-sm font-black uppercase tracking-widest text-slate-500 hover:text-slate-700 hover:border-slate-300 focus:outline-none focus:text-slate-700 focus:border-slate-300 transition duration-150 ease-in-out italic"
+                                        >
+                                            Pendaftaran
+                                            <svg className="ms-2 -me-0.5 h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                                <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
+                                            </svg>
+                                        </button>
+                                    </span>
+                                </Dropdown.Trigger>
+                                <Dropdown.Content>
+                                    <Dropdown.Link href={route('admin-sekolah.houses.index')} className="font-black uppercase tracking-widest italic">Rumah Sukan</Dropdown.Link>
+                                    <Dropdown.Link href={route('admin-sekolah.teachers.index')} className="font-black uppercase tracking-widest italic">Guru</Dropdown.Link>
+                                    <Dropdown.Link href={route('admin-sekolah.teachers.assignments.index')} className="font-black uppercase tracking-widest italic">Lantikan Guru</Dropdown.Link>
+                                    <Dropdown.Link href={route('admin-sekolah.students.index')} className="font-black uppercase tracking-widest italic">Pelajar</Dropdown.Link>
+                                </Dropdown.Content>                            </Dropdown>
+
+                            <Dropdown>
+                                <Dropdown.Trigger>
+                                    <span className="inline-flex rounded-md">
+                                        <button
+                                            type="button"
+                                            className="inline-flex items-center px-1 pt-1 border-b-2 border-transparent text-sm font-black uppercase tracking-widest text-slate-500 hover:text-slate-700 hover:border-slate-300 focus:outline-none focus:text-slate-700 focus:border-slate-300 transition duration-150 ease-in-out italic"
+                                        >
+                                            Pengurusan
+                                            <svg className="ms-2 -me-0.5 h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                                <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
+                                            </svg>
+                                        </button>
+                                    </span>
+                                </Dropdown.Trigger>
+                                <Dropdown.Content>
+                                    <Dropdown.Link href={route('admin-sekolah.meets.index')} className="font-black uppercase tracking-widest italic">Kejohanan</Dropdown.Link>
+                                    <Dropdown.Link href={route('admin-sekolah.events.index')} className="font-black uppercase tracking-widest italic">Urus Acara</Dropdown.Link>
+                                    <Dropdown.Link href={route('admin-sekolah.scoring.index')} className="font-black uppercase tracking-widest italic">Pemarkahan</Dropdown.Link>
+                                </Dropdown.Content>
+                            </Dropdown>
                         </div>
                     </div>
 
@@ -168,35 +174,49 @@ export default function AdminSekolahLayout({ header, children }) {
                         >
                             Dashboard
                         </ResponsiveNavLink>
+                        
+                        <div className="pt-2 pb-2 px-4 text-xs font-black uppercase tracking-widest text-slate-500">
+                            Pendaftaran
+                        </div>
                         <ResponsiveNavLink
                             href={route('admin-sekolah.houses.index')}
                             active={route().current('admin-sekolah.houses.*')}
                         >
                             Rumah Sukan
                         </ResponsiveNavLink>
-<ResponsiveNavLink
-                             href={route('admin-sekolah.teachers.index')}
-                             active={route().current('admin-sekolah.teachers.*')}
-                         >
-                             Guru
-                         </ResponsiveNavLink>
-                         <ResponsiveNavLink
-                             href={route('admin-sekolah.teachers.assignments.index')}
-                             active={route().current('admin-sekolah.teachers.assignments')}
-                         >
-                             Lantikan Guru
-                         </ResponsiveNavLink>
+                        <ResponsiveNavLink
+                            href={route('admin-sekolah.teachers.index')}
+                            active={route().current('admin-sekolah.teachers.*')}
+                        >
+                            Guru
+                        </ResponsiveNavLink>
+                        <ResponsiveNavLink
+                            href={route('admin-sekolah.teachers.assignments.index')}
+                            active={route().current('admin-sekolah.teachers.assignments')}
+                        >
+                            Lantikan Guru
+                        </ResponsiveNavLink>
                         <ResponsiveNavLink
                             href={route('admin-sekolah.students.index')}
                             active={route().current('admin-sekolah.students.*')}
                         >
                             Pelajar
                         </ResponsiveNavLink>
+
+                        <div className="pt-2 pb-2 px-4 text-xs font-black uppercase tracking-widest text-slate-500">
+                            Pengurusan
+                        </div>
                         <ResponsiveNavLink
                             href={route('admin-sekolah.meets.index')}
                             active={route().current('admin-sekolah.meets.*')}
                         >
                             Kejohanan
+                        </ResponsiveNavLink>
+                        <ResponsiveNavLink
+                            href={route('admin-sekolah.events.index')}
+                            active={route().current('admin-sekolah.events.*')}
+                        >
+                            Urus Acara
                         </ResponsiveNavLink>
                         <ResponsiveNavLink
                             href={route('admin-sekolah.scoring.index')}

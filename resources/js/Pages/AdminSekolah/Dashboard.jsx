@@ -73,7 +73,7 @@ export default function AdminSekolahDashboard({ stats, houses, sekolah }) {
                 </div>
 
                 {/* Ranking Section */}
-                <div className="bg-slate-900 rounded-[3rem] overflow-hidden shadow-2xl relative">
+                <div className="hidden">
                     {/* Background Texture */}
                     <div className="absolute inset-0 opacity-10 pointer-events-none select-none overflow-hidden uppercase font-black text-[10vw] leading-none text-white flex flex-col gap-0 items-center justify-center rotate-[-10deg]">
                         <div>Leaderboard</div>

@@ -1,25 +1,35 @@
 import AdminSekolahLayout from '@/Layouts/AdminSekolahLayout';
 import { Head, Link, useForm } from '@inertiajs/react';
 
-const colorOptions = [
-    { name: 'Merah', value: '#ef4444' },
-    { name: 'Biru', value: '#3b82f6' },
-    { name: 'Hijau', value: '#22c55e' },
-    { name: 'Kuning', value: '#eab308' },
-    { name: 'Ungu', value: '#a855f7' },
-    { name: 'Pink', value: '#ec4899' },
-    { name: 'Oren', value: '#f97316' },
-    { name: 'Sian', value: '#06b6d4' },
+const fixedColorOptions = [
+    { label: 'Merah', value: '#ef4444' },
+    { label: 'Biru', value: '#3b82f6' },
+    { label: 'Hijau', value: '#22c55e' },
+    { label: 'Kuning', value: '#eab308' },
 ];
 
 export default function HousesCreate() {
-    const { data, setData, post, processing, errors } = useForm({
+    const { data, setData, post, processing, errors, transform } = useForm({
         name: '',
         color: '',
+        custom_name: '',
     });
 
     const handleSubmit = (e) => {
         e.preventDefault();
+        
+        // Cari label warna berdasarkan value
+        const colorOption = fixedColorOptions.find(o => o.value === data.color);
+        const colorLabel = colorOption ? colorOption.label : 'Rumah';
+        
+        // Gabungkan nama
+        const finalName = data.custom_name ? `${colorLabel} (${data.custom_name})` : colorLabel;
+        
+        transform((data) => ({
+            ...data,
+            name: finalName,
+        }));
+
         post(route('admin-sekolah.houses.store'));
     };
 
@@ -53,66 +63,46 @@ export default function HousesCreate() {
                         <div className="p-6 sm:p-10">
                             <form onSubmit={handleSubmit} className="space-y-6 sm:space-y-10">
                                 <div className="space-y-6 sm:space-y-8">
-                                    <div className="space-y-2 sm:space-y-3">
-                                        <label className="text-[10px] sm:text-xs font-black uppercase tracking-widest text-slate-500 italic block">
-                                            Nama Rumah Sukan <span className="text-orange-600">*</span>
-                                        </label>
-                                        <input
-                                            type="text"
-                                            value={data.name}
-                                            onChange={(e) => setData('name', e.target.value)}
-                                            className="w-full px-4 sm:px-6 py-3 sm:py-4 bg-slate-50 border-2 sm:border-4 border-slate-900 rounded-xl sm:rounded-2xl text-base sm:text-xl font-black italic uppercase tracking-tighter text-slate-900 focus:ring-0 focus:border-orange-600 transition-colors placeholder:text-slate-300"
-                                            placeholder="CONTOH: MERAH, BIRU, HIJAU"
-                                        />
-                                        {errors.name && (
-                                            <p className="text-[10px] font-black uppercase tracking-widest text-red-500 italic">{errors.name}</p>
-                                        )}
-                                    </div>
-
+                                    
                                     <div className="space-y-3 sm:space-y-4">
                                         <label className="text-[10px] sm:text-xs font-black uppercase tracking-widest text-slate-500 italic block">
-                                            Pilih Tema Warna
+                                            Pilih Warna Rumah <span className="text-orange-600">*</span>
                                         </label>
-                                        <div className="grid grid-cols-4 sm:grid-cols-4 gap-3 sm:gap-4">
-                                            {colorOptions.map((color) => (
+                                        <div className="grid grid-cols-4 gap-3 sm:gap-4">
+                                            {fixedColorOptions.map((option) => (
                                                 <button
-                                                    key={color.value}
+                                                    key={option.value}
                                                     type="button"
-                                                    onClick={() => setData('color', color.value)}
-                                                    className={`aspect-square sm:h-16 rounded-xl sm:rounded-2xl border-2 sm:border-4 transition-all transform active:scale-95 flex items-center justify-center ${
-                                                        data.color === color.value
+                                                    onClick={() => setData('color', option.value)}
+                                                    className={`aspect-square sm:h-20 rounded-xl sm:rounded-2xl border-2 sm:border-4 transition-all transform active:scale-95 flex flex-col items-center justify-center gap-2 ${
+                                                        data.color === option.value
                                                             ? 'border-slate-900 shadow-[3px_3px_0px_0px_rgba(15,23,42,1)] sm:shadow-[6px_6px_0px_0px_rgba(15,23,42,1)] -translate-y-1 scale-105'
-                                                            : 'border-slate-100 hover:border-slate-300 shadow-none translate-y-0 scale-100'
+                                                            : 'border-slate-200 hover:border-slate-300 shadow-none translate-y-0 scale-100'
                                                     }`}
-                                                    style={{ backgroundColor: color.value }}
-                                                    title={color.name}
+                                                    style={{ backgroundColor: option.value }}
                                                 >
-                                                    {data.color === color.value && (
-                                                        <div className="bg-white/30 backdrop-blur-md rounded-full p-1 sm:p-2 text-white">
-                                                            <svg className="w-4 h-4 sm:w-6 sm:h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="4" d="M5 13l4 4L19 7" />
-                                                            </svg>
-                                                        </div>
-                                                    )}
+                                                    <span className="text-[10px] sm:text-sm font-black uppercase tracking-widest text-white drop-shadow-md">
+                                                        {option.label}
+                                                    </span>
                                                 </button>
                                             ))}
                                         </div>
-                                        <input type="hidden" name="color" value={data.color} />
                                         {errors.color && (
                                             <p className="text-[10px] font-black uppercase tracking-widest text-red-500 italic">{errors.color}</p>
                                         )}
-                                        <div className="p-4 sm:p-5 bg-slate-900 rounded-2xl sm:rounded-3xl border-2 sm:border-4 border-orange-600 mt-6">
-                                            <div className="flex gap-3 sm:gap-4">
-                                                <div className="flex-shrink-0 text-orange-500">
-                                                    <svg className="h-6 w-6 sm:h-8 sm:w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                                    </svg>
-                                                </div>
-                                                <p className="text-[10px] sm:text-sm font-bold text-slate-400 italic leading-snug">
-                                                    Warna ini akan digunakan pada papan markah (scoreboard) dan laporan prestasi rumah.
-                                                </p>
-                                            </div>
-                                        </div>
+                                    </div>
+
+                                    <div className="space-y-2 sm:space-y-3">
+                                        <label className="text-[10px] sm:text-xs font-black uppercase tracking-widest text-slate-500 italic block">
+                                            Nama Tersuai Rumah (Optional)
+                                        </label>
+                                        <input
+                                            type="text"
+                                            value={data.custom_name}
+                                            onChange={(e) => setData('custom_name', e.target.value)}
+                                            className="w-full px-4 sm:px-6 py-3 sm:py-4 bg-slate-50 border-2 sm:border-4 border-slate-900 rounded-xl sm:rounded-2xl text-base sm:text-xl font-black italic uppercase tracking-tighter text-slate-900 focus:ring-0 focus:border-orange-600 transition-colors placeholder:text-slate-300"
+                                            placeholder="CONTOH: GAMMA (Nama penuh: MERAH (GAMMA))"
+                                        />
                                     </div>
                                 </div>
 

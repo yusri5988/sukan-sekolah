@@ -49,7 +49,8 @@ export default function HousesIndex({ houses }) {
                     </div>
                 )}
 
-                <div className="bg-white border-4 border-slate-900 p-8 rounded-[2rem] shadow-[8px_8px_0px_0px_rgba(15,23,42,1)] flex flex-col md:flex-row items-center justify-between gap-8 relative overflow-hidden group">
+                {/* Auto Assign Section */}
+                <div className="hidden">
                     <div className="relative z-10">
                         <h3 className="text-2xl font-black italic uppercase tracking-tighter text-slate-900 mb-2">Auto Assign Pelajar</h3>
                         <p className="text-slate-500 font-bold text-sm italic max-w-xl">
@@ -86,33 +87,33 @@ export default function HousesIndex({ houses }) {
                         </Link>
                     </div>
                 ) : (
-                    <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
+                    <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
                         {houses.map((house) => (
-                            <div key={house.id} className="bg-white border-4 border-slate-900 rounded-[2.5rem] shadow-[8px_8px_0px_0px_rgba(15,23,42,1)] overflow-hidden flex flex-col group hover:-translate-y-2 transition-transform">
+                            <div key={house.id} className="bg-white border-2 border-slate-900 rounded-3xl shadow-[4px_4px_0px_0px_rgba(15,23,42,1)] overflow-hidden flex flex-col group hover:-translate-y-1 transition-transform">
                                 <div 
-                                    className="h-32 p-8 flex items-end justify-between relative overflow-hidden"
+                                    className="h-24 p-6 flex items-end justify-between relative overflow-hidden"
                                     style={house.color ? { backgroundColor: house.color } : { backgroundColor: '#0f172a' }}
                                 >
                                     {/* Texture Overlay */}
                                     <div className="absolute inset-0 bg-black/10 mix-blend-overlay" />
-                                    <div className="absolute top-4 right-6 text-white/20 font-black italic text-6xl select-none leading-none">
+                                    <div className="absolute top-2 right-4 text-white/20 font-black italic text-4xl select-none leading-none">
                                         #{house.id}
                                     </div>
                                     
-                                    <h3 className="text-3xl font-black italic uppercase tracking-tighter text-white relative z-10 drop-shadow-lg">
+                                    <h3 className="text-2xl font-black italic uppercase tracking-tighter text-white relative z-10 drop-shadow-lg">
                                         {house.name}
                                     </h3>
                                 </div>
                                 
-                                <div className="p-8 flex-1 flex flex-col">
-                                    <div className="grid grid-cols-2 gap-4 mb-8">
-                                        <div className="bg-slate-50 p-4 rounded-2xl border-2 border-slate-100 group-hover:border-slate-900 transition-colors">
+                                <div className="p-6 flex-1 flex flex-col">
+                                    <div className="grid grid-cols-2 gap-3 mb-6">
+                                        <div className="bg-slate-50 p-3 rounded-xl border-2 border-slate-100 group-hover:border-slate-900 transition-colors">
                                             <div className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-1">Mata</div>
-                                            <div className="text-3xl font-black italic text-slate-900 tabular-nums">{house.points}</div>
+                                            <div className="text-2xl font-black italic text-slate-900 tabular-nums">{house.points}</div>
                                         </div>
-                                        <div className="bg-slate-50 p-4 rounded-2xl border-2 border-slate-100 group-hover:border-slate-900 transition-colors">
+                                        <div className="bg-slate-50 p-3 rounded-xl border-2 border-slate-100 group-hover:border-slate-900 transition-colors">
                                             <div className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-1">Pelajar</div>
-                                            <div className="text-3xl font-black italic text-slate-900 tabular-nums">{house.students_count}</div>
+                                            <div className="text-2xl font-black italic text-slate-900 tabular-nums">{house.students_count}</div>
                                         </div>
                                     </div>
                                     

@@ -64,7 +64,7 @@ class CikguEventParticipantService
 
     /**
      * Bulk register students for an event.
-     * Setiap pelajar mesti disemak semula - memang dari rumah cikgu.
+     * Setiap pelajar gotta disemak semula - memang dari rumah cikgu.
      */
     public function bulkRegister(Event $event, User $cikgu, array $studentIds): array
     {
@@ -74,6 +74,15 @@ class CikguEventParticipantService
             return [
                 'created' => 0,
                 'errors' => ['Anda belum dilantik kepada rumah sukan atau rumah anda telah dipadam.'],
+            ];
+        }
+
+        // Check if registration is closed
+        $meet = $event->sekolah->meet;
+        if ($meet && $meet->closing_date && now()->gt($meet->closing_date)) {
+            return [
+                'created' => 0,
+                'errors' => ['Pendaftaran telah ditutup pada '.$meet->closing_date->format('d/m/Y').'.'],
             ];
         }
 

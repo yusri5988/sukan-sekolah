@@ -27,6 +27,7 @@ class MeetService
                 'sekolah_id' => $sekolah->id,
                 'name' => $data['name'],
                 'date' => $data['date'],
+                'closing_date' => $data['closing_date'] ?? null,
                 'description' => $data['description'] ?? null,
                 'status' => Meet::STATUS_DRAFT,
                 'point_config' => $data['point_config'] ?? self::DEFAULT_POINT_CONFIG,

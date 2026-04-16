@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Meet;
+use App\Models\Sekolah;
 use App\Services\ResultService;
 use Inertia\Inertia;
 
@@ -15,8 +16,14 @@ class PublicMeetController extends Controller
     /**
      * Public meet dashboard
      */
-    public function show(Meet $meet)
+    public function show(Sekolah $sekolah)
     {
+        $meet = $sekolah->meet;
+
+        if (! $meet) {
+            abort(404);
+        }
+
         $this->authorizePublicAccess($meet);
 
         $meet->load(['events' => function ($query) {
@@ -46,17 +53,24 @@ class PublicMeetController extends Controller
                 'description' => $meet->description,
                 'status' => $meet->status,
                 'is_public' => $meet->is_public,
+                'sekolah_code' => $sekolah->kod_sekolah,
             ],
             'events' => $eventsWithResults,
-            'ranking' => $this->resultService->getRanking($meet),
+            'ranking' => $this->resultService->getRanking($sekolah),
         ]);
     }
 
     /**
      * Public live ranking only
      */
-    public function ranking(Meet $meet)
+    public function ranking(Sekolah $sekolah)
     {
+        $meet = $sekolah->meet;
+
+        if (! $meet) {
+            abort(404);
+        }
+
         $this->authorizePublicAccess($meet);
 
         return Inertia::render('Public/Ranking', [
@@ -64,14 +78,15 @@ class PublicMeetController extends Controller
                 'id' => $meet->id,
                 'name' => $meet->name,
                 'date' => $meet->date,
+                'sekolah_code' => $sekolah->kod_sekolah,
             ],
-            'ranking' => $this->resultService->getRanking($meet),
+            'ranking' => $this->resultService->getRanking($sekolah),
         ]);
     }
 
     private function authorizePublicAccess(Meet $meet): void
     {
-        if (! $meet->is_public && $meet->status !== Meet::STATUS_ACTIVE) {
+        if (! $meet->is_public && $meet->status !== 'active') {
             abort(404);
         }
     }

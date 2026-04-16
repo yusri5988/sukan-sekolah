@@ -5,6 +5,7 @@ export default function MeetsCreate() {
     const { data, setData, post, processing, errors } = useForm({
         name: '',
         date: '',
+        closing_date: '',
         description: '',
         point_config: {
             '1': 5,
@@ -100,6 +101,21 @@ export default function MeetsCreate() {
                                         />
                                         {errors.date && (
                                             <p className="mt-2 text-sm font-bold text-red-600 italic">{errors.date}</p>
+                                        )}
+                                    </div>
+
+                                    <div>
+                                        <label className="block text-xs font-black uppercase tracking-[0.3em] text-slate-500 mb-2">
+                                            Tarikh Tutup Pendaftaran
+                                        </label>
+                                        <input
+                                            type="date"
+                                            value={data.closing_date}
+                                            onChange={(e) => setData('closing_date', e.target.value)}
+                                            className="w-full px-6 py-4 bg-slate-50 border-4 border-slate-900 rounded-2xl text-slate-900 font-bold focus:outline-none focus:border-orange-600 focus:ring-4 focus:ring-orange-600/20 transition-all"
+                                        />
+                                        {errors.closing_date && (
+                                            <p className="mt-2 text-sm font-bold text-red-600 italic">{errors.closing_date}</p>
                                         )}
                                     </div>
                                 </div>

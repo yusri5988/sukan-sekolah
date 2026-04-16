@@ -101,7 +101,7 @@ export default function MeetsIndex({ meets, sekolah }) {
                                              meet.status === 'completed' ? '✓ Selesai' : '✎ Draf'}
                                         </span>
                                         <Link
-                                            href={route('admin-sekolah.meets.show', meet.id)}
+                                            href={route('admin-sekolah.meets.show')}
                                             className="px-8 py-4 bg-slate-900 text-white text-xs font-black uppercase tracking-widest italic rounded-xl hover:bg-orange-600 transition-all active:scale-95 shadow-xl shadow-slate-100"
                                         >
                                             Urus Kejohanan

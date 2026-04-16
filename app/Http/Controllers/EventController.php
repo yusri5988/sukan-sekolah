@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Models\Event;
-use App\Models\Meet;
 use App\Services\EventService;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -15,17 +14,12 @@ class EventController extends Controller
     ) {}
 
     /**
-     * Show events for a meet
+     * Show events for current sekolah
      */
-    public function index(Meet $meet)
+    public function index()
     {
-        $user = auth()->user();
-
-        if ($meet->sekolah_id !== $user->sekolah_id) {
-            abort(403, 'Anda tidak mempunyai akses ke meet ini.');
-        }
-
-        $events = $this->eventService->getEventsForMeet($meet);
+        $meet = $this->getMeetForCurrentUser();
+        $events = $this->eventService->getEventsForSekolah($meet->sekolah);
 
         return Inertia::render('AdminSekolah/Events/Index', [
             'meet' => $meet,
@@ -36,13 +30,9 @@ class EventController extends Controller
     /**
      * Show form to create new event
      */
-    public function create(Meet $meet)
+    public function create()
     {
-        $user = auth()->user();
-
-        if ($meet->sekolah_id !== $user->sekolah_id) {
-            abort(403, 'Anda tidak mempunyai akses ke meet ini.');
-        }
+        $meet = $this->getMeetForCurrentUser();
 
         $templates = $this->eventService->getTemplatesGroupedByCategory();
 
@@ -55,55 +45,63 @@ class EventController extends Controller
     /**
      * Show template selection page
      */
-    public function selectTemplates(Meet $meet)
+    public function selectTemplates()
     {
-        $user = auth()->user();
+        $meet = $this->getMeetForCurrentUser();
 
-        if ($meet->sekolah_id !== $user->sekolah_id) {
-            abort(403, 'Anda tidak mempunyai akses ke meet ini.');
-        }
-
-        $templates = $this->eventService->getTemplatesGroupedByCategory();
+        $categories = $this->eventService->getMasterTemplatesGroupedByCategory();
 
         return Inertia::render('AdminSekolah/Events/SelectTemplates', [
             'meet' => $meet,
-            'templates' => $templates,
+            'categories' => $categories,
+        ]);
+    }
+
+    /**
+     * Show template configuration page
+     */
+    public function configureTemplates(Request $request)
+    {
+        $meet = $this->getMeetForCurrentUser();
+        
+        $validated = $request->validate([
+            'names' => 'required|array|min:1',
+            'names.*' => 'string',
+        ]);
+
+        $templatesByName = $this->eventService->getTemplatesByNames($validated['names']);
+
+        return Inertia::render('AdminSekolah/Events/ConfigureTemplates', [
+            'meet' => $meet,
+            'templatesByName' => $templatesByName,
         ]);
     }
 
     /**
      * Store multiple events from selected templates
      */
-    public function storeFromTemplates(Request $request, Meet $meet)
+    public function storeFromTemplates(Request $request)
     {
-        $user = auth()->user();
-
-        if ($meet->sekolah_id !== $user->sekolah_id) {
-            abort(403, 'Anda tidak mempunyai akses ke meet ini.');
-        }
+        $meet = $this->getMeetForCurrentUser();
 
         $validated = $request->validate([
             'template_ids' => 'required|array|min:1',
             'template_ids.*' => 'exists:event_templates,id',
         ]);
 
-        $events = $this->eventService->createEventsFromTemplates($validated['template_ids'], $meet);
+        $events = $this->eventService->createEventsFromTemplates($validated['template_ids'], $meet->sekolah);
 
         return redirect()
-            ->route('admin-sekolah.events.index', $meet->id)
+            ->route('admin-sekolah.events.index')
             ->with('success', count($events).' acara berjaya dicipta!');
     }
 
     /**
      * Store new event
      */
-    public function store(Request $request, Meet $meet)
+    public function store(Request $request)
     {
-        $user = auth()->user();
-
-        if ($meet->sekolah_id !== $user->sekolah_id) {
-            abort(403, 'Anda tidak mempunyai akses ke meet ini.');
-        }
+        $meet = $this->getMeetForCurrentUser();
 
         $validated = $request->validate([
             'event_template_id' => 'required|exists:event_templates,id',
@@ -111,23 +109,20 @@ class EventController extends Controller
             'scheduled_date' => 'nullable|date',
         ]);
 
-        $event = $this->eventService->createEventFromTemplate($validated, $meet);
+        $event = $this->eventService->createEventFromTemplate($validated, $meet->sekolah);
 
         return redirect()
-            ->route('admin-sekolah.events.index', $meet->id)
+            ->route('admin-sekolah.events.index')
             ->with('success', 'Acara berjaya dicipta!');
     }
 
     /**
      * Show single event details
      */
-    public function show(Meet $meet, Event $event)
+    public function show(Event $event)
     {
-        $user = auth()->user();
-
-        if ($event->sekolah_id !== $user->sekolah_id || $event->meet_id !== $meet->id) {
-            abort(403, 'Anda tidak mempunyai akses ke acara ini.');
-        }
+        $this->authorizeEvent($event);
+        $meet = $this->getMeetForCurrentUser();
 
         $event->load('participants.student', 'results.house');
 
@@ -140,13 +135,10 @@ class EventController extends Controller
     /**
      * Edit event
      */
-    public function edit(Meet $meet, Event $event)
+    public function edit(Event $event)
     {
-        $user = auth()->user();
-
-        if ($event->sekolah_id !== $user->sekolah_id || $event->meet_id !== $meet->id) {
-            abort(403, 'Anda tidak mempunyai akses ke acara ini.');
-        }
+        $this->authorizeEvent($event);
+        $meet = $this->getMeetForCurrentUser();
 
         return Inertia::render('AdminSekolah/Events/Edit', [
             'meet' => $meet,
@@ -157,13 +149,9 @@ class EventController extends Controller
     /**
      * Update event
      */
-    public function update(Request $request, Meet $meet, Event $event)
+    public function update(Request $request, Event $event)
     {
-        $user = auth()->user();
-
-        if ($event->sekolah_id !== $user->sekolah_id || $event->meet_id !== $meet->id) {
-            abort(403, 'Anda tidak mempunyai akses ke acara ini.');
-        }
+        $this->authorizeEvent($event);
 
         $validated = $request->validate([
             'name' => 'required|string|max:255',
@@ -174,48 +162,68 @@ class EventController extends Controller
             'scheduled_time' => 'nullable|date_format:H:i',
             'scheduled_date' => 'nullable|date',
             'is_active' => 'boolean',
+            'settings' => 'nullable|array',
         ]);
 
         $this->eventService->updateEvent($event, $validated);
 
         return redirect()
-            ->route('admin-sekolah.events.show', [$meet->id, $event->id])
+            ->route('admin-sekolah.events.show', $event->id)
             ->with('success', 'Acara berjaya dikemaskini!');
     }
 
     /**
      * Toggle event active status
      */
-    public function toggleActive(Meet $meet, Event $event)
+    public function toggleActive(Event $event)
     {
-        $user = auth()->user();
-
-        if ($event->sekolah_id !== $user->sekolah_id || $event->meet_id !== $meet->id) {
-            abort(403, 'Anda tidak mempunyai akses ke acara ini.');
-        }
+        $this->authorizeEvent($event);
 
         $this->eventService->toggleActive($event);
 
         return redirect()
-            ->route('admin-sekolah.events.index', $meet->id)
+            ->route('admin-sekolah.events.index')
             ->with('success', $event->is_active ? 'Acara diaktifkan.' : 'Acara dinonaktifkan.');
     }
 
     /**
      * Delete event
      */
-    public function destroy(Meet $meet, Event $event)
+    public function destroy(Event $event)
     {
-        $user = auth()->user();
-
-        if ($event->sekolah_id !== $user->sekolah_id || $event->meet_id !== $meet->id) {
-            abort(403, 'Anda tidak mempunyai akses ke acara ini.');
-        }
+        $this->authorizeEvent($event);
 
         $this->eventService->deleteEvent($event);
 
         return redirect()
-            ->route('admin-sekolah.events.index', $meet->id)
+            ->route('admin-sekolah.events.index')
             ->with('success', 'Acara berjaya dihapus!');
+    }
+
+    private function authorizeEvent(Event $event): void
+    {
+        $user = auth()->user();
+
+        if (! $user || $event->sekolah_id !== $user->sekolah_id) {
+            abort(403, 'Anda tidak mempunyai akses ke acara ini.');
+        }
+    }
+
+    private function getMeetForCurrentUser()
+    {
+        $user = auth()->user();
+        $sekolah = $user->sekolah;
+
+        if (! $sekolah) {
+            abort(403, 'Tiada sekolah dihubungkan dengan akaun anda.');
+        }
+
+        $meet = $sekolah->meet()->first();
+
+        if (! $meet) {
+            abort(422, 'Kejohanan belum diwujudkan untuk sekolah ini.');
+        }
+
+        return $meet;
     }
 }

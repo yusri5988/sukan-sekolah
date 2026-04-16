@@ -12,7 +12,7 @@ export default function ResultsIndex({ event, results, ranking }) {
                         <h2 className="text-xl font-semibold leading-tight text-gray-800">Keputusan - {event.name}</h2>
                         <p className="text-sm text-gray-500">Live ranking rumah sukan</p>
                     </div>
-                    <Link href={route('admin-sekolah.events.show', [event.meet_id, event.id])} className="text-sm text-blue-600 hover:text-blue-900">
+                    <Link href={route('admin-sekolah.events.show', event.id)} className="text-sm text-blue-600 hover:text-blue-900">
                         ← Kembali ke Acara
                     </Link>
                 </div>
@@ -28,7 +28,7 @@ export default function ResultsIndex({ event, results, ranking }) {
                         <div className="overflow-hidden bg-white shadow-sm sm:rounded-lg">
                             <div className="border-b border-gray-200 bg-gray-50 px-6 py-4 flex items-center justify-between">
                                 <h3 className="text-lg font-semibold text-gray-900">Keputusan Acara</h3>
-                                <Link href={route('admin-sekolah.results.create', [event.meet_id, event.id])} className="rounded-md bg-green-600 px-4 py-2 text-sm font-medium text-white hover:bg-green-700">
+                                <Link href={route('admin-sekolah.results.create', event.id)} className="rounded-md bg-green-600 px-4 py-2 text-sm font-medium text-white hover:bg-green-700">
                                     + Tambah Keputusan
                                 </Link>
                             </div>
@@ -61,8 +61,8 @@ export default function ResultsIndex({ event, results, ranking }) {
                                                     </div>
                                                 </div>
                                                 <div className="mt-3 flex gap-2">
-                                                    <Link href={route('admin-sekolah.results.edit', [event.meet_id, event.id, result.id])} className="rounded-md border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50">Edit</Link>
-                                                    <form action={route('admin-sekolah.results.toggle-lock', [event.meet_id, event.id, result.id])} method="POST">
+                                                    <Link href={route('admin-sekolah.results.edit', [event.id, result.id])} className="rounded-md border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50">Edit</Link>
+                                                    <form action={route('admin-sekolah.results.toggle-lock', [event.id, result.id])} method="POST">
                                                         <button type="submit" className="rounded-md bg-blue-600 px-3 py-2 text-sm font-medium text-white hover:bg-blue-700">{result.is_locked ? 'Unlock' : 'Lock'}</button>
                                                     </form>
                                                 </div>

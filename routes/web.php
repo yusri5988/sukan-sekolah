@@ -52,8 +52,8 @@ Route::get('/dashboard', function () {
     return Inertia::render('Dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
 
-Route::get('/public/meets/{meet}', [PublicMeetController::class, 'show'])->name('public.meets.show');
-Route::get('/public/meets/{meet}/ranking', [PublicMeetController::class, 'ranking'])->name('public.meets.ranking');
+Route::get('/public/sekolah/{sekolah:kod_sekolah}', [PublicMeetController::class, 'show'])->name('public.meets.show');
+Route::get('/public/sekolah/{sekolah:kod_sekolah}/ranking', [PublicMeetController::class, 'ranking'])->name('public.meets.ranking');
 
 // Super Admin Routes
 Route::middleware(['auth', SuperAdminMiddleware::class])->prefix('super-admin')->name('super-admin.')->group(function () {
@@ -98,45 +98,47 @@ Route::middleware(['auth', AdminSekolahMiddleware::class])->prefix('admin-sekola
 
     // Meets Management - Single kejohanan per sekolah
     Route::get('/meets', [MeetController::class, 'index'])->name('meets.index');
-    Route::get('/meets/{meet}', [MeetController::class, 'show'])->name('meets.show');
-    Route::get('/meets/{meet}/edit', [MeetController::class, 'edit'])->name('meets.edit');
-    Route::patch('/meets/{meet}', [MeetController::class, 'update'])->name('meets.update');
+    Route::get('/meets/show', [MeetController::class, 'show'])->name('meets.show');
+    Route::get('/meets/edit', [MeetController::class, 'edit'])->name('meets.edit');
+    Route::patch('/meets', [MeetController::class, 'update'])->name('meets.update');
 
     // Scoring Configuration
     Route::get('/scoring', [ScoringController::class, 'index'])->name('scoring.index');
     Route::patch('/scoring/{category}', [ScoringController::class, 'update'])->name('scoring.update');
-    Route::post('/meets/{meet}/activate', [MeetController::class, 'activate'])->name('meets.activate');
-    Route::post('/meets/{meet}/complete', [MeetController::class, 'complete'])->name('meets.complete');
-    Route::post('/meets/{meet}/toggle-public', [MeetController::class, 'togglePublic'])->name('meets.toggle-public');
+    Route::post('/meets/activate', [MeetController::class, 'activate'])->name('meets.activate');
+    Route::post('/meets/complete', [MeetController::class, 'complete'])->name('meets.complete');
+    Route::post('/meets/toggle-public', [MeetController::class, 'togglePublic'])->name('meets.toggle-public');
+    Route::patch('/meets/dates', [MeetController::class, 'updateDates'])->name('meets.update-dates');
 
     // Events Management
-    Route::get('/meets/{meet}/events/select-templates', [EventController::class, 'selectTemplates'])->name('events.select-templates');
-    Route::post('/meets/{meet}/events/from-templates', [EventController::class, 'storeFromTemplates'])->name('events.store-from-templates');
-    Route::get('/meets/{meet}/events', [EventController::class, 'index'])->name('events.index');
-    Route::get('/meets/{meet}/events/create', [EventController::class, 'create'])->name('events.create');
-    Route::post('/meets/{meet}/events', [EventController::class, 'store'])->name('events.store');
-    Route::get('/meets/{meet}/events/{event}', [EventController::class, 'show'])->name('events.show');
-    Route::get('/meets/{meet}/events/{event}/edit', [EventController::class, 'edit'])->name('events.edit');
-    Route::patch('/meets/{meet}/events/{event}', [EventController::class, 'update'])->name('events.update');
-    Route::post('/meets/{meet}/events/{event}/toggle-active', [EventController::class, 'toggleActive'])->name('events.toggle-active');
-    Route::delete('/meets/{meet}/events/{event}', [EventController::class, 'destroy'])->name('events.destroy');
+    Route::get('/events/select-templates', [EventController::class, 'selectTemplates'])->name('events.select-templates');
+    Route::get('/events/configure-templates', [EventController::class, 'configureTemplates'])->name('events.configure-templates');
+    Route::post('/events/from-templates', [EventController::class, 'storeFromTemplates'])->name('events.store-from-templates');
+    Route::get('/events', [EventController::class, 'index'])->name('events.index');
+    Route::get('/events/create', [EventController::class, 'create'])->name('events.create');
+    Route::post('/events', [EventController::class, 'store'])->name('events.store');
+    Route::get('/events/{event}', [EventController::class, 'show'])->name('events.show');
+    Route::get('/events/{event}/edit', [EventController::class, 'edit'])->name('events.edit');
+    Route::patch('/events/{event}', [EventController::class, 'update'])->name('events.update');
+    Route::post('/events/{event}/toggle-active', [EventController::class, 'toggleActive'])->name('events.toggle-active');
+    Route::delete('/events/{event}', [EventController::class, 'destroy'])->name('events.destroy');
 
     // Event Participants Management
-    Route::get('/meets/{meet}/events/{event}/participants', [EventParticipantController::class, 'index'])->name('events.participants.index');
-    Route::get('/meets/{meet}/events/{event}/participants/create', [EventParticipantController::class, 'create'])->name('events.participants.create');
-    Route::post('/meets/{meet}/events/{event}/participants', [EventParticipantController::class, 'store'])->name('events.participants.store');
-    Route::post('/meets/{meet}/events/{event}/participants/{participant}/assign-lane', [EventParticipantController::class, 'assignLane'])->name('events.participants.assign-lane');
-    Route::delete('/meets/{meet}/events/{event}/participants/{participant}', [EventParticipantController::class, 'destroy'])->name('events.participants.destroy');
+    Route::get('/events/{event}/participants', [EventParticipantController::class, 'index'])->name('events.participants.index');
+    Route::get('/events/{event}/participants/create', [EventParticipantController::class, 'create'])->name('events.participants.create');
+    Route::post('/events/{event}/participants', [EventParticipantController::class, 'store'])->name('events.participants.store');
+    Route::post('/events/{event}/participants/{participant}/assign-lane', [EventParticipantController::class, 'assignLane'])->name('events.participants.assign-lane');
+    Route::delete('/events/{event}/participants/{participant}', [EventParticipantController::class, 'destroy'])->name('events.participants.destroy');
 
     // Results Management
-    Route::get('/meets/{meet}/events/{event}/results', [ResultController::class, 'index'])->name('results.index');
-    Route::get('/meets/{meet}/events/{event}/results/create', [ResultController::class, 'create'])->name('results.create');
-    Route::post('/meets/{meet}/events/{event}/results', [ResultController::class, 'store'])->name('results.store');
-    Route::get('/meets/{meet}/events/{event}/results/{result}/edit', [ResultController::class, 'edit'])->name('results.edit');
-    Route::patch('/meets/{meet}/events/{event}/results/{result}', [ResultController::class, 'update'])->name('results.update');
-    Route::delete('/meets/{meet}/events/{event}/results/{result}', [ResultController::class, 'destroy'])->name('results.destroy');
-    Route::post('/meets/{meet}/events/{event}/results/{result}/toggle-lock', [ResultController::class, 'toggleLock'])->name('results.toggle-lock');
-    Route::get('/meets/{meet}/events/{event}/ranking', [ResultController::class, 'ranking'])->name('results.ranking');
+    Route::get('/events/{event}/results', [ResultController::class, 'index'])->name('results.index');
+    Route::get('/events/{event}/results/create', [ResultController::class, 'create'])->name('results.create');
+    Route::post('/events/{event}/results', [ResultController::class, 'store'])->name('results.store');
+    Route::get('/events/{event}/results/{result}/edit', [ResultController::class, 'edit'])->name('results.edit');
+    Route::patch('/events/{event}/results/{result}', [ResultController::class, 'update'])->name('results.update');
+    Route::delete('/events/{event}/results/{result}', [ResultController::class, 'destroy'])->name('results.destroy');
+    Route::post('/events/{event}/results/{result}/toggle-lock', [ResultController::class, 'toggleLock'])->name('results.toggle-lock');
+    Route::get('/events/{event}/ranking', [ResultController::class, 'ranking'])->name('results.ranking');
 });
 
 // Cikgu Routes
@@ -145,8 +147,8 @@ Route::middleware(['auth', CikguMiddleware::class])->prefix('cikgu')->name('cikg
     Route::get('/students', [CikguController::class, 'studentIndex'])->name('students.index');
     Route::get('/students/create', [CikguController::class, 'studentCreate'])->name('students.create');
     Route::post('/students', [CikguController::class, 'studentStore'])->name('students.store');
-    Route::get('/meets/{meet}/events/{event}/participants', [CikguController::class, 'participantIndex'])->name('events.participants.index');
-    Route::post('/meets/{meet}/events/{event}/participants', [CikguController::class, 'participantStore'])->name('events.participants.store');
+    Route::get('/events/{event}/participants', [CikguController::class, 'participantIndex'])->name('events.participants.index');
+    Route::post('/events/{event}/participants', [CikguController::class, 'participantStore'])->name('events.participants.store');
 });
 
 Route::middleware('auth')->group(function () {
