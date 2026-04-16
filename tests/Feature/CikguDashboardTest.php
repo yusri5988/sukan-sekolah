@@ -33,11 +33,10 @@ class CikguDashboardTest extends TestCase
             'sekolah_id' => $school->id,
             'house_id' => $house?->id,
             'name' => 'Test Student',
-            'ic_number' => '1234567890'.rand(1000, 9999),
+            'ic_number' => fake()->unique()->numerify('############'),
             'class' => '1A',
             'year' => 1,
-            'gender' => 'male',
-            'date_of_birth' => '2015-01-01',
+            'gender' => 'L',
         ]);
     }
 

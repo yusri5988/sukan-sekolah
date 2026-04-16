@@ -27,14 +27,16 @@ class StudentService
     public function createStudent(array $data, Sekolah $sekolah): Student
     {
         return DB::transaction(function () use ($data, $sekolah) {
+            $houseId = $this->resolveHouseIdForSekolah($data['house_id'] ?? null, $sekolah);
+
             return Student::create([
                 'sekolah_id' => $sekolah->id,
-                'house_id' => $data['house_id'] ?? null,
+                'house_id' => $houseId,
                 'name' => $data['name'],
                 'ic_number' => $data['ic_number'],
                 'class' => $data['class'],
                 'year' => $data['year'],
-                'gender' => $data['gender'] ?? 'male',
+                'gender' => $this->normalizeGender($data['gender'] ?? null),
             ]);
         });
     }
@@ -60,7 +62,7 @@ class StudentService
                 'ic_number' => $data['ic_number'],
                 'class' => $data['class'],
                 'year' => $data['year'],
-                'gender' => $data['gender'] ?? 'male',
+                'gender' => $this->normalizeGender($data['gender'] ?? null),
             ]);
         });
     }
@@ -102,14 +104,14 @@ class StudentService
                         'name' => $row['name'],
                         'class' => $row['class'],
                         'gender' => $this->normalizeGender($row['gender'] ?? $existingStudent->gender),
-                        'house_id' => $row['house_id'] ?? $existingStudent->house_id,
+                        'house_id' => $this->resolveHouseIdForSekolah($row['house_id'] ?? $existingStudent->house_id, $sekolah),
                     ]);
                     $updated++;
                 } else {
                     // Create new student
                     Student::create([
                         'sekolah_id' => $sekolah->id,
-                        'house_id' => $row['house_id'] ?? null,
+                        'house_id' => $this->resolveHouseIdForSekolah($row['house_id'] ?? null, $sekolah),
                         'name' => $row['name'],
                         'ic_number' => $row['ic_number'],
                         'class' => $row['class'],
@@ -181,5 +183,23 @@ class StudentService
         return Student::whereIn('id', $studentIds)
             ->where('sekolah_id', $house->sekolah_id)
             ->update(['house_id' => $house->id]);
+    }
+
+    private function resolveHouseIdForSekolah(int|string|null $houseId, Sekolah $sekolah): ?int
+    {
+        if ($houseId === null || $houseId === '') {
+            return null;
+        }
+
+        $house = House::query()
+            ->whereKey($houseId)
+            ->where('sekolah_id', $sekolah->id)
+            ->first();
+
+        if (! $house) {
+            throw new \InvalidArgumentException('Rumah sukan tidak sah untuk sekolah ini.');
+        }
+
+        return $house->id;
     }
 }

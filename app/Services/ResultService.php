@@ -30,12 +30,32 @@ class ResultService
             $points = $meet?->getPointsForPosition((int) $data['position']) ?? 0;
 
             $participantId = $data['event_participant_id'] ?? null;
-            $houseId = $data['house_id'];
+            $houseId = $data['house_id'] ?? null;
 
-            // If participant is provided, get the house from the participant
             if ($participantId) {
-                $participant = EventParticipant::findOrFail($participantId);
+                $participant = EventParticipant::query()
+                    ->whereKey($participantId)
+                    ->where('event_id', $event->id)
+                    ->firstOrFail();
+
+                if (! $participant->house_id) {
+                    abort(422, 'Peserta ini tiada rumah sukan yang sah.');
+                }
+
                 $houseId = $participant->house_id;
+            }
+
+            if (! $houseId) {
+                abort(422, 'Rumah sukan diperlukan untuk keputusan ini.');
+            }
+
+            $houseExists = House::query()
+                ->whereKey($houseId)
+                ->where('sekolah_id', $event->sekolah_id)
+                ->exists();
+
+            if (! $houseExists) {
+                abort(403, 'Rumah sukan tidak sah untuk acara ini.');
             }
 
             $result = Result::updateOrCreate(

@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\Event;
+use App\Models\EventCategory;
 use App\Models\EventParticipant;
 use App\Models\House;
 use App\Models\Meet;
@@ -35,10 +36,18 @@ class ResultManagementTest extends TestCase
             'point_config' => ['1' => 10, '2' => 7, '3' => 5],
         ]);
 
+        $this->category = EventCategory::create([
+            'name' => 'Balapan',
+            'code' => 'track',
+            'order' => 1,
+            'is_active' => true,
+        ]);
+
         $this->event = Event::create([
             'sekolah_id' => $this->sekolah->id,
+            'event_category_id' => $this->category->id,
             'name' => '100m Lelaki',
-            'category' => '16+',
+            'category' => Event::CATEGORY_TAHUN_5,
             'gender' => 'male',
             'type' => 'individual',
         ]);
@@ -53,7 +62,6 @@ class ResultManagementTest extends TestCase
             'class' => '5A',
             'year' => 5,
             'gender' => 'L',
-            'age_category' => '16+',
         ]);
 
         $this->student2 = Student::create([
@@ -64,7 +72,6 @@ class ResultManagementTest extends TestCase
             'class' => '5B',
             'year' => 5,
             'gender' => 'L',
-            'age_category' => '16+',
         ]);
 
         $this->participant1 = EventParticipant::create([

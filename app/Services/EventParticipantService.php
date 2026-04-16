@@ -189,6 +189,8 @@ class EventParticipantService
      */
     public function isEligibleForEvent(Student $student, Event $event): bool
     {
+        $studentGender = $this->normalizeStudentGender($student->gender);
+
         // Check category based on year field
         if ($event->category !== Event::CATEGORY_ALL) {
             $yearCategory = 'tahun_'.$student->year;
@@ -197,14 +199,23 @@ class EventParticipantService
             }
         }
 
-        if ($event->gender === Event::GENDER_MALE && $student->gender !== 'male') {
+        if ($event->gender === Event::GENDER_MALE && $studentGender !== 'male') {
             return false;
         }
 
-        if ($event->gender === Event::GENDER_FEMALE && $student->gender !== 'female') {
+        if ($event->gender === Event::GENDER_FEMALE && $studentGender !== 'female') {
             return false;
         }
 
         return true;
+    }
+
+    private function normalizeStudentGender(?string $gender): ?string
+    {
+        return match (strtoupper((string) $gender)) {
+            'L', 'MALE', 'LELAKI' => 'male',
+            'P', 'FEMALE', 'PEREMPUAN' => 'female',
+            default => null,
+        };
     }
 }

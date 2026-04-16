@@ -55,6 +55,7 @@ class SchoolController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
+            'nama' => ['required', 'string', 'max:255'],
             'school_reference_id' => [
                 'required',
                 'integer',
@@ -67,6 +68,7 @@ class SchoolController extends Controller
 
         $result = $this->schoolService->createSekolahFromReference(
             (int) $validated['school_reference_id'],
+            $validated['nama'],
             $telefon
         );
 

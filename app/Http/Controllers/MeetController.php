@@ -190,11 +190,11 @@ class MeetController extends Controller
     {
         $meet = $this->getMeetForCurrentUser();
 
-        $this->meetService->togglePublic($meet);
+        $updatedMeet = $this->meetService->togglePublic($meet);
 
         return redirect()
             ->route('admin-sekolah.meets.show')
-            ->with('success', $meet->is_public ? 'Paparan awam disembunyikan.' : 'Paparan awam diaktifkan.');
+            ->with('success', $updatedMeet->is_public ? 'Paparan awam diaktifkan.' : 'Paparan awam disembunyikan.');
     }
 
     /**

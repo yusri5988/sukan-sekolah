@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\Event;
+use App\Models\EventCategory;
 use App\Models\House;
 use App\Models\Meet;
 use App\Models\Sekolah;
@@ -18,6 +19,16 @@ class AuthorizationOwnershipSmokeTest extends TestCase
     private function school(): Sekolah
     {
         return Sekolah::factory()->create();
+    }
+
+    private function eventCategory(): EventCategory
+    {
+        return EventCategory::create([
+            'name' => 'Balapan',
+            'code' => 'track',
+            'order' => 1,
+            'is_active' => true,
+        ]);
     }
 
     private function admin(Sekolah $school): User
@@ -37,17 +48,16 @@ class AuthorizationOwnershipSmokeTest extends TestCase
         ]);
     }
 
-    private function student(Sekolah $school, ?House $house, string $name, string $gender = 'male', int $age = 8): Student
+    private function student(Sekolah $school, ?House $house, string $name, string $gender = 'L', int $year = 1): Student
     {
         return Student::create([
             'sekolah_id' => $school->id,
             'house_id' => $house?->id,
             'name' => $name,
             'ic_number' => fake()->unique()->numerify('############'),
-            'class' => '1A',
-            'year' => 1,
+            'class' => $year.'A',
+            'year' => $year,
             'gender' => $gender,
-            'date_of_birth' => now()->subYears($age),
         ]);
     }
 
@@ -65,8 +75,9 @@ class AuthorizationOwnershipSmokeTest extends TestCase
     {
         return Event::create(array_merge([
             'sekolah_id' => $school->id,
+            'event_category_id' => $this->eventCategory()->id,
             'name' => '100m Lelaki',
-            'category' => Event::CATEGORY_7_9,
+            'category' => Event::CATEGORY_TAHUN_1,
             'gender' => Event::GENDER_MALE,
             'type' => Event::TYPE_INDIVIDUAL,
             'max_participants' => 10,
@@ -143,7 +154,6 @@ class AuthorizationOwnershipSmokeTest extends TestCase
         $houseMerah = House::factory()->create(['sekolah_id' => $school->id, 'name' => 'Merah']);
         $houseBiru = House::factory()->create(['sekolah_id' => $school->id, 'name' => 'Biru']);
         $cikgu = $this->cikgu($school, $houseMerah);
-
         $merah = $this->student($school, $houseMerah, 'Pelajar Merah');
         $this->student($school, $houseBiru, 'Pelajar Biru');
 
@@ -159,28 +169,23 @@ class AuthorizationOwnershipSmokeTest extends TestCase
         );
     }
 
-    public function test_cikgu_cannot_create_student_for_other_house_via_request(): void
+    public function test_cikgu_cannot_reassign_student_from_other_house_via_request(): void
     {
         $school = $this->school();
         $houseMerah = House::factory()->create(['sekolah_id' => $school->id, 'name' => 'Merah']);
         $houseBiru = House::factory()->create(['sekolah_id' => $school->id, 'name' => 'Biru']);
         $cikgu = $this->cikgu($school, $houseMerah);
+        $studentBiru = $this->student($school, $houseBiru, 'Pelajar Biru');
 
         $response = $this->actingAs($cikgu)
             ->post(route('cikgu.students.store'), [
-                'name' => 'Pelajar Ujian',
-                'ic_number' => '999999999999',
-                'class' => '1A',
-                'year' => 1,
-                'gender' => 'male',
-                'date_of_birth' => '2015-01-01',
-                'house_id' => $houseBiru->id,
+                'student_ids' => [$studentBiru->id],
             ]);
 
         $response->assertRedirect(route('cikgu.students.index'));
         $this->assertDatabaseHas('students', [
-            'ic_number' => '999999999999',
-            'house_id' => $houseMerah->id,
+            'id' => $studentBiru->id,
+            'house_id' => $houseBiru->id,
         ]);
     }
 
@@ -192,7 +197,6 @@ class AuthorizationOwnershipSmokeTest extends TestCase
         $cikgu = $this->cikgu($school, $houseMerah);
         $meet = $this->meet($school);
         $event = $this->event($school, $meet);
-
         $merah = $this->student($school, $houseMerah, 'Peserta Merah');
         $biru = $this->student($school, $houseBiru, 'Peserta Biru');
 
@@ -201,7 +205,7 @@ class AuthorizationOwnershipSmokeTest extends TestCase
                 'student_ids' => [$merah->id, $biru->id],
             ]);
 
-        $response->assertRedirect();
+        $response->assertRedirect(route('cikgu.events.participants.index', $event->id));
         $this->assertDatabaseHas('event_participants', [
             'event_id' => $event->id,
             'student_id' => $merah->id,
@@ -220,24 +224,23 @@ class AuthorizationOwnershipSmokeTest extends TestCase
         $house = House::factory()->create(['sekolah_id' => $school->id]);
         $meet = $this->meet($school);
         $event = $this->event($school, $meet);
-        $student = $this->student($school, $house, 'Pelajar Tanpa Lantikan');
+        $studentToAssign = $this->student($school, null, 'Pelajar Baru');
+        $participantCandidate = $this->student($school, $house, 'Pelajar Tanpa Lantikan');
 
         $createResponse = $this->actingAs($cikgu)->post(route('cikgu.students.store'), [
-            'name' => 'Pelajar Baru',
-            'ic_number' => '888888888888',
-            'class' => '1A',
-            'year' => 1,
-            'gender' => 'male',
-            'date_of_birth' => '2015-01-01',
+            'student_ids' => [$studentToAssign->id],
         ]);
 
         $participantResponse = $this->actingAs($cikgu)->post(route('cikgu.events.participants.store', $event->id), [
-            'student_ids' => [$student->id],
+            'student_ids' => [$participantCandidate->id],
         ]);
 
         $createResponse->assertRedirect(route('cikgu.dashboard'));
         $participantResponse->assertRedirect(route('cikgu.dashboard'));
-        $this->assertDatabaseMissing('students', ['ic_number' => '888888888888']);
-        $this->assertDatabaseMissing('event_participants', ['student_id' => $student->id]);
+        $this->assertDatabaseHas('students', [
+            'id' => $studentToAssign->id,
+            'house_id' => null,
+        ]);
+        $this->assertDatabaseMissing('event_participants', ['student_id' => $participantCandidate->id]);
     }
 }

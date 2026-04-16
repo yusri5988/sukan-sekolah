@@ -27,21 +27,20 @@ class CikguStudentControllerTest extends TestCase
         ]);
     }
 
-    protected function createStudent(Sekolah $school, ?House $house = null, string $name = 'Test Student'): Student
+    protected function createStudent(Sekolah $school, ?House $house = null, array $attributes = []): Student
     {
-        return Student::create([
+        return Student::create(array_merge([
             'sekolah_id' => $school->id,
             'house_id' => $house?->id,
-            'name' => $name,
-            'ic_number' => '1234567890'.rand(1000, 9999),
+            'name' => 'Test Student',
+            'ic_number' => fake()->unique()->numerify('############'),
             'class' => '1A',
             'year' => 1,
-            'gender' => 'male',
-            'date_of_birth' => '2015-01-01',
-        ]);
+            'gender' => 'L',
+        ], $attributes));
     }
 
-    public function test_cikgu_with_house_can_view_students_index()
+    public function test_cikgu_with_house_can_view_students_index(): void
     {
         $school = $this->createSchool();
         $house = House::factory()->create(['sekolah_id' => $school->id]);
@@ -50,14 +49,14 @@ class CikguStudentControllerTest extends TestCase
         $response = $this->actingAs($cikgu)
             ->get(route('cikgu.students.index'));
 
-        $response->assertStatus(200);
+        $response->assertOk();
         $response->assertInertia(fn ($page) => $page
             ->component('Cikgu/Students/Index')
             ->where('myHouse.id', $house->id)
         );
     }
 
-    public function test_cikgu_without_house_cannot_view_students_index()
+    public function test_cikgu_without_house_cannot_view_students_index(): void
     {
         $school = $this->createSchool();
         $cikgu = $this->createCikgu($school, null);
@@ -68,25 +67,26 @@ class CikguStudentControllerTest extends TestCase
         $response->assertRedirect(route('cikgu.dashboard'));
     }
 
-    public function test_cikgu_with_house_can_see_own_house_students_only()
+    public function test_cikgu_with_house_can_see_own_house_students_only(): void
     {
         $school = $this->createSchool();
         $houseMerah = House::factory()->create(['sekolah_id' => $school->id, 'name' => 'Merah']);
         $houseBiru = House::factory()->create(['sekolah_id' => $school->id, 'name' => 'Biru']);
         $cikgu = $this->createCikgu($school, $houseMerah);
-
-        $studentMerah = $this->createStudent($school, $houseMerah, 'Student Merah');
-        $studentBiru = $this->createStudent($school, $houseBiru, 'Student Biru');
+        $studentMerah = $this->createStudent($school, $houseMerah, ['name' => 'Student Merah']);
+        $this->createStudent($school, $houseBiru, ['name' => 'Student Biru']);
 
         $response = $this->actingAs($cikgu)
             ->get(route('cikgu.students.index'));
 
-        $response->assertStatus(200);
-        $response->assertSee($studentMerah->name, false);
-        $response->assertDontSee($studentBiru->name, false);
+        $response->assertOk();
+        $response->assertInertia(fn ($page) => $page
+            ->has('students', 1)
+            ->where('students.0.name', $studentMerah->name)
+        );
     }
 
-    public function test_cikgu_with_house_can_view_create_form()
+    public function test_cikgu_with_house_can_view_create_form(): void
     {
         $school = $this->createSchool();
         $house = House::factory()->create(['sekolah_id' => $school->id]);
@@ -95,14 +95,14 @@ class CikguStudentControllerTest extends TestCase
         $response = $this->actingAs($cikgu)
             ->get(route('cikgu.students.create'));
 
-        $response->assertStatus(200);
+        $response->assertOk();
         $response->assertInertia(fn ($page) => $page
             ->component('Cikgu/Students/Create')
             ->where('myHouse.id', $house->id)
         );
     }
 
-    public function test_cikgu_without_house_cannot_view_create_form()
+    public function test_cikgu_without_house_cannot_view_create_form(): void
     {
         $school = $this->createSchool();
         $cikgu = $this->createCikgu($school, null);
@@ -113,96 +113,133 @@ class CikguStudentControllerTest extends TestCase
         $response->assertRedirect(route('cikgu.dashboard'));
     }
 
-    public function test_cikgu_can_store_student_with_auto_assigned_house()
+    public function test_create_form_shows_unassigned_students_only(): void
     {
         $school = $this->createSchool();
         $house = House::factory()->create(['sekolah_id' => $school->id]);
         $cikgu = $this->createCikgu($school, $house);
+        $eligible = $this->createStudent($school, null, ['name' => 'Unassigned Student']);
+        $this->createStudent($school, $house, ['name' => 'Assigned Student']);
 
         $response = $this->actingAs($cikgu)
-            ->post(route('cikgu.students.store'), [
-                'name' => 'Ahmad Bin Ali',
-                'ic_number' => '123456789012',
-                'class' => '1A',
-                'year' => 1,
-                'gender' => 'male',
-                'date_of_birth' => '2015-01-01',
-            ]);
+            ->get(route('cikgu.students.create'));
 
-        $response->assertRedirect(route('cikgu.students.index'));
-        $this->assertDatabaseHas('students', [
-            'name' => 'Ahmad Bin Ali',
-            'ic_number' => '123456789012',
-            'house_id' => $house->id,
-            'sekolah_id' => $school->id,
-        ]);
+        $response->assertOk();
+        $response->assertInertia(fn ($page) => $page
+            ->has('unassignedStudents', 1)
+            ->where('unassignedStudents.0.name', $eligible->name)
+        );
     }
 
-    public function test_cikgu_student_auto_assigned_to_teachers_house()
+    public function test_create_form_supports_year_and_class_filters(): void
+    {
+        $school = $this->createSchool();
+        $house = House::factory()->create(['sekolah_id' => $school->id]);
+        $cikgu = $this->createCikgu($school, $house);
+        $matching = $this->createStudent($school, null, ['name' => 'Filtered Student', 'year' => 3, 'class' => '3A']);
+        $this->createStudent($school, null, ['name' => 'Other Student', 'year' => 4, 'class' => '4A']);
+
+        $response = $this->actingAs($cikgu)
+            ->get(route('cikgu.students.create', ['year' => 3, 'class' => '3A']));
+
+        $response->assertOk();
+        $response->assertInertia(fn ($page) => $page
+            ->has('unassignedStudents', 1)
+            ->where('unassignedStudents.0.name', $matching->name)
+            ->where('filterYear', '3')
+            ->where('filterClass', '3A')
+        );
+    }
+
+    public function test_cikgu_can_assign_multiple_unassigned_students_to_own_house(): void
     {
         $school = $this->createSchool();
         $house = House::factory()->create(['sekolah_id' => $school->id, 'name' => 'Mercury']);
         $cikgu = $this->createCikgu($school, $house);
+        $student1 = $this->createStudent($school, null, ['name' => 'Student One']);
+        $student2 = $this->createStudent($school, null, ['name' => 'Student Two']);
 
-        $this->actingAs($cikgu)
+        $response = $this->actingAs($cikgu)
             ->post(route('cikgu.students.store'), [
-                'name' => 'Test Student',
-                'ic_number' => '999999999999',
-                'class' => '2B',
-                'year' => 3,
-                'gender' => 'male',
-                'date_of_birth' => '2015-01-01',
+                'student_ids' => [$student1->id, $student2->id],
             ]);
 
-        $student = Student::where('ic_number', '999999999999')->first();
-        $this->assertEquals($house->id, $student->house_id);
-        $this->assertEquals('Mercury', $student->house->name);
+        $response->assertRedirect(route('cikgu.students.index'));
+        $this->assertDatabaseHas('students', ['id' => $student1->id, 'house_id' => $house->id]);
+        $this->assertDatabaseHas('students', ['id' => $student2->id, 'house_id' => $house->id]);
     }
 
-    public function test_cannot_manipulate_house_id_through_request()
+    public function test_cannot_manipulate_assignment_for_student_from_other_school(): void
+    {
+        $schoolA = $this->createSchool();
+        $schoolB = $this->createSchool();
+        $houseA = House::factory()->create(['sekolah_id' => $schoolA->id, 'name' => 'Merah']);
+        $cikgu = $this->createCikgu($schoolA, $houseA);
+        $foreignStudent = $this->createStudent($schoolB, null, ['name' => 'Foreign Student']);
+
+        $response = $this->actingAs($cikgu)
+            ->post(route('cikgu.students.store'), [
+                'student_ids' => [$foreignStudent->id],
+            ]);
+
+        $response->assertRedirect(route('cikgu.students.index'));
+        $this->assertDatabaseHas('students', [
+            'id' => $foreignStudent->id,
+            'house_id' => null,
+        ]);
+    }
+
+    public function test_cannot_reassign_student_who_already_has_house(): void
     {
         $school = $this->createSchool();
         $houseMerah = House::factory()->create(['sekolah_id' => $school->id, 'name' => 'Merah']);
         $houseBiru = House::factory()->create(['sekolah_id' => $school->id, 'name' => 'Biru']);
         $cikgu = $this->createCikgu($school, $houseMerah);
+        $assignedStudent = $this->createStudent($school, $houseBiru, ['name' => 'Assigned Student']);
 
         $response = $this->actingAs($cikgu)
             ->post(route('cikgu.students.store'), [
-                'name' => 'Test Student',
-                'ic_number' => '123456789555',
-                'class' => '1A',
-                'year' => 1,
-                'gender' => 'male',
-                'date_of_birth' => '2015-01-01',
-                'house_id' => $houseBiru->id,
+                'student_ids' => [$assignedStudent->id],
             ]);
 
-        $student = Student::where('ic_number', '123456789555')->first();
-        $this->assertEquals($houseMerah->id, $student->house_id);
-        $this->assertNotEquals($houseBiru->id, $student->house_id);
+        $response->assertRedirect(route('cikgu.students.index'));
+        $this->assertDatabaseHas('students', [
+            'id' => $assignedStudent->id,
+            'house_id' => $houseBiru->id,
+        ]);
     }
 
-    public function test_cikgu_without_house_cannot_store_student()
+    public function test_cikgu_without_house_cannot_store_student_assignments(): void
     {
         $school = $this->createSchool();
         $cikgu = $this->createCikgu($school, null);
+        $student = $this->createStudent($school, null);
 
         $response = $this->actingAs($cikgu)
             ->post(route('cikgu.students.store'), [
-                'name' => 'Test Student',
-                'ic_number' => '123456789666',
-                'class' => '1A',
-                'year' => 1,
-                'gender' => 'male',
-                'date_of_birth' => '2015-01-01',
+                'student_ids' => [$student->id],
             ]);
 
-        $response->assertStatus(302);
-        $response->assertRedirectContains('cikgu');
-        $this->assertDatabaseMissing('students', ['ic_number' => '123456789666']);
+        $response->assertRedirect(route('cikgu.dashboard'));
+        $this->assertDatabaseHas('students', [
+            'id' => $student->id,
+            'house_id' => null,
+        ]);
     }
 
-    public function test_store_validation_name_required()
+    public function test_store_validation_requires_student_ids(): void
+    {
+        $school = $this->createSchool();
+        $house = House::factory()->create(['sekolah_id' => $school->id]);
+        $cikgu = $this->createCikgu($school, $house);
+
+        $response = $this->actingAs($cikgu)
+            ->post(route('cikgu.students.store'), []);
+
+        $response->assertSessionHasErrors('student_ids');
+    }
+
+    public function test_store_validation_rejects_unknown_student_ids(): void
     {
         $school = $this->createSchool();
         $house = House::factory()->create(['sekolah_id' => $school->id]);
@@ -210,85 +247,13 @@ class CikguStudentControllerTest extends TestCase
 
         $response = $this->actingAs($cikgu)
             ->post(route('cikgu.students.store'), [
-                'ic_number' => '123456789777',
-                'class' => '1A',
-                'year' => 1,
+                'student_ids' => [999999],
             ]);
 
-        $response->assertSessionHasErrors('name');
+        $response->assertSessionHasErrors('student_ids.0');
     }
 
-    public function test_store_validation_ic_number_unique()
-    {
-        $school = $this->createSchool();
-        $house = House::factory()->create(['sekolah_id' => $school->id]);
-        $cikgu = $this->createCikgu($school, $house);
-
-        $this->createStudent($school, $house);
-
-        $response = $this->actingAs($cikgu)
-            ->post(route('cikgu.students.store'), [
-                'name' => 'Another Student',
-                'ic_number' => $school->students->first()->ic_number,
-                'class' => '1A',
-                'year' => 1,
-            ]);
-
-        $response->assertSessionHasErrors('ic_number');
-    }
-
-    public function test_store_validation_year_between_1_and_6()
-    {
-        $school = $this->createSchool();
-        $house = House::factory()->create(['sekolah_id' => $school->id]);
-        $cikgu = $this->createCikgu($school, $house);
-
-        $response = $this->actingAs($cikgu)
-            ->post(route('cikgu.students.store'), [
-                'name' => 'Test Student',
-                'ic_number' => '123456789888',
-                'class' => '1A',
-                'year' => 7,
-            ]);
-
-        $response->assertSessionHasErrors('year');
-    }
-
-    public function test_store_validation_class_required()
-    {
-        $school = $this->createSchool();
-        $house = House::factory()->create(['sekolah_id' => $school->id]);
-        $cikgu = $this->createCikgu($school, $house);
-
-        $response = $this->actingAs($cikgu)
-            ->post(route('cikgu.students.store'), [
-                'name' => 'Test Student',
-                'ic_number' => '123456789999',
-                'year' => 1,
-            ]);
-
-        $response->assertSessionHasErrors('class');
-    }
-
-    public function test_cikgu_cannot_see_other_house_students()
-    {
-        $school = $this->createSchool();
-        $houseA = House::factory()->create(['sekolah_id' => $school->id, 'name' => 'Alpha']);
-        $houseB = House::factory()->create(['sekolah_id' => $school->id, 'name' => 'Beta']);
-        $cikguAlpha = $this->createCikgu($school, $houseA);
-
-        $studentAlpha = $this->createStudent($school, $houseA, 'Student Alpha');
-        $studentBeta = $this->createStudent($school, $houseB, 'Student Beta');
-
-        $response = $this->actingAs($cikguAlpha)
-            ->get(route('cikgu.students.index'));
-
-        $response->assertStatus(200);
-        $response->assertSee($studentAlpha->name, false);
-        $response->assertDontSee($studentBeta->name, false);
-    }
-
-    public function test_cikgu_dashboard_shortcut_shows_correct_house_name()
+    public function test_cikgu_dashboard_shortcut_shows_correct_house_name(): void
     {
         $school = $this->createSchool();
         $house = House::factory()->create(['sekolah_id' => $school->id, 'name' => 'Olympus']);
@@ -297,7 +262,7 @@ class CikguStudentControllerTest extends TestCase
         $response = $this->actingAs($cikgu)
             ->get(route('cikgu.dashboard'));
 
-        $response->assertStatus(200);
+        $response->assertOk();
         $response->assertInertia(fn ($page) => $page
             ->where('myHouse.name', 'Olympus')
         );

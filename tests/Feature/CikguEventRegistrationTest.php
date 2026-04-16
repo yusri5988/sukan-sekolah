@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\Event;
+use App\Models\EventCategory;
 use App\Models\EventParticipant;
 use App\Models\House;
 use App\Models\Meet;
@@ -21,6 +22,26 @@ class CikguEventRegistrationTest extends TestCase
         return Sekolah::factory()->create();
     }
 
+    protected function createMeet(Sekolah $school): Meet
+    {
+        return Meet::create([
+            'sekolah_id' => $school->id,
+            'name' => 'Test Meet',
+            'date' => now()->addDays(7),
+            'status' => Meet::STATUS_ACTIVE,
+        ]);
+    }
+
+    protected function createEventCategory(): EventCategory
+    {
+        return EventCategory::create([
+            'name' => 'Balapan',
+            'code' => 'track',
+            'order' => 1,
+            'is_active' => true,
+        ]);
+    }
+
     protected function createCikgu(Sekolah $school, ?House $house = null): User
     {
         return User::factory()->create([
@@ -36,22 +57,22 @@ class CikguEventRegistrationTest extends TestCase
             'sekolah_id' => $school->id,
             'house_id' => $house?->id,
             'name' => 'Test Student',
-            'ic_number' => '1234567890'.rand(1000, 9999),
+            'ic_number' => fake()->unique()->numerify('############'),
             'class' => '1A',
             'year' => 1,
-            'gender' => 'male',
-            'date_of_birth' => '2015-01-01',
+            'gender' => 'L',
         ];
 
         return Student::create(array_merge($defaults, $attributes));
     }
 
-    protected function createEvent(Sekolah $school, Meet $meet, array $attributes = []): Event
+    protected function createEvent(Sekolah $school, array $attributes = []): Event
     {
         $defaults = [
             'sekolah_id' => $school->id,
+            'event_category_id' => $this->createEventCategory()->id,
             'name' => 'Test Event',
-            'category' => Event::CATEGORY_7_9,
+            'category' => Event::CATEGORY_TAHUN_1,
             'gender' => Event::GENDER_MIXED,
             'type' => Event::TYPE_INDIVIDUAL,
             'max_participants' => 10,
@@ -62,62 +83,34 @@ class CikguEventRegistrationTest extends TestCase
         return Event::create(array_merge($defaults, $attributes));
     }
 
-    protected function createMeet(Sekolah $school): Meet
-    {
-        return Meet::create([
-            'sekolah_id' => $school->id,
-            'name' => 'Test Meet',
-            'date' => now()->addDays(7),
-            'status' => Meet::STATUS_ACTIVE,
-        ]);
-    }
-
-    // ============ TEST: getEligibleStudents ============
-
-    public function test_cikgu_can_only_see_eligible_students_from_own_house()
+    public function test_cikgu_can_only_see_eligible_students_from_own_house(): void
     {
         $school = $this->createSchool();
-        $meet = $this->createMeet($school);
+        $this->createMeet($school);
         $houseMerah = House::factory()->create(['sekolah_id' => $school->id, 'name' => 'Merah']);
         $houseBiru = House::factory()->create(['sekolah_id' => $school->id, 'name' => 'Biru']);
-
         $cikguMerah = $this->createCikgu($school, $houseMerah);
-
-        // Pelajar dari rumah Merah (layak)
-        $studentMerah = $this->createStudent($school, $houseMerah, [
-            'name' => 'Student Merah',
-            'date_of_birth' => now()->subYears(8), // 8 tahun
-        ]);
-
-        // Pelajar dari rumah Biru (tidak layak untuk cikgu Merah)
-        $studentBiru = $this->createStudent($school, $houseBiru, [
-            'name' => 'Student Biru',
-            'date_of_birth' => now()->subYears(8),
-        ]);
-
-        // Acara untuk umur 7-9
-        $event = $this->createEvent($school, $meet, [
-            'category' => Event::CATEGORY_7_9,
-        ]);
+        $studentMerah = $this->createStudent($school, $houseMerah, ['name' => 'Student Merah']);
+        $this->createStudent($school, $houseBiru, ['name' => 'Student Biru']);
+        $event = $this->createEvent($school);
 
         $response = $this->actingAs($cikguMerah)
             ->get(route('cikgu.events.participants.index', $event->id));
 
-        $response->assertStatus(200);
-        // Pelajar Merah mesti ada
-        $response->assertSee('Student Merah', false);
-        // Pelajar Biru mesti tiada
-        $response->assertDontSee('Student Biru', false);
+        $response->assertOk();
+        $response->assertInertia(fn ($page) => $page
+            ->component('Cikgu/Events/Participants/Index')
+            ->has('eligibleStudents', 1)
+            ->where('eligibleStudents.0.name', $studentMerah->name)
+        );
     }
 
-    public function test_cikgu_without_house_cannot_see_eligible_students()
+    public function test_cikgu_without_house_cannot_see_eligible_students(): void
     {
         $school = $this->createSchool();
-        $meet = $this->createMeet($school);
+        $this->createMeet($school);
         $cikguTanpaRumah = $this->createCikgu($school, null);
-        $house = House::factory()->create(['sekolah_id' => $school->id]);
-
-        $event = $this->createEvent($school, $meet);
+        $event = $this->createEvent($school);
 
         $response = $this->actingAs($cikguTanpaRumah)
             ->get(route('cikgu.events.participants.index', $event->id));
@@ -126,89 +119,58 @@ class CikguEventRegistrationTest extends TestCase
         $response->assertSessionHas('error');
     }
 
-    public function test_eligible_students_filter_by_age_category()
+    public function test_eligible_students_filter_by_event_category(): void
     {
         $school = $this->createSchool();
-        $meet = $this->createMeet($school);
+        $this->createMeet($school);
         $house = House::factory()->create(['sekolah_id' => $school->id]);
         $cikgu = $this->createCikgu($school, $house);
-
-        // Pelajar umur 8 tahun (layak untuk 7-9)
-        $student8yo = $this->createStudent($school, $house, [
-            'name' => 'Student 8yo',
-            'date_of_birth' => now()->subYears(8),
-        ]);
-
-        // Pelajar umur 12 tahun (tidak layak untuk 7-9)
-        $student12yo = $this->createStudent($school, $house, [
-            'name' => 'Student 12yo',
-            'date_of_birth' => now()->subYears(12),
-        ]);
-
-        $event = $this->createEvent($school, $meet, [
-            'category' => Event::CATEGORY_7_9,
-        ]);
+        $eligible = $this->createStudent($school, $house, ['name' => 'Student Tahun 1', 'year' => 1]);
+        $this->createStudent($school, $house, ['name' => 'Student Tahun 5', 'year' => 5]);
+        $event = $this->createEvent($school, ['category' => Event::CATEGORY_TAHUN_1]);
 
         $response = $this->actingAs($cikgu)
             ->get(route('cikgu.events.participants.index', $event->id));
 
-        $response->assertStatus(200);
-        $response->assertSee('Student 8yo', false);
-        $response->assertDontSee('Student 12yo', false);
+        $response->assertOk();
+        $response->assertInertia(fn ($page) => $page
+            ->has('eligibleStudents', 1)
+            ->where('eligibleStudents.0.name', $eligible->name)
+        );
     }
 
-    public function test_eligible_students_filter_by_gender()
+    public function test_eligible_students_filter_by_gender(): void
     {
         $school = $this->createSchool();
-        $meet = $this->createMeet($school);
+        $this->createMeet($school);
         $house = House::factory()->create(['sekolah_id' => $school->id]);
         $cikgu = $this->createCikgu($school, $house);
-
-        // Pelajar lelaki
-        $studentMale = $this->createStudent($school, $house, [
-            'name' => 'Student Male',
-            'gender' => 'male',
-            'date_of_birth' => now()->subYears(8),
-        ]);
-
-        // Pelajar perempuan
-        $studentFemale = $this->createStudent($school, $house, [
-            'name' => 'Student Female',
-            'gender' => 'female',
-            'date_of_birth' => now()->subYears(8),
-        ]);
-
-        // Acara khusus lelaki
-        $event = $this->createEvent($school, $meet, [
-            'category' => Event::CATEGORY_7_9,
+        $male = $this->createStudent($school, $house, ['name' => 'Student Male', 'gender' => 'L']);
+        $this->createStudent($school, $house, ['name' => 'Student Female', 'gender' => 'P']);
+        $event = $this->createEvent($school, [
+            'category' => Event::CATEGORY_TAHUN_1,
             'gender' => Event::GENDER_MALE,
         ]);
 
         $response = $this->actingAs($cikgu)
             ->get(route('cikgu.events.participants.index', $event->id));
 
-        $response->assertStatus(200);
-        $response->assertSee('Student Male', false);
-        $response->assertDontSee('Student Female', false);
+        $response->assertOk();
+        $response->assertInertia(fn ($page) => $page
+            ->has('eligibleStudents', 1)
+            ->where('eligibleStudents.0.name', $male->name)
+        );
     }
 
-    public function test_registered_students_not_shown_in_eligible_list()
+    public function test_registered_students_not_shown_in_eligible_list(): void
     {
         $school = $this->createSchool();
-        $meet = $this->createMeet($school);
+        $this->createMeet($school);
         $house = House::factory()->create(['sekolah_id' => $school->id]);
         $cikgu = $this->createCikgu($school, $house);
+        $student = $this->createStudent($school, $house, ['name' => 'Registered Student']);
+        $event = $this->createEvent($school);
 
-        $student = $this->createStudent($school, $house, [
-            'name' => 'Registered Student',
-            'date_of_birth' => now()->subYears(8),
-        ]);
-
-        $event = $this->createEvent($school, $meet, [
-            'category' => Event::CATEGORY_7_9,
-        ]);
-
-        // Daftarkan pelajar
         EventParticipant::create([
             'event_id' => $event->id,
             'student_id' => $student->id,
@@ -219,64 +181,46 @@ class CikguEventRegistrationTest extends TestCase
         $response = $this->actingAs($cikgu)
             ->get(route('cikgu.events.participants.index', $event->id));
 
-        $response->assertStatus(200);
-        // Pelajar yang sudah didaftarkan tidak ada dalam senarai eligible
+        $response->assertOk();
         $response->assertInertia(fn ($page) => $page
-            ->component('Cikgu/Events/Participants/Index')
-            ->where('eligibleStudents', fn ($students) => $students->where('name', 'Registered Student')->isEmpty())
+            ->where('eligibleStudents', fn ($students) => collect($students)->where('name', $student->name)->isEmpty())
         );
     }
 
-    public function test_students_without_house_not_shown_in_eligible_list()
+    public function test_students_without_house_not_shown_in_eligible_list(): void
     {
         $school = $this->createSchool();
-        $meet = $this->createMeet($school);
+        $this->createMeet($school);
         $house = House::factory()->create(['sekolah_id' => $school->id]);
         $cikgu = $this->createCikgu($school, $house);
-
-        // Pelajar tanpa rumah
-        $studentNoHouse = $this->createStudent($school, null, [
-            'name' => 'No House Student',
-            'date_of_birth' => now()->subYears(8),
-        ]);
-
-        $event = $this->createEvent($school, $meet, [
-            'category' => Event::CATEGORY_7_9,
-        ]);
+        $this->createStudent($school, null, ['name' => 'No House Student']);
+        $event = $this->createEvent($school);
 
         $response = $this->actingAs($cikgu)
             ->get(route('cikgu.events.participants.index', $event->id));
 
-        $response->assertStatus(200);
-        $response->assertDontSee('No House Student', false);
+        $response->assertOk();
+        $response->assertInertia(fn ($page) => $page
+            ->where('eligibleStudents', fn ($students) => collect($students)->where('name', 'No House Student')->isEmpty())
+        );
     }
 
-    // ============ TEST: bulkRegister ============
-
-    public function test_cikgu_can_register_student_from_own_house()
+    public function test_cikgu_can_register_student_from_own_house(): void
     {
         $school = $this->createSchool();
-        $meet = $this->createMeet($school);
+        $this->createMeet($school);
         $house = House::factory()->create(['sekolah_id' => $school->id]);
         $cikgu = $this->createCikgu($school, $house);
-
-        $student = $this->createStudent($school, $house, [
-            'name' => 'Registerable Student',
-            'date_of_birth' => now()->subYears(8),
-        ]);
-
-        $event = $this->createEvent($school, $meet, [
-            'category' => Event::CATEGORY_7_9,
-        ]);
+        $student = $this->createStudent($school, $house, ['name' => 'Registerable Student']);
+        $event = $this->createEvent($school);
 
         $response = $this->actingAs($cikgu)
             ->post(route('cikgu.events.participants.store', $event->id), [
                 'student_ids' => [$student->id],
             ]);
 
-        $response->assertRedirect();
+        $response->assertRedirect(route('cikgu.events.participants.index', $event->id));
         $response->assertSessionHas('success');
-
         $this->assertDatabaseHas('event_participants', [
             'event_id' => $event->id,
             'student_id' => $student->id,
@@ -284,121 +228,85 @@ class CikguEventRegistrationTest extends TestCase
         ]);
     }
 
-    public function test_cikgu_cannot_register_student_from_other_house()
+    public function test_cikgu_cannot_register_student_from_other_house(): void
     {
         $school = $this->createSchool();
-        $meet = $this->createMeet($school);
+        $this->createMeet($school);
         $houseMerah = House::factory()->create(['sekolah_id' => $school->id, 'name' => 'Merah']);
         $houseBiru = House::factory()->create(['sekolah_id' => $school->id, 'name' => 'Biru']);
         $cikguMerah = $this->createCikgu($school, $houseMerah);
-
-        $studentBiru = $this->createStudent($school, $houseBiru, [
-            'name' => 'Student Biru',
-            'date_of_birth' => now()->subYears(8),
-        ]);
-
-        $event = $this->createEvent($school, $meet, [
-            'category' => Event::CATEGORY_7_9,
-        ]);
+        $studentBiru = $this->createStudent($school, $houseBiru, ['name' => 'Student Biru']);
+        $event = $this->createEvent($school);
 
         $response = $this->actingAs($cikguMerah)
             ->post(route('cikgu.events.participants.store', $event->id), [
                 'student_ids' => [$studentBiru->id],
             ]);
 
-        $response->assertRedirect();
+        $response->assertRedirect(route('cikgu.events.participants.index', $event->id));
         $response->assertSessionHas('registration_errors');
-
         $this->assertDatabaseMissing('event_participants', [
             'event_id' => $event->id,
             'student_id' => $studentBiru->id,
         ]);
     }
 
-    public function test_cikgu_cannot_register_student_without_house()
+    public function test_cikgu_cannot_register_student_without_house(): void
     {
         $school = $this->createSchool();
-        $meet = $this->createMeet($school);
+        $this->createMeet($school);
         $house = House::factory()->create(['sekolah_id' => $school->id]);
         $cikgu = $this->createCikgu($school, $house);
-
-        $studentNoHouse = $this->createStudent($school, null, [
-            'name' => 'No House Student',
-            'date_of_birth' => now()->subYears(8),
-        ]);
-
-        $event = $this->createEvent($school, $meet, [
-            'category' => Event::CATEGORY_7_9,
-        ]);
+        $studentNoHouse = $this->createStudent($school, null, ['name' => 'No House Student']);
+        $event = $this->createEvent($school);
 
         $response = $this->actingAs($cikgu)
             ->post(route('cikgu.events.participants.store', $event->id), [
                 'student_ids' => [$studentNoHouse->id],
             ]);
 
-        $response->assertRedirect();
+        $response->assertRedirect(route('cikgu.events.participants.index', $event->id));
         $response->assertSessionHas('registration_errors');
-
         $this->assertDatabaseMissing('event_participants', [
             'event_id' => $event->id,
             'student_id' => $studentNoHouse->id,
         ]);
     }
 
-    public function test_cikgu_cannot_register_student_from_different_school()
+    public function test_cikgu_cannot_register_student_from_different_school(): void
     {
         $school1 = $this->createSchool();
         $school2 = $this->createSchool();
-        $meet = $this->createMeet($school1);
+        $this->createMeet($school1);
         $house1 = House::factory()->create(['sekolah_id' => $school1->id]);
         $house2 = House::factory()->create(['sekolah_id' => $school2->id]);
         $cikgu = $this->createCikgu($school1, $house1);
-
-        $studentOtherSchool = $this->createStudent($school2, $house2, [
-            'name' => 'Other School Student',
-            'date_of_birth' => now()->subYears(8),
-        ]);
-
-        $event = $this->createEvent($school1, $meet, [
-            'category' => Event::CATEGORY_7_9,
-        ]);
+        $studentOtherSchool = $this->createStudent($school2, $house2, ['name' => 'Other School Student']);
+        $event = $this->createEvent($school1);
 
         $response = $this->actingAs($cikgu)
             ->post(route('cikgu.events.participants.store', $event->id), [
                 'student_ids' => [$studentOtherSchool->id],
             ]);
 
-        $response->assertRedirect();
+        $response->assertRedirect(route('cikgu.events.participants.index', $event->id));
         $response->assertSessionHas('registration_errors');
-
         $this->assertDatabaseMissing('event_participants', [
             'event_id' => $event->id,
             'student_id' => $studentOtherSchool->id,
         ]);
     }
 
-    public function test_max_participants_limit_respected()
+    public function test_max_participants_limit_respected(): void
     {
         $school = $this->createSchool();
-        $meet = $this->createMeet($school);
+        $this->createMeet($school);
         $house = House::factory()->create(['sekolah_id' => $school->id]);
         $cikgu = $this->createCikgu($school, $house);
-
-        // Acara dengan max 2 peserta
-        $event = $this->createEvent($school, $meet, [
-            'category' => Event::CATEGORY_7_9,
-            'max_participants' => 2,
-        ]);
-
-        // Daftarkan 2 pelajar dahulu
-        $student1 = $this->createStudent($school, $house, [
-            'name' => 'Student 1',
-            'date_of_birth' => now()->subYears(8),
-        ]);
-        $student2 = $this->createStudent($school, $house, [
-            'name' => 'Student 2',
-            'date_of_birth' => now()->subYears(8),
-        ]);
+        $event = $this->createEvent($school, ['max_participants' => 2]);
+        $student1 = $this->createStudent($school, $house, ['name' => 'Student 1']);
+        $student2 = $this->createStudent($school, $house, ['name' => 'Student 2']);
+        $student3 = $this->createStudent($school, $house, ['name' => 'Student 3']);
 
         EventParticipant::create([
             'event_id' => $event->id,
@@ -413,41 +321,27 @@ class CikguEventRegistrationTest extends TestCase
             'status' => 'registered',
         ]);
 
-        // Cuba daftarkan 1 lagi
-        $student3 = $this->createStudent($school, $house, [
-            'name' => 'Student 3',
-            'date_of_birth' => now()->subYears(8),
-        ]);
-
         $response = $this->actingAs($cikgu)
             ->post(route('cikgu.events.participants.store', $event->id), [
                 'student_ids' => [$student3->id],
             ]);
 
-        $response->assertRedirect();
+        $response->assertRedirect(route('cikgu.events.participants.index', $event->id));
         $response->assertSessionHas('registration_errors');
-
         $this->assertDatabaseMissing('event_participants', [
             'event_id' => $event->id,
             'student_id' => $student3->id,
         ]);
     }
 
-    public function test_cikgu_without_house_cannot_register_anyone()
+    public function test_cikgu_without_house_cannot_register_anyone(): void
     {
         $school = $this->createSchool();
-        $meet = $this->createMeet($school);
+        $this->createMeet($school);
         $house = House::factory()->create(['sekolah_id' => $school->id]);
         $cikguTanpaRumah = $this->createCikgu($school, null);
-
-        $student = $this->createStudent($school, $house, [
-            'name' => 'Any Student',
-            'date_of_birth' => now()->subYears(8),
-        ]);
-
-        $event = $this->createEvent($school, $meet, [
-            'category' => Event::CATEGORY_7_9,
-        ]);
+        $student = $this->createStudent($school, $house, ['name' => 'Any Student']);
+        $event = $this->createEvent($school);
 
         $response = $this->actingAs($cikguTanpaRumah)
             ->post(route('cikgu.events.participants.store', $event->id), [
@@ -456,101 +350,67 @@ class CikguEventRegistrationTest extends TestCase
 
         $response->assertRedirect(route('cikgu.dashboard'));
         $response->assertSessionHas('error');
-
         $this->assertDatabaseMissing('event_participants', [
             'event_id' => $event->id,
             'student_id' => $student->id,
         ]);
     }
 
-    public function test_ineligible_student_cannot_be_registered()
+    public function test_ineligible_student_cannot_be_registered(): void
     {
         $school = $this->createSchool();
-        $meet = $this->createMeet($school);
+        $this->createMeet($school);
         $house = House::factory()->create(['sekolah_id' => $school->id]);
         $cikgu = $this->createCikgu($school, $house);
-
-        // Pelajar umur 12 (tidak layak untuk acara 7-9)
-        $student12yo = $this->createStudent($school, $house, [
-            'name' => 'Student 12yo',
-            'date_of_birth' => now()->subYears(12),
-        ]);
-
-        $event = $this->createEvent($school, $meet, [
-            'category' => Event::CATEGORY_7_9,
-        ]);
+        $studentTahunLima = $this->createStudent($school, $house, ['name' => 'Student Tahun 5', 'year' => 5]);
+        $event = $this->createEvent($school, ['category' => Event::CATEGORY_TAHUN_1]);
 
         $response = $this->actingAs($cikgu)
             ->post(route('cikgu.events.participants.store', $event->id), [
-                'student_ids' => [$student12yo->id],
+                'student_ids' => [$studentTahunLima->id],
             ]);
 
-        $response->assertRedirect();
+        $response->assertRedirect(route('cikgu.events.participants.index', $event->id));
         $response->assertSessionHas('registration_errors');
-
         $this->assertDatabaseMissing('event_participants', [
             'event_id' => $event->id,
-            'student_id' => $student12yo->id,
+            'student_id' => $studentTahunLima->id,
         ]);
     }
 
-    public function test_manipulated_request_with_wrong_student_id_still_rejected()
+    public function test_manipulated_request_with_wrong_student_id_still_rejected(): void
     {
         $school = $this->createSchool();
-        $meet = $this->createMeet($school);
+        $this->createMeet($school);
         $houseMerah = House::factory()->create(['sekolah_id' => $school->id, 'name' => 'Merah']);
         $houseBiru = House::factory()->create(['sekolah_id' => $school->id, 'name' => 'Biru']);
         $cikguMerah = $this->createCikgu($school, $houseMerah);
+        $studentBiru = $this->createStudent($school, $houseBiru, ['name' => 'Student Biru']);
+        $event = $this->createEvent($school);
 
-        $studentMerah = $this->createStudent($school, $houseMerah, [
-            'name' => 'Student Merah',
-            'date_of_birth' => now()->subYears(8),
-        ]);
-        $studentBiru = $this->createStudent($school, $houseBiru, [
-            'name' => 'Student Biru',
-            'date_of_birth' => now()->subYears(8),
-        ]);
-
-        $event = $this->createEvent($school, $meet, [
-            'category' => Event::CATEGORY_7_9,
-        ]);
-
-        // Cikgu Merah cuba daftar pelajar Biru (melalui manipulasi request)
         $response = $this->actingAs($cikguMerah)
             ->post(route('cikgu.events.participants.store', $event->id), [
-                'student_ids' => [$studentBiru->id], // ID pelajar Biru
+                'student_ids' => [$studentBiru->id],
             ]);
 
-        $response->assertRedirect();
-        // Pelajar Biru ditolak
+        $response->assertRedirect(route('cikgu.events.participants.index', $event->id));
         $this->assertDatabaseMissing('event_participants', [
             'event_id' => $event->id,
             'student_id' => $studentBiru->id,
         ]);
     }
 
-    public function test_cikgu_can_see_own_house_participants_only()
+    public function test_cikgu_can_see_own_house_participants_only(): void
     {
         $school = $this->createSchool();
-        $meet = $this->createMeet($school);
+        $this->createMeet($school);
         $houseMerah = House::factory()->create(['sekolah_id' => $school->id, 'name' => 'Merah']);
         $houseBiru = House::factory()->create(['sekolah_id' => $school->id, 'name' => 'Biru']);
         $cikguMerah = $this->createCikgu($school, $houseMerah);
+        $event = $this->createEvent($school);
+        $studentMerah = $this->createStudent($school, $houseMerah, ['name' => 'Participant Merah']);
+        $studentBiru = $this->createStudent($school, $houseBiru, ['name' => 'Participant Biru']);
 
-        $event = $this->createEvent($school, $meet, [
-            'category' => Event::CATEGORY_7_9,
-        ]);
-
-        $studentMerah = $this->createStudent($school, $houseMerah, [
-            'name' => 'Participant Merah',
-            'date_of_birth' => now()->subYears(8),
-        ]);
-        $studentBiru = $this->createStudent($school, $houseBiru, [
-            'name' => 'Participant Biru',
-            'date_of_birth' => now()->subYears(8),
-        ]);
-
-        // Daftarkan kedua-dua pelajar
         EventParticipant::create([
             'event_id' => $event->id,
             'student_id' => $studentMerah->id,
@@ -567,40 +427,30 @@ class CikguEventRegistrationTest extends TestCase
         $response = $this->actingAs($cikguMerah)
             ->get(route('cikgu.events.participants.index', $event->id));
 
-        $response->assertStatus(200);
-        // Cikgu Merah hanya nampak peserta Merah
-        $response->assertSee('Participant Merah', false);
-        $response->assertDontSee('Participant Biru', false);
+        $response->assertOk();
+        $response->assertInertia(fn ($page) => $page
+            ->has('participants', 1)
+            ->where('participants.0.student.name', $studentMerah->name)
+        );
     }
 
-    public function test_cikgu_can_bulk_register_multiple_students_from_own_house()
+    public function test_cikgu_can_bulk_register_multiple_students_from_own_house(): void
     {
         $school = $this->createSchool();
-        $meet = $this->createMeet($school);
+        $this->createMeet($school);
         $house = House::factory()->create(['sekolah_id' => $school->id]);
         $cikgu = $this->createCikgu($school, $house);
-
-        $student1 = $this->createStudent($school, $house, [
-            'name' => 'Student One',
-            'date_of_birth' => now()->subYears(8),
-        ]);
-        $student2 = $this->createStudent($school, $house, [
-            'name' => 'Student Two',
-            'date_of_birth' => now()->subYears(9),
-        ]);
-
-        $event = $this->createEvent($school, $meet, [
-            'category' => Event::CATEGORY_7_9,
-        ]);
+        $student1 = $this->createStudent($school, $house, ['name' => 'Student One']);
+        $student2 = $this->createStudent($school, $house, ['name' => 'Student Two']);
+        $event = $this->createEvent($school);
 
         $response = $this->actingAs($cikgu)
             ->post(route('cikgu.events.participants.store', $event->id), [
                 'student_ids' => [$student1->id, $student2->id],
             ]);
 
-        $response->assertRedirect();
+        $response->assertRedirect(route('cikgu.events.participants.index', $event->id));
         $response->assertSessionHas('success');
-
         $this->assertDatabaseHas('event_participants', [
             'event_id' => $event->id,
             'student_id' => $student1->id,
@@ -611,60 +461,45 @@ class CikguEventRegistrationTest extends TestCase
         ]);
     }
 
-    public function test_cikgu_cannot_bulk_register_mixed_house_students()
+    public function test_cikgu_cannot_bulk_register_mixed_house_students(): void
     {
         $school = $this->createSchool();
-        $meet = $this->createMeet($school);
+        $this->createMeet($school);
         $houseMerah = House::factory()->create(['sekolah_id' => $school->id, 'name' => 'Merah']);
         $houseBiru = House::factory()->create(['sekolah_id' => $school->id, 'name' => 'Biru']);
         $cikguMerah = $this->createCikgu($school, $houseMerah);
-
-        $studentMerah = $this->createStudent($school, $houseMerah, [
-            'name' => 'Student Merah',
-            'date_of_birth' => now()->subYears(8),
-        ]);
-        $studentBiru = $this->createStudent($school, $houseBiru, [
-            'name' => 'Student Biru',
-            'date_of_birth' => now()->subYears(8),
-        ]);
-
-        $event = $this->createEvent($school, $meet, [
-            'category' => Event::CATEGORY_7_9,
-        ]);
+        $studentMerah = $this->createStudent($school, $houseMerah, ['name' => 'Student Merah']);
+        $studentBiru = $this->createStudent($school, $houseBiru, ['name' => 'Student Biru']);
+        $event = $this->createEvent($school);
 
         $response = $this->actingAs($cikguMerah)
             ->post(route('cikgu.events.participants.store', $event->id), [
                 'student_ids' => [$studentMerah->id, $studentBiru->id],
             ]);
 
-        $response->assertRedirect();
-
-        // Student Merah berjaya didaftarkan
+        $response->assertRedirect(route('cikgu.events.participants.index', $event->id));
         $this->assertDatabaseHas('event_participants', [
             'event_id' => $event->id,
             'student_id' => $studentMerah->id,
         ]);
-
-        // Student Biru ditolak
         $this->assertDatabaseMissing('event_participants', [
             'event_id' => $event->id,
             'student_id' => $studentBiru->id,
         ]);
     }
 
-    public function test_cikgu_can_see_eligible_list_with_correct_house_info()
+    public function test_cikgu_can_see_eligible_list_with_correct_house_info(): void
     {
         $school = $this->createSchool();
-        $meet = $this->createMeet($school);
+        $this->createMeet($school);
         $houseMerah = House::factory()->create(['sekolah_id' => $school->id, 'name' => 'Merah', 'color' => '#FF0000']);
         $cikgu = $this->createCikgu($school, $houseMerah);
-
-        $event = $this->createEvent($school, $meet);
+        $event = $this->createEvent($school);
 
         $response = $this->actingAs($cikgu)
             ->get(route('cikgu.events.participants.index', $event->id));
 
-        $response->assertStatus(200);
+        $response->assertOk();
         $response->assertInertia(fn ($page) => $page
             ->component('Cikgu/Events/Participants/Index')
             ->where('myHouse.id', $houseMerah->id)

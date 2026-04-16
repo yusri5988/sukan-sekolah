@@ -8,6 +8,7 @@ use App\Models\Result;
 use App\Services\EventParticipantService;
 use App\Services\ResultService;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 use Inertia\Inertia;
 
 class ResultController extends Controller
@@ -54,8 +55,19 @@ class ResultController extends Controller
         $this->authorizeEvent($event);
 
         $validated = $request->validate([
-            'event_participant_id' => 'nullable|exists:event_participants,id',
-            'house_id' => 'required|exists:houses,id',
+            'event_participant_id' => [
+                'nullable',
+                Rule::exists('event_participants', 'id')->where(
+                    fn ($query) => $query->where('event_id', $event->id)
+                ),
+            ],
+            'house_id' => [
+                'nullable',
+                Rule::requiredIf(fn () => ! $request->filled('event_participant_id')),
+                Rule::exists('houses', 'id')->where(
+                    fn ($query) => $query->where('sekolah_id', $event->sekolah_id)
+                ),
+            ],
             'position' => 'required|integer|min:1|max:10',
             'time_record' => 'nullable|string|max:50',
             'notes' => 'nullable|string',
@@ -89,8 +101,19 @@ class ResultController extends Controller
         $this->authorizeResult($result, $event);
 
         $validated = $request->validate([
-            'event_participant_id' => 'nullable|exists:event_participants,id',
-            'house_id' => 'required|exists:houses,id',
+            'event_participant_id' => [
+                'nullable',
+                Rule::exists('event_participants', 'id')->where(
+                    fn ($query) => $query->where('event_id', $event->id)
+                ),
+            ],
+            'house_id' => [
+                'nullable',
+                Rule::requiredIf(fn () => ! $request->filled('event_participant_id')),
+                Rule::exists('houses', 'id')->where(
+                    fn ($query) => $query->where('sekolah_id', $event->sekolah_id)
+                ),
+            ],
             'position' => 'required|integer|min:1|max:10',
             'time_record' => 'nullable|string|max:50',
             'notes' => 'nullable|string',
