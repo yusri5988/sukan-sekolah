@@ -297,16 +297,18 @@ class CikguEventRegistrationTest extends TestCase
         ]);
     }
 
-    public function test_max_participants_limit_respected(): void
+    public function test_max_participants_per_house_limit_respected(): void
     {
         $school = $this->createSchool();
         $this->createMeet($school);
         $house = House::factory()->create(['sekolah_id' => $school->id]);
         $cikgu = $this->createCikgu($school, $house);
-        $event = $this->createEvent($school, ['max_participants' => 2]);
+        $event = $this->createEvent($school, ['max_participants' => 1]);
         $student1 = $this->createStudent($school, $house, ['name' => 'Student 1']);
         $student2 = $this->createStudent($school, $house, ['name' => 'Student 2']);
         $student3 = $this->createStudent($school, $house, ['name' => 'Student 3']);
+        $student4 = $this->createStudent($school, $house, ['name' => 'Student 4']);
+        $student5 = $this->createStudent($school, $house, ['name' => 'Student 5']);
 
         EventParticipant::create([
             'event_id' => $event->id,
@@ -320,17 +322,28 @@ class CikguEventRegistrationTest extends TestCase
             'house_id' => $house->id,
             'status' => 'registered',
         ]);
+        EventParticipant::create([
+            'event_id' => $event->id,
+            'student_id' => $student3->id,
+            'house_id' => $house->id,
+            'status' => 'registered',
+        ]);
 
         $response = $this->actingAs($cikgu)
             ->post(route('cikgu.events.participants.store', $event->id), [
-                'student_ids' => [$student3->id],
+                'student_ids' => [$student4->id, $student5->id],
             ]);
 
         $response->assertRedirect(route('cikgu.events.participants.index', $event->id));
         $response->assertSessionHas('registration_errors');
+        $response->assertSessionHas('success');
+        $this->assertDatabaseHas('event_participants', [
+            'event_id' => $event->id,
+            'student_id' => $student4->id,
+        ]);
         $this->assertDatabaseMissing('event_participants', [
             'event_id' => $event->id,
-            'student_id' => $student3->id,
+            'student_id' => $student5->id,
         ]);
     }
 

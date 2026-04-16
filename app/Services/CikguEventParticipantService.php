@@ -13,6 +13,8 @@ use Illuminate\Support\Facades\DB;
 
 class CikguEventParticipantService
 {
+    private const MAX_PARTICIPANTS_PER_HOUSE = 4;
+
     public function __construct(
         private EventParticipantService $baseParticipantService
     ) {}
@@ -89,14 +91,13 @@ class CikguEventParticipantService
         $created = 0;
         $errors = [];
 
-        // Semak max_participants jika ada
-        $currentParticipantsCount = $event->participants()->count();
-        $maxParticipants = $event->max_participants;
+        $currentHouseParticipantsCount = $event->participants()
+            ->where('house_id', $house->id)
+            ->count();
 
         foreach ($studentIds as $studentId) {
-            // Check max participants limit
-            if ($maxParticipants !== null && $maxParticipants > 0 && $currentParticipantsCount >= $maxParticipants) {
-                $errors[] = 'Had maksimum peserta acara telah dicapai.';
+            if ($currentHouseParticipantsCount >= self::MAX_PARTICIPANTS_PER_HOUSE) {
+                $errors[] = 'Had maksimum 4 peserta untuk setiap rumah telah dicapai.';
                 break;
             }
 
@@ -160,7 +161,7 @@ class CikguEventParticipantService
                 });
 
                 $created++;
-                $currentParticipantsCount++;
+                $currentHouseParticipantsCount++;
             } catch (\Throwable $e) {
                 $errors[] = "{$student->name}: {$e->getMessage()}";
             }
