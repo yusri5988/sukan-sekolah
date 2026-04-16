@@ -1,5 +1,7 @@
 import AdminSekolahLayout from '@/Layouts/AdminSekolahLayout';
 import { Head, Link, usePage, useForm } from '@inertiajs/react';
+import Countdown from '@/Components/Countdown';
+import CountdownHero from '@/Components/CountdownHero';
 
 export default function MeetsShow({ meet }) {
     const { flash } = usePage().props;
@@ -43,6 +45,8 @@ export default function MeetsShow({ meet }) {
                         <div className="text-sm font-bold text-emerald-900 italic">{flash.success}</div>
                     </div>
                 )}
+
+                <CountdownHero meet={meet} />
 
                 <div className="bg-white border-4 border-slate-900 p-10 rounded-[2.5rem] shadow-[10px_10px_0px_0px_rgba(15,23,42,1)] relative overflow-hidden">
                     <div className="relative z-10">

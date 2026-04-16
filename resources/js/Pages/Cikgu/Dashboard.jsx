@@ -1,7 +1,8 @@
 import CikguLayout from '@/Layouts/CikguLayout';
 import { Head, Link, usePage } from '@inertiajs/react';
+import CountdownHero from '@/Components/CountdownHero';
 
-export default function CikguDashboard({ stats, houses, sekolah, myHouse }) {
+export default function CikguDashboard({ stats, houses, sekolah, myHouse, events }) {
     const { flash } = usePage().props;
 
     return (
@@ -34,6 +35,8 @@ export default function CikguDashboard({ stats, houses, sekolah, myHouse }) {
             <Head title={`Dashboard Cikgu | ${sekolah.nama}`} />
 
             <div className="space-y-12">
+                {/* Dashboard Hero Countdown */}
+                <CountdownHero meet={sekolah.meet} />
                 {flash?.error && (
                     <div className="rounded-[2rem] border-4 border-red-400 bg-red-50 p-6 shadow-sm">
                         <div className="text-[10px] font-black uppercase tracking-widest text-red-600 mb-1">Ralat</div>
@@ -178,11 +181,36 @@ export default function CikguDashboard({ stats, houses, sekolah, myHouse }) {
                                 <p className="text-orange-700 font-bold mb-8 italic">
                                     Daftar pelajar rumah {myHouse.name} untuk menyertai acara sekolah.
                                 </p>
-                                <div className="flex flex-wrap gap-4">
-                                    <span className="px-8 py-4 bg-orange-200 text-orange-800 text-sm font-black uppercase tracking-widest italic rounded-xl shadow-xl shadow-orange-100 cursor-not-allowed">
-                                        ↗ Hubungi Admin untuk Pendaftaran
-                                    </span>
-                                </div>
+                                {!events || events.length === 0 ? (
+                                    <p className="text-orange-600 font-bold italic">Belum ada acara yang tersedia.</p>
+                                ) : (
+                                    <div className="space-y-3 max-h-[300px] overflow-y-auto pr-2">
+                                        {events.map((event) => (
+                                            <Link
+                                                key={event.id}
+                                                href={route('cikgu.events.participants.index', event.id)}
+                                                className="flex items-center justify-between p-4 bg-white border-2 border-orange-200 rounded-xl hover:bg-orange-100 hover:border-orange-400 transition-all active:scale-[0.98] group/link"
+                                            >
+                                                <div>
+                                                    <div className="text-sm font-black text-slate-900 uppercase tracking-tighter">
+                                                        {event.name}
+                                                    </div>
+                                                    <div className="text-xs text-slate-500 font-bold italic">
+                                                        {event.category_label} · {event.gender_label} · {event.type_label}
+                                                    </div>
+                                                </div>
+                                                <div className="flex items-center gap-3">
+                                                    <span className="text-xs font-black text-orange-600">
+                                                        {event.participants_count}{event.max_participants ? `/${event.max_participants}` : ''} peserta
+                                                    </span>
+                                                    <svg className="w-5 h-5 text-orange-600 group-hover/link:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M9 5l7 7-7 7" />
+                                                    </svg>
+                                                </div>
+                                            </Link>
+                                        ))}
+                                    </div>
+                                )}
                             </div>
                             <div className="absolute -bottom-10 -right-10 w-40 h-40 bg-orange-100 rounded-full group-hover:scale-150 transition-transform duration-700 -z-10" />
                         </div>
@@ -200,10 +228,10 @@ export default function CikguDashboard({ stats, houses, sekolah, myHouse }) {
                             <span className="w-6 h-6 bg-slate-900 text-white rounded-full flex items-center justify-center text-xs font-black flex-shrink-0 mt-0.5">2</span>
                             <span><strong>Tambah pelajar baharu</strong> yang belum berdaftar.</span>
                         </li>
-                        <li className="flex items-start gap-3">
-                            <span className="w-6 h-6 bg-slate-900 text-white rounded-full flex items-center justify-center text-xs font-black flex-shrink-0 mt-0.5">3</span>
-                            <span><strong>Hubungi admin</strong> untuk pendaftaran acara sekolah.</span>
-                        </li>
+                    <li className="flex items-start gap-3">
+                        <span className="w-6 h-6 bg-slate-900 text-white rounded-full flex items-center justify-center text-xs font-black flex-shrink-0 mt-0.5">3</span>
+                        <span><strong>Daftar pelajar untuk acara</strong> yang tersedia di panel Pendaftaran Acara.</span>
+                    </li>
                     </ul>
                 </div>
             </div>

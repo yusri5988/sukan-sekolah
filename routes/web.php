@@ -145,6 +145,7 @@ Route::middleware(['auth', AdminSekolahMiddleware::class])->prefix('admin-sekola
 // Cikgu Routes
 Route::middleware(['auth', CikguMiddleware::class])->prefix('cikgu')->name('cikgu.')->group(function () {
     Route::get('/dashboard', [CikguController::class, 'dashboard'])->name('dashboard');
+    Route::get('/events', [CikguController::class, 'eventIndex'])->name('events.index');
     Route::get('/students', [CikguController::class, 'studentIndex'])->name('students.index');
     Route::get('/students/create', [CikguController::class, 'studentCreate'])->name('students.create');
     Route::post('/students', [CikguController::class, 'studentStore'])->name('students.store');

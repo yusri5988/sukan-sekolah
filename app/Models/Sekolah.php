@@ -80,4 +80,12 @@ class Sekolah extends Model
     {
         return $this->hasOne(Meet::class);
     }
+
+    /**
+     * Get all events for this sekolah
+     */
+    public function events(): HasMany
+    {
+        return $this->hasMany(Event::class);
+    }
 }

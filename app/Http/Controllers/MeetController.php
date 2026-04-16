@@ -88,7 +88,16 @@ class MeetController extends Controller
         $meet->load('events');
 
         return Inertia::render('AdminSekolah/Meets/Show', [
-            'meet' => $meet,
+            'meet' => [
+                'id' => $meet->id,
+                'name' => $meet->name,
+                'date' => $meet->date ? $meet->date->format('Y-m-d') : null,
+                'closing_date' => $meet->closing_date ? $meet->closing_date->format('Y-m-d') : null,
+                'description' => $meet->description,
+                'status' => $meet->status,
+                'point_config' => $meet->point_config,
+                'is_public' => $meet->is_public,
+            ],
         ]);
     }
 

@@ -1,5 +1,6 @@
 import AdminSekolahLayout from '@/Layouts/AdminSekolahLayout';
 import { Head, Link } from '@inertiajs/react';
+import CountdownHero from '@/Components/CountdownHero';
 
 export default function AdminSekolahDashboard({ stats, houses, sekolah }) {
     return (
@@ -30,6 +31,8 @@ export default function AdminSekolahDashboard({ stats, houses, sekolah }) {
             <Head title={`Dashboard | ${sekolah.nama}`} />
 
             <div className="space-y-12">
+                {/* Dashboard Hero Countdown */}
+                <CountdownHero meet={sekolah.meet} />
                 {/* Stats Grid */}
                 <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
                     {[

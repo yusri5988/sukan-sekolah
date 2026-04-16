@@ -45,11 +45,30 @@ class CikguController extends Controller
             ->orderBy('points', 'desc')
             ->get();
 
+        $events = $sekolah->events()
+            ->where('is_active', true)
+            ->with('eventCategory')
+            ->orderBy('order')
+            ->orderBy('name')
+            ->get()
+            ->map(function ($event) {
+                return [
+                    'id' => $event->id,
+                    'name' => $event->name,
+                    'category_label' => $event->category_label,
+                    'gender_label' => $event->gender_label,
+                    'type_label' => $event->type_label,
+                    'participants_count' => $event->participants()->count(),
+                    'max_participants' => $event->max_participants,
+                ];
+            });
+
         return Inertia::render('Cikgu/Dashboard', [
             'stats' => $stats,
             'houses' => $houses,
-            'sekolah' => $sekolah,
+            'sekolah' => $sekolah->load('meet'),
             'myHouse' => $house,
+            'events' => $events,
         ]);
     }
 
@@ -157,6 +176,89 @@ class CikguController extends Controller
         return redirect()
             ->route('cikgu.students.index')
             ->with('success', $count.' pelajar berjaya diperuntukkan kepada Rumah '.$user->house->name.'.');
+    }
+
+    /**
+     * List all events for event registration.
+     */
+    public function eventIndex(Request $request)
+    {
+        $user = auth()->user();
+        $sekolah = $user->sekolah;
+
+        if (! $sekolah) {
+            return redirect()->route('dashboard')->with('error', 'Tiada sekolah dihubungkan dengan akaun anda.');
+        }
+
+        $filterCategory = $request->query('category');
+        $filterGender = $request->query('gender');
+        $search = $request->query('search');
+
+        $query = $sekolah->events()
+            ->where('is_active', true)
+            ->with('eventCategory')
+            ->withCount('participants');
+
+        if ($filterCategory) {
+            $query->where('category', $filterCategory);
+        }
+
+        if ($filterGender) {
+            $query->where('gender', $filterGender);
+        }
+
+        if ($search) {
+            $query->where('name', 'like', '%'.$search.'%');
+        }
+
+        $events = $query->orderBy('order')
+            ->orderBy('name')
+            ->get()
+            ->map(function ($event) use ($user) {
+                $houseParticipants = $event->participants()
+                    ->where('house_id', $user->house_id)
+                    ->count();
+
+                return [
+                    'id' => $event->id,
+                    'name' => $event->name,
+                    'category_label' => $event->category_label,
+                    'gender_label' => $event->gender_label,
+                    'type_label' => $event->type_label,
+                    'category' => $event->category,
+                    'gender' => $event->gender,
+                    'type' => $event->type,
+                    'total_participants' => $event->participants_count,
+                    'my_house_participants' => $houseParticipants,
+                    'max_participants' => $event->max_participants,
+                ];
+            });
+
+        $categories = $sekolah->events()
+            ->where('is_active', true)
+            ->distinct()
+            ->pluck('category')
+            ->sort()
+            ->values();
+
+        $genders = $sekolah->events()
+            ->where('is_active', true)
+            ->distinct()
+            ->pluck('gender')
+            ->sort()
+            ->values();
+
+        return Inertia::render('Cikgu/Events/Index', [
+            'events' => $events,
+            'categories' => $categories,
+            'genders' => $genders,
+            'myHouse' => $user->house,
+            'filters' => [
+                'category' => $filterCategory,
+                'gender' => $filterGender,
+                'search' => $search,
+            ],
+        ]);
     }
 
     /**

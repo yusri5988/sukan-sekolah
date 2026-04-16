@@ -32,7 +32,7 @@ class AdminSekolahController extends Controller
         return Inertia::render('AdminSekolah/Dashboard', [
             'stats' => $stats,
             'houses' => $houses,
-            'sekolah' => $sekolah,
+            'sekolah' => $sekolah->load('meet'),
         ]);
     }
 }

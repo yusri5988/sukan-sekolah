@@ -37,11 +37,11 @@ export default function Welcome({ auth }) {
                         </span>
                     </div>
 
-                    <div className="flex items-center gap-4">
+                    <div className="flex items-center gap-3 sm:gap-4">
                         {auth.user ? (
                             <Link
                                 href={route('dashboard')}
-                                className="px-6 py-2.5 bg-slate-900 text-white text-sm font-black uppercase tracking-widest rounded-lg hover:bg-orange-600 transition-all active:scale-95 shadow-xl shadow-slate-200"
+                                className="px-4 md:px-6 py-2 bg-slate-900 text-white text-[10px] md:text-xs font-black uppercase tracking-widest rounded-lg hover:bg-orange-600 transition-all active:scale-95 shadow-xl shadow-slate-200"
                             >
                                 Dashboard
                             </Link>
@@ -49,15 +49,15 @@ export default function Welcome({ auth }) {
                             <>
                                 <Link
                                     href={route('login')}
-                                    className="hidden sm:block text-xs font-black uppercase tracking-widest text-slate-500 hover:text-slate-900 transition-colors"
+                                    className="text-[10px] md:text-xs font-black uppercase tracking-widest text-slate-500 hover:text-orange-600 transition-colors"
                                 >
-                                    Log Masuk
+                                    Log In
                                 </Link>
                                 <Link
                                     href={route('register')}
-                                    className="px-6 py-2.5 bg-orange-600 text-white text-xs font-black uppercase tracking-widest rounded-lg hover:bg-slate-900 transition-all active:scale-95 shadow-lg shadow-orange-100"
+                                    className="px-4 md:px-6 py-2.5 bg-orange-600 text-white text-[10px] md:text-xs font-black uppercase tracking-widest rounded-lg hover:bg-slate-900 transition-all active:scale-95 shadow-lg shadow-orange-100"
                                 >
-                                    Daftar Sekarang
+                                    Daftar
                                 </Link>
                             </>
                         )}

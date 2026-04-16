@@ -189,8 +189,12 @@ class EventParticipantService
      */
     public function isEligibleForEvent(Student $student, Event $event): bool
     {
-        if ($event->category !== Event::CATEGORY_ALL && $student->age_category !== $event->category) {
-            return false;
+        // Check category based on year field
+        if ($event->category !== Event::CATEGORY_ALL) {
+            $yearCategory = 'tahun_'.$student->year;
+            if ($yearCategory !== $event->category) {
+                return false;
+            }
         }
 
         if ($event->gender === Event::GENDER_MALE && $student->gender !== 'male') {

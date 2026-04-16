@@ -60,16 +60,8 @@ export default function Login({ status, canResetPassword }) {
                 </div>
 
                 <div>
-                    <div className="flex justify-between items-center">
+                    <div>
                         <InputLabel htmlFor="password" value="Kata Laluan" />
-                        {canResetPassword && (
-                            <Link
-                                href={route('password.request')}
-                                className="text-[10px] font-black uppercase tracking-widest text-slate-400 hover:text-orange-600 transition-colors"
-                            >
-                                Lupa Kata Laluan?
-                            </Link>
-                        )}
                     </div>
 
                     <TextInput

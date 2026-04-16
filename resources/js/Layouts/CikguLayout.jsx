@@ -36,6 +36,12 @@ export default function CikguLayout({ header, children }) {
                             >
                                 Pelajar
                             </NavLink>
+                            <NavLink
+                                href={route('cikgu.events.index')}
+                                active={route().current('cikgu.events.*')}
+                            >
+                                Acara
+                            </NavLink>
                         </div>
                     </div>
 
@@ -141,6 +147,12 @@ export default function CikguLayout({ header, children }) {
                             active={route().current('cikgu.students.*')}
                         >
                             Pelajar
+                        </ResponsiveNavLink>
+                        <ResponsiveNavLink
+                            href={route('cikgu.events.index')}
+                            active={route().current('cikgu.events.*')}
+                        >
+                            Acara
                         </ResponsiveNavLink>
                     </div>
 

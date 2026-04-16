@@ -99,21 +99,7 @@ export default function StudentsIndex({ students, houses, selectedHouseId, sekol
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
                                 </svg>
                             </div>
-                            <p className="text-2xl font-black italic uppercase tracking-tighter text-slate-400 mb-8">Tiada Rekod Pelajar Dijumpai</p>
-                            <div className="flex flex-col sm:flex-row justify-center gap-4">
-                                <Link
-                                    href={route('admin-sekolah.students.create')}
-                                    className="px-8 py-4 bg-slate-900 text-white text-sm font-black uppercase tracking-widest italic rounded-xl hover:bg-orange-600 transition-all shadow-xl shadow-slate-200"
-                                >
-                                    Tambah Manual
-                                </Link>
-                                <Link
-                                    href={route('admin-sekolah.students.import')}
-                                    className="px-8 py-4 bg-white border-4 border-slate-900 text-slate-900 text-sm font-black uppercase tracking-widest italic rounded-xl hover:bg-slate-50 transition-all"
-                                >
-                                    Import CSV
-                                </Link>
-                            </div>
+                            <p className="text-2xl font-black italic uppercase tracking-tighter text-slate-400">Tiada Rekod Pelajar Dijumpai</p>
                         </div>
                     ) : (
                         <div className="overflow-x-auto">
