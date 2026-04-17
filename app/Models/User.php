@@ -26,6 +26,8 @@ class User extends Authenticatable
 
     public const ROLE_CIKGU_SUKAN = 'cikgu_sukan';
 
+    public const ROLE_PENGURUS_ACARA = 'pengurus_acara';
+
     /**
      * Teacher-like roles that should be treated as cikgu in the app.
      *
@@ -82,6 +84,14 @@ class User extends Authenticatable
     public function isCikguSukan(): bool
     {
         return $this->role === self::ROLE_CIKGU_SUKAN;
+    }
+
+    /**
+     * Check if user is event manager.
+     */
+    public function isPengurusAcara(): bool
+    {
+        return $this->role === self::ROLE_PENGURUS_ACARA;
     }
 
     /**

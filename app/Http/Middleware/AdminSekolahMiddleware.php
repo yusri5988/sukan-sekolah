@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Models\User;
 use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -21,8 +22,8 @@ class AdminSekolahMiddleware
 
         $user = auth()->user();
 
-        if (! $user->isAdminSekolah()) {
-            abort(403, 'Unauthorized. Admin Sekolah access only.');
+        if (! $this->canAccessRoute($request, $user)) {
+            abort(403, 'Unauthorized. Admin Sekolah or Pengurus Acara access only.');
         }
 
         if (! $user->sekolah_id) {
@@ -30,5 +31,21 @@ class AdminSekolahMiddleware
         }
 
         return $next($request);
+    }
+
+    /**
+     * Allow admin sekolah everywhere, and pengurus acara only on event-related routes.
+     */
+    private function canAccessRoute(Request $request, User $user): bool
+    {
+        if ($user->isAdminSekolah()) {
+            return true;
+        }
+
+        if ($user->isPengurusAcara()) {
+            return $request->routeIs('admin-sekolah.events.*', 'admin-sekolah.results.*');
+        }
+
+        return false;
     }
 }

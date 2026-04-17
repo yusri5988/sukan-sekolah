@@ -45,6 +45,10 @@ Route::get('/dashboard', function () {
         return redirect()->route('admin-sekolah.dashboard');
     }
 
+    if ($user->isPengurusAcara()) {
+        return redirect()->route('admin-sekolah.events.index');
+    }
+
     if ($user->isCikgu()) {
         return redirect()->route('cikgu.dashboard');
     }
