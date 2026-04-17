@@ -46,7 +46,7 @@ class Sekolah extends Model
      */
     public function cikgus(): HasMany
     {
-        return $this->hasMany(User::class)->where('role', User::ROLE_CIKGU);
+        return $this->hasMany(User::class)->whereIn('role', User::teacherRoles());
     }
 
     /**

@@ -20,7 +20,7 @@ class TeacherAssignmentService
      */
     public function getTeachersWithHouse(Sekolah $school): Collection
     {
-        return User::where('role', User::ROLE_CIKGU)
+        return User::whereIn('role', User::teacherRoles())
             ->where('sekolah_id', $school->id)
             ->with('house')
             ->get();

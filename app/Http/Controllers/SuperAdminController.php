@@ -16,7 +16,7 @@ class SuperAdminController extends Controller
         $stats = [
             'total_sekolah' => Sekolah::count(),
             'total_admin_sekolah' => User::where('role', User::ROLE_ADMIN_SEKOLAH)->count(),
-            'total_cikgu' => User::where('role', User::ROLE_CIKGU)->count(),
+            'total_cikgu' => User::whereIn('role', User::teacherRoles())->count(),
         ];
 
         return Inertia::render('SuperAdmin/Dashboard', [

@@ -24,6 +24,21 @@ class User extends Authenticatable
 
     public const ROLE_CIKGU = 'cikgu';
 
+    public const ROLE_CIKGU_SUKAN = 'cikgu_sukan';
+
+    /**
+     * Teacher-like roles that should be treated as cikgu in the app.
+     *
+     * @return array<int, string>
+     */
+    public static function teacherRoles(): array
+    {
+        return [
+            self::ROLE_CIKGU,
+            self::ROLE_CIKGU_SUKAN,
+        ];
+    }
+
     /**
      * Get the attributes that should be cast.
      *
@@ -58,7 +73,15 @@ class User extends Authenticatable
      */
     public function isCikgu(): bool
     {
-        return $this->role === self::ROLE_CIKGU;
+        return in_array($this->role, self::teacherRoles(), true);
+    }
+
+    /**
+     * Check if user is the special sports teacher role.
+     */
+    public function isCikguSukan(): bool
+    {
+        return $this->role === self::ROLE_CIKGU_SUKAN;
     }
 
     /**
