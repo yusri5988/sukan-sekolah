@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Event;
 use App\Services\EventService;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 use Inertia\Inertia;
 
 class EventController extends Controller
@@ -157,14 +158,26 @@ class EventController extends Controller
 
         $validated = $request->validate([
             'name' => 'required|string|max:255',
-            'category' => 'required|in:7-9,10-12,13-15,16+,all',
+            'category' => ['required', Rule::in([
+                'tahun_1',
+                'tahun_2',
+                'tahun_3',
+                'tahun_4',
+                'tahun_5',
+                'tahun_6',
+                'all',
+                '7-9',
+                '10-12',
+                '13-15',
+                '16+',
+            ])],
             'gender' => 'required|in:male,female,mixed',
-            'type' => 'required|in:individual,relay',
             'max_participants' => 'nullable|integer|min:1|max:20',
             'scheduled_time' => 'nullable|date_format:H:i',
             'scheduled_date' => 'nullable|date',
             'is_active' => 'boolean',
             'settings' => 'nullable|array',
+            'settings.max_participants_per_house' => 'nullable|integer|min:1|max:20',
         ]);
 
         $this->eventService->updateEvent($event, $validated);

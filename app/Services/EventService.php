@@ -7,6 +7,7 @@ use App\Models\EventCategory;
 use App\Models\EventTemplate;
 use App\Models\ScoringRule;
 use App\Models\Sekolah;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
 
 class EventService
@@ -94,7 +95,19 @@ class EventService
      */
     public function updateEvent(Event $event, array $data): Event
     {
-        $event->update($data);
+        $settings = array_merge($event->settings ?? [], $data['settings'] ?? []);
+
+        if (isset($settings['lane_count'])) {
+            $settings['lane_count'] = (int) $settings['lane_count'];
+        }
+
+        if (isset($settings['max_participants_per_house'])) {
+            $settings['max_participants_per_house'] = (int) $settings['max_participants_per_house'];
+        }
+
+        $event->fill(Arr::except($data, ['settings']));
+        $event->settings = $settings;
+        $event->save();
 
         return $event->fresh();
     }

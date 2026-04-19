@@ -2,6 +2,8 @@ import AdminSekolahLayout from '@/Layouts/AdminSekolahLayout';
 import { Head, Link } from '@inertiajs/react';
 
 export default function EventsShow({ meet, event }) {
+    const maxParticipantsPerHouse = event.settings?.max_participants_per_house ?? event.max_participants ?? 1;
+
     return (
         <AdminSekolahLayout>
             <Head title={`${event.name} - Perincian`} />
@@ -71,8 +73,8 @@ export default function EventsShow({ meet, event }) {
                                     </div>
                                 </div>
                                 <div className="px-4 md:px-6 py-3 md:py-4 bg-white/5 backdrop-blur-md rounded-2xl border border-white/10 group hover:bg-white transition-all duration-300 col-span-2 md:col-span-1">
-                                    <div className="text-[9px] font-bold text-slate-400 uppercase tracking-widest group-hover:text-slate-500 mb-1">Maksima</div>
-                                    <div className="text-lg md:text-2xl font-black italic uppercase text-white group-hover:text-slate-900 leading-none">{event.max_participants} <span className="text-[10px] italic opacity-50">Atlet</span></div>
+                                    <div className="text-[9px] font-bold text-slate-400 uppercase tracking-widest group-hover:text-slate-500 mb-1">Maksimum Pelajar / Rumah</div>
+                                    <div className="text-lg md:text-2xl font-black italic uppercase text-white group-hover:text-slate-900 leading-none">{maxParticipantsPerHouse} <span className="text-[10px] italic opacity-50">Pelajar</span></div>
                                 </div>
                             </div>
                         </div>

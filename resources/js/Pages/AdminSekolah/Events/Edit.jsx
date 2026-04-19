@@ -2,19 +2,44 @@ import AdminSekolahLayout from '@/Layouts/AdminSekolahLayout';
 import { Head, Link, useForm } from '@inertiajs/react';
 
 export default function EventsEdit({ meet, event }) {
+    const categoryOptions = [
+        { value: 'tahun_1', label: 'Tahun 1' },
+        { value: 'tahun_2', label: 'Tahun 2' },
+        { value: 'tahun_3', label: 'Tahun 3' },
+        { value: 'tahun_4', label: 'Tahun 4' },
+        { value: 'tahun_5', label: 'Tahun 5' },
+        { value: 'tahun_6', label: 'Tahun 6' },
+        { value: 'all', label: 'Semua Umur' },
+    ];
+
+    const legacyCategoryLabels = {
+        '7-9': '7-9 Tahun',
+        '10-12': '10-12 Tahun',
+        '13-15': '13-15 Tahun',
+        '16+': '16+ Tahun',
+    };
+
+    const selectedCategory = event.category || 'tahun_1';
+    const categorySelectOptions = categoryOptions.some((option) => option.value === selectedCategory)
+        ? categoryOptions
+        : [
+              {
+                  value: selectedCategory,
+                  label: `${legacyCategoryLabels[selectedCategory] || selectedCategory} (Lama)`,
+              },
+              ...categoryOptions,
+          ];
+
     const { data, setData, patch, processing, errors } = useForm({
         name: event.name || '',
-        category: event.category || '10-12',
+        category: selectedCategory,
         gender: event.gender || 'male',
-        type: event.type || 'individual',
-        max_participants: event.max_participants || 1,
         scheduled_time: event.scheduled_time || '',
         scheduled_date: event.scheduled_date || '',
         is_active: event.is_active ?? true,
         settings: {
             lane_count: event.settings?.lane_count || 8,
-            qualifier_count: event.settings?.qualifier_count || 4,
-            max_participants_per_house: event.settings?.max_participants_per_house || 2,
+            max_participants_per_house: event.settings?.max_participants_per_house || 4,
         }
     });
 
@@ -95,11 +120,11 @@ export default function EventsEdit({ meet, event }) {
                                             onChange={(e) => setData('category', e.target.value)}
                                             className="w-full px-6 py-4 bg-slate-50 border-4 border-slate-900 rounded-2xl text-slate-900 font-bold focus:outline-none focus:border-orange-600 focus:ring-4 focus:ring-orange-600/20 transition-all appearance-none cursor-pointer"
                                         >
-                                            <option value="7-9">7-9 Tahun</option>
-                                            <option value="10-12">10-12 Tahun</option>
-                                            <option value="13-15">13-15 Tahun</option>
-                                            <option value="16+">16+ Tahun</option>
-                                            <option value="all">Semua Umur</option>
+                                            {categorySelectOptions.map((option) => (
+                                                <option key={option.value} value={option.value}>
+                                                    {option.label}
+                                                </option>
+                                            ))}
                                         </select>
                                         {errors.category && (
                                             <p className="mt-2 text-sm font-bold text-red-600 italic">{errors.category}</p>
@@ -125,68 +150,31 @@ export default function EventsEdit({ meet, event }) {
                                     </div>
                                 </div>
 
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                    <div>
-                                        <label className="block text-xs font-black uppercase tracking-[0.3em] text-slate-500 mb-2">
-                                            Jenis <span className="text-orange-600">*</span>
-                                        </label>
-                                        <select
-                                            value={data.type}
-                                            onChange={(e) => setData('type', e.target.value)}
-                                            className="w-full px-6 py-4 bg-slate-50 border-4 border-slate-900 rounded-2xl text-slate-900 font-bold focus:outline-none focus:border-orange-600 focus:ring-4 focus:ring-orange-600/20 transition-all appearance-none cursor-pointer"
-                                        >
-                                            <option value="individual">Individu</option>
-                                            <option value="relay">Relay</option>
-                                        </select>
-                                        {errors.type && (
-                                            <p className="mt-2 text-sm font-bold text-red-600 italic">{errors.type}</p>
-                                        )}
-                                    </div>
-
-                                    <div>
-                                        <label className="block text-xs font-black uppercase tracking-[0.3em] text-slate-500 mb-2">
-                                            Max Peserta
-                                        </label>
-                                        <input
-                                            type="number"
-                                            value={data.max_participants}
-                                            onChange={(e) => setData('max_participants', parseInt(e.target.value) || 1)}
-                                            className="w-full px-6 py-4 bg-slate-50 border-4 border-slate-900 rounded-2xl text-slate-900 font-bold focus:outline-none focus:border-orange-600 focus:ring-4 focus:ring-orange-600/20 transition-all [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-                                            min="1"
-                                            max="20"
-                                        />
-                                        {errors.max_participants && (
-                                            <p className="mt-2 text-sm font-bold text-red-600 italic">{errors.max_participants}</p>
-                                        )}
-                                    </div>
+                                <div>
+                                    <label className="block text-xs font-black uppercase tracking-[0.3em] text-slate-500 mb-2">
+                                        Maksimum Pelajar / Rumah <span className="text-orange-600">*</span>
+                                    </label>
+                                    <input
+                                        type="number"
+                                        value={data.settings.max_participants_per_house}
+                                        onChange={e => setData('settings', { ...data.settings, max_participants_per_house: parseInt(e.target.value) || 4 })}
+                                        className="w-full px-6 py-4 bg-slate-50 border-4 border-slate-900 rounded-2xl text-slate-900 font-bold focus:outline-none focus:border-orange-600 focus:ring-4 focus:ring-orange-600/20 transition-all [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                                        min="1"
+                                        max="20"
+                                    />
+                                    {errors['settings.max_participants_per_house'] && (
+                                        <p className="mt-2 text-sm font-bold text-red-600 italic">{errors['settings.max_participants_per_house']}</p>
+                                    )}
                                 </div>
 
                                 {/* Dynamic Settings */}
-                                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pt-6 border-t-2 border-slate-100">
+                                <div className="grid grid-cols-1 gap-6 pt-6 border-t-2 border-slate-100">
                                     <div>
                                         <label className="block text-xs font-black uppercase tracking-widest text-slate-500 mb-2">Bil. Lorong</label>
                                         <input
                                             type="number"
                                             value={data.settings.lane_count}
                                             onChange={e => setData('settings', { ...data.settings, lane_count: parseInt(e.target.value) || 8 })}
-                                            className="w-full px-6 py-4 bg-slate-50 border-4 border-slate-900 rounded-2xl text-slate-900 font-bold focus:border-orange-600"
-                                        />
-                                    </div>
-                                    <div>
-                                        <label className="block text-xs font-black uppercase tracking-widest text-slate-500 mb-2">Kuota Final</label>
-                                        <input
-                                            type="number"
-                                            value={data.settings.qualifier_count}
-                                            onChange={e => setData('settings', { ...data.settings, qualifier_count: parseInt(e.target.value) || 4 })}
-                                            className="w-full px-6 py-4 bg-slate-50 border-4 border-slate-900 rounded-2xl text-slate-900 font-bold focus:border-orange-600"
-                                        />
-                                    </div>
-                                    <div>
-                                        <label className="block text-xs font-black uppercase tracking-widest text-slate-500 mb-2">Had/Rumah</label>
-                                        <input
-                                            type="number"
-                                            value={data.settings.max_participants_per_house}
-                                            onChange={e => setData('settings', { ...data.settings, max_participants_per_house: parseInt(e.target.value) || 2 })}
                                             className="w-full px-6 py-4 bg-slate-50 border-4 border-slate-900 rounded-2xl text-slate-900 font-bold focus:border-orange-600"
                                         />
                                     </div>
