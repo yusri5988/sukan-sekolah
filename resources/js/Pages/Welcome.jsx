@@ -49,7 +49,7 @@ export default function Welcome({ auth }) {
                             <>
                                 <Link
                                     href={route('login')}
-                                    className="text-[10px] md:text-xs font-black uppercase tracking-widest text-slate-500 hover:text-orange-600 transition-colors"
+                                    className="px-4 md:px-6 py-2.5 bg-slate-900 text-white text-[10px] md:text-xs font-black uppercase tracking-widest rounded-lg hover:bg-orange-600 transition-all active:scale-95 shadow-lg shadow-slate-200"
                                 >
                                     Log In
                                 </Link>
@@ -78,8 +78,8 @@ export default function Welcome({ auth }) {
                     <div className="grid lg:grid-cols-12 gap-12 items-center">
                         <div className="lg:col-span-7">
                             <div className="inline-flex items-center gap-3 mb-8">
-                                <div className="w-12 h-[2px] bg-orange-600" />
-                                <span className="text-orange-600 text-sm font-black uppercase tracking-[0.3em]">Digital Sports Excellence</span>
+                                <div className="w-12 h-[2px] bg-slate-400" />
+                                <span className="text-slate-400 text-sm font-black uppercase tracking-[0.3em]">Kecemerlangan Sukan Digital</span>
                             </div>
                             
                             <h1 className="text-6xl lg:text-[110px] font-black italic tracking-tighter leading-[0.85] text-slate-900 uppercase mb-8">
@@ -98,12 +98,6 @@ export default function Welcome({ auth }) {
                                 >
                                     Mula Sekarang
                                 </Link>
-                                <a
-                                    href="#guru"
-                                    className="px-10 py-5 bg-white text-slate-900 border-4 border-slate-900 text-xl font-black uppercase tracking-widest italic rounded-xl hover:bg-slate-50 transition-all active:scale-95 text-center"
-                                >
-                                    Lihat Ciri
-                                </a>
                             </div>
 
                             <div className="flex items-center gap-8 border-t-2 border-slate-100 pt-8">
