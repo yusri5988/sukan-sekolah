@@ -122,7 +122,7 @@ export default function Welcome({ auth }) {
                                         <div className="w-3 h-3 rounded-full bg-red-500 animate-pulse" />
                                         <span className="text-xs font-black uppercase tracking-widest text-white">Ranking Secara Langsung</span>
                                     </div>
-                                    <span className="text-[10px] font-bold text-slate-400">14 APR 2026 • 10:45 AM</span>
+                                    <span className="text-[10px] font-bold text-slate-400">{'14 APR 2026 \u2022 10:45 AM'}</span>
                                     </div>
 
                                     <div className="space-y-4">
@@ -163,11 +163,11 @@ export default function Welcome({ auth }) {
                     {[1, 2, 3, 4, 5].map(i => (
                         <div key={i} className="flex items-center gap-12">
                             <span className="text-2xl font-black italic uppercase text-white tracking-tighter">Keputusan Real-Time</span>
-                            <span className="text-2xl text-white opacity-50">•</span>
+                            <span className="text-2xl text-white opacity-50">{'\u2022'}</span>
                             <span className="text-2xl font-black italic uppercase text-white tracking-tighter">Urus Atlet Mudah</span>
-                            <span className="text-2xl text-white opacity-50">•</span>
+                            <span className="text-2xl text-white opacity-50">{'\u2022'}</span>
                             <span className="text-2xl font-black italic uppercase text-white tracking-tighter">Ranking Automatik</span>
-                            <span className="text-2xl text-white opacity-50">•</span>
+                            <span className="text-2xl text-white opacity-50">{'\u2022'}</span>
                         </div>
                     ))}
                 </div>
@@ -180,7 +180,7 @@ export default function Welcome({ auth }) {
                         <div className="relative">
                             <div className="aspect-[4/5] bg-slate-100 rounded-[2.5rem] overflow-hidden border-8 border-slate-900 shadow-2xl relative group">
                                 <img 
-                                    src="https://images.unsplash.com/photo-1544644181-1484b3fdfc62?auto=format&fit=crop&q=80&w=1200" 
+                                    src="/images/teacher-field.svg" 
                                     className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700"
                                     alt="Teacher On Field"
                                 />
@@ -261,7 +261,7 @@ export default function Welcome({ auth }) {
                         <div className="relative">
                              <div className="w-[300px] h-[600px] bg-slate-800 rounded-[3rem] border-8 border-slate-700 shadow-2xl overflow-hidden relative group">
                                 <img 
-                                    src="https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&q=80&w=800" 
+                                    src="/images/parent-phone.svg" 
                                     className="w-full h-full object-cover opacity-60 group-hover:scale-110 transition-transform duration-[2s]"
                                     alt="Live App on Phone"
                                 />
@@ -273,7 +273,7 @@ export default function Welcome({ auth }) {
                                             </div>
                                             <span className="text-xs font-black uppercase text-slate-900">Keputusan Baru!</span>
                                         </div>
-                                        <div className="text-sm font-bold text-slate-600 italic">Anak anda memenangi Emas dalam acara 100m (L1)! 🥇</div>
+                                        <div className="text-sm font-bold text-slate-600 italic">{'Anak anda memenangi Emas dalam acara 100m (L1)! \u{1F947}'}</div>
                                     </div>
                                 </div>
                              </div>
@@ -385,7 +385,7 @@ export default function Welcome({ auth }) {
                     
                     <div className="pt-16 flex flex-col md:flex-row justify-between items-center gap-6">
                         <p className="text-slate-400 font-black uppercase tracking-widest text-[10px]">
-                            © 2026 Sistem Hari Sukan Sekolah. Built for speed.
+                            {'\u00A9 2026 Sistem Hari Sukan Sekolah. Built for speed.'}
                         </p>
                         <div className="flex gap-8 text-[10px] font-black uppercase tracking-widest text-slate-400">
                             <a href="#" className="hover:text-slate-900 transition-colors">Privacy Policy</a>
