@@ -82,45 +82,44 @@ export default function HousesIndex({ houses }) {
                         </Link>
                     </div>
                 ) : (
-                    <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
+                    <div className="space-y-3">
                         {houses.map((house) => (
-                            <div key={house.id} className="bg-white border border-slate-100 rounded-2xl shadow-sm hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300 group overflow-hidden">
+                            <div key={house.id} className="bg-white border border-slate-100 rounded-2xl shadow-sm hover:shadow-md transition-all duration-300 group overflow-hidden flex items-stretch">
                                 <div 
-                                    className="h-16 p-4 flex items-end justify-between relative overflow-hidden"
+                                    className="w-3 shrink-0"
                                     style={house.color ? { backgroundColor: house.color } : { backgroundColor: '#0f172a' }}
-                                >
-                                    <div className="absolute inset-0 bg-black/10 mix-blend-overlay" />
-                                    <h3 className="text-sm md:text-base font-black italic uppercase tracking-tighter text-white relative z-10 drop-shadow-md truncate">
+                                />
+                                <div className="flex-1 p-3 flex items-center justify-between gap-4">
+                                    <h3 className="text-sm md:text-base font-black italic uppercase tracking-tighter text-slate-900 truncate">
                                         {house.name}
                                     </h3>
-                                </div>
-                                
-                                <div className="p-3 flex gap-2">
-                                    <Link
-                                        href={route('admin-sekolah.houses.edit', house.id)}
-                                        className="flex-1 flex items-center justify-center px-3 py-2 bg-white border border-slate-200 text-slate-900 text-[9px] font-black uppercase tracking-[0.15em] italic rounded-lg hover:bg-slate-50 active:scale-95 transition-all shadow-sm"
-                                    >
-                                        Edit
-                                    </Link>
-                                    <form
-                                        action={route('admin-sekolah.houses.destroy', house.id)}
-                                        method="POST"
-                                        className="shrink-0"
-                                        onSubmit={(e) => {
-                                            if (!confirm('Adakah anda pasti ingin menghapuskan rumah sukan ini?')) {
-                                                e.preventDefault();
-                                            }
-                                        }}
-                                    >
-                                        <input type="hidden" name="_method" value="DELETE" />
-                                        <button
-                                            type="submit"
-                                            className="w-9 h-9 bg-red-50 text-red-600 rounded-lg hover:bg-red-600 hover:text-white transition-all text-center flex items-center justify-center border border-red-100 active:scale-90"
-                                            title="Hapus Rumah"
+                                    <div className="flex items-center gap-2 shrink-0">
+                                        <Link
+                                            href={route('admin-sekolah.houses.edit', house.id)}
+                                            className="px-4 py-2 bg-white border border-slate-200 text-slate-900 text-[9px] font-black uppercase tracking-[0.15em] italic rounded-lg hover:bg-slate-50 active:scale-95 transition-all shadow-sm"
                                         >
-                                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
-                                        </button>
-                                    </form>
+                                            Edit
+                                        </Link>
+                                        <form
+                                            action={route('admin-sekolah.houses.destroy', house.id)}
+                                            method="POST"
+                                            className="shrink-0"
+                                            onSubmit={(e) => {
+                                                if (!confirm('Adakah anda pasti ingin menghapuskan rumah sukan ini?')) {
+                                                    e.preventDefault();
+                                                }
+                                            }}
+                                        >
+                                            <input type="hidden" name="_method" value="DELETE" />
+                                            <button
+                                                type="submit"
+                                                className="w-9 h-9 bg-red-50 text-red-600 rounded-lg hover:bg-red-600 hover:text-white transition-all text-center flex items-center justify-center border border-red-100 active:scale-90"
+                                                title="Hapus Rumah"
+                                            >
+                                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                                            </button>
+                                        </form>
+                                    </div>
                                 </div>
                             </div>
                         ))}
