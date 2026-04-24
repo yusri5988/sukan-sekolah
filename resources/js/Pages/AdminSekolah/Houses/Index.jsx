@@ -100,11 +100,7 @@ export default function HousesIndex({ houses }) {
                                 </div>
                                 
                                 <div className="p-6 flex-1 flex flex-col">
-                                    <div className="grid grid-cols-2 gap-3 mb-6">
-                                        <div className="bg-slate-50 p-3 rounded-2xl border border-slate-100/50 flex flex-col items-center justify-center">
-                                            <div className="text-[9px] font-black uppercase tracking-widest text-slate-400 mb-1 leading-none">Mata</div>
-                                            <div className="text-xl font-black italic text-slate-900 tabular-nums leading-none">{house.points}</div>
-                                        </div>
+                                    <div className="mb-6">
                                         <div className="bg-slate-50 p-3 rounded-2xl border border-slate-100/50 flex flex-col items-center justify-center">
                                             <div className="text-[9px] font-black uppercase tracking-widest text-slate-400 mb-1 leading-none">Atlet</div>
                                             <div className="text-xl font-black italic text-slate-900 tabular-nums leading-none">{house.students_count}</div>
@@ -113,10 +109,10 @@ export default function HousesIndex({ houses }) {
                                     
                                     <div className="flex gap-2 mt-auto">
                                         <Link
-                                            href={route('admin-sekolah.houses.show', house.id)}
+                                            href={route('admin-sekolah.houses.edit', house.id)}
                                             className="flex-1 flex items-center justify-center px-4 py-3 bg-white border border-slate-200 text-slate-900 text-[10px] font-black uppercase tracking-[0.2em] italic rounded-xl hover:bg-slate-50 active:scale-95 transition-all shadow-sm"
                                         >
-                                            Penuh
+                                            Edit
                                         </Link>
                                         <form
                                             action={route('admin-sekolah.houses.destroy', house.id)}

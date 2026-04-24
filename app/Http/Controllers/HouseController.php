@@ -62,6 +62,51 @@ class HouseController extends Controller
     }
 
     /**
+     * Show form to edit house
+     */
+    public function edit(House $house)
+    {
+        $user = Auth::user();
+
+        if ($house->sekolah_id !== $user->sekolah_id) {
+            abort(403, 'Anda tidak mempunyai akses ke rumah sukan ini.');
+        }
+
+        return Inertia::render('AdminSekolah/Houses/Edit', [
+            'house' => $house,
+        ]);
+    }
+
+    /**
+     * Update house
+     */
+    public function update(Request $request, House $house)
+    {
+        $user = Auth::user();
+        $sekolah = $user->sekolah;
+
+        if ($house->sekolah_id !== $sekolah->id) {
+            abort(403, 'Anda tidak mempunyai akses ke rumah sukan ini.');
+        }
+
+        $validated = $request->validate([
+            'color' => ['required', Rule::in(['#ef4444', '#3b82f6', '#22c55e', '#eab308'])],
+            'name' => [
+                'required',
+                'string',
+                'max:255',
+                Rule::unique('houses', 'name')->where(fn ($query) => $query->where('sekolah_id', $sekolah->id))->ignore($house->id),
+            ],
+        ]);
+
+        $house->update($validated);
+
+        return redirect()
+            ->route('admin-sekolah.houses.index')
+            ->with('success', 'Rumah sukan berjaya dikemaskini.');
+    }
+
+    /**
      * Show single house details
      * Paparkan pelajar dan cikgu-cikgu yang menjaga rumah ini
      */
