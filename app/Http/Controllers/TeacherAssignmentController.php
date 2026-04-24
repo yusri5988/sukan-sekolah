@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Response;
+use Illuminate\Validation\Rule;
 use Inertia\Inertia;
 
 /**
@@ -93,5 +94,47 @@ class TeacherAssignmentController extends Controller
         }
 
         return Response::json(['message' => 'Assignment updated successfully.']);
+    }
+
+    /**
+     * Appoint a teacher to a specific role.
+     *
+     * @param  User  $teacher  (Route‑model bound, must be a teacher)
+     */
+    public function appoint(Request $request, User $teacher)
+    {
+        $admin = Auth::user();
+        $school = $admin->sekolah;
+
+        $data = $request->validate([
+            'role' => ['required', Rule::in([
+                User::ROLE_CIKGU,
+                User::ROLE_CIKGU_SUKAN,
+                User::ROLE_PENGURUS_ACARA,
+                User::ROLE_PENGURUSAN_KEPUTUSAN,
+            ])],
+            'house_id' => ['nullable', 'required_if:role,' . User::ROLE_CIKGU_SUKAN, 'exists:houses,id'],
+        ]);
+
+        // Ensure the teacher belongs to the same school
+        if ($teacher->sekolah_id !== $school->id) {
+            return Response::json(['error' => 'Teacher does not belong to your school.'], 403);
+        }
+
+        $teacher->role = $data['role'];
+
+        if ($data['role'] === User::ROLE_CIKGU_SUKAN && ! is_null($data['house_id'])) {
+            $house = House::findOrFail($data['house_id']);
+            if ($house->sekolah_id !== $school->id) {
+                return Response::json(['error' => 'House does not belong to your school.'], 403);
+            }
+            $teacher->house_id = $house->id;
+        } elseif ($data['role'] !== User::ROLE_CIKGU_SUKAN) {
+            $teacher->house_id = null;
+        }
+
+        $teacher->save();
+
+        return Response::json(['message' => 'Pelantikan berjaya.']);
     }
 }

@@ -34,7 +34,8 @@ class AdminSekolahMiddleware
     }
 
     /**
-     * Allow admin sekolah everywhere, and pengurus acara only on event-related routes.
+     * Allow admin sekolah everywhere, pengurus acara only on events,
+     * and pengurusan keputusan on results.
      */
     private function canAccessRoute(Request $request, User $user): bool
     {
@@ -43,7 +44,15 @@ class AdminSekolahMiddleware
         }
 
         if ($user->isPengurusAcara()) {
-            return $request->routeIs('admin-sekolah.events.*', 'admin-sekolah.results.*');
+            return $request->routeIs('admin-sekolah.events.*');
+        }
+
+        if ($user->isPengurusanKeputusan()) {
+            return $request->routeIs(
+                'admin-sekolah.events.index',
+                'admin-sekolah.events.show',
+                'admin-sekolah.results.*'
+            );
         }
 
         return false;

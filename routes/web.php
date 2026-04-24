@@ -49,6 +49,10 @@ Route::get('/dashboard', function () {
         return redirect()->route('admin-sekolah.events.index');
     }
 
+    if ($user->isPengurusanKeputusan()) {
+        return redirect()->route('admin-sekolah.events.index');
+    }
+
     if ($user->isCikgu()) {
         return redirect()->route('cikgu.dashboard');
     }
@@ -81,6 +85,7 @@ Route::middleware(['auth', AdminSekolahMiddleware::class])->prefix('admin-sekola
     // Teacher House Assignments
     Route::get('/teachers/assignments', [TeacherAssignmentController::class, 'page'])->name('teachers.assignments.index');
     Route::patch('/teachers/{teacher}/assignment', [TeacherAssignmentController::class, 'update'])->name('teachers.assignment.update');
+    Route::post('/teachers/{teacher}/appoint', [TeacherAssignmentController::class, 'appoint'])->name('teachers.appoint');
 
     // Houses Management
     Route::get('/houses', [HouseController::class, 'index'])->name('houses.index');
@@ -102,6 +107,8 @@ Route::middleware(['auth', AdminSekolahMiddleware::class])->prefix('admin-sekola
 
     // Meets Management - Single kejohanan per sekolah
     Route::get('/meets', [MeetController::class, 'index'])->name('meets.index');
+    Route::get('/launch', [MeetController::class, 'launch'])->name('launch');
+    Route::post('/launch', [MeetController::class, 'processLaunch'])->name('launch.process');
     Route::get('/meets/show', [MeetController::class, 'show'])->name('meets.show');
     Route::get('/meets/edit', [MeetController::class, 'edit'])->name('meets.edit');
     Route::patch('/meets', [MeetController::class, 'update'])->name('meets.update');

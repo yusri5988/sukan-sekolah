@@ -22,11 +22,19 @@ class TeacherService
      */
     public function createTeacher(Sekolah $sekolah, array $data): User
     {
+        $validRoles = [
+            User::ROLE_CIKGU,
+            User::ROLE_CIKGU_SUKAN,
+            User::ROLE_PENGURUS_ACARA,
+            User::ROLE_PENGURUSAN_KEPUTUSAN,
+        ];
+        $role = in_array($data['role'] ?? null, $validRoles, true) ? $data['role'] : User::ROLE_CIKGU;
+
         return User::create([
             'name' => $data['name'],
             'email' => $data['email'],
             'password' => Hash::make($data['password']),
-            'role' => User::ROLE_CIKGU,
+            'role' => $role,
             'sekolah_id' => $sekolah->id,
         ]);
     }
@@ -36,8 +44,15 @@ class TeacherService
      */
     public function deleteTeacher(User $teacher, Sekolah $sekolah): bool
     {
+        $validTeacherRoles = [
+            User::ROLE_CIKGU,
+            User::ROLE_CIKGU_SUKAN,
+            User::ROLE_PENGURUS_ACARA,
+            User::ROLE_PENGURUSAN_KEPUTUSAN,
+        ];
+
         // Ensure the teacher belongs to the school
-        if ($teacher->sekolah_id !== $sekolah->id || ! $teacher->isCikgu()) {
+        if ($teacher->sekolah_id !== $sekolah->id || ! in_array($teacher->role, $validTeacherRoles, true)) {
             throw new \Exception('Unauthorized action.');
         }
 

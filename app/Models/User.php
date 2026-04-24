@@ -28,6 +28,8 @@ class User extends Authenticatable
 
     public const ROLE_PENGURUS_ACARA = 'pengurus_acara';
 
+    public const ROLE_PENGURUSAN_KEPUTUSAN = 'pengurusan_keputusan';
+
     /**
      * Teacher-like roles that should be treated as cikgu in the app.
      *
@@ -92,6 +94,14 @@ class User extends Authenticatable
     public function isPengurusAcara(): bool
     {
         return $this->role === self::ROLE_PENGURUS_ACARA;
+    }
+
+    /**
+     * Check if user is results manager (pengurusan keputusan).
+     */
+    public function isPengurusanKeputusan(): bool
+    {
+        return $this->role === self::ROLE_PENGURUSAN_KEPUTUSAN;
     }
 
     /**
