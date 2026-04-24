@@ -91,7 +91,6 @@ Route::middleware(['auth', AdminSekolahMiddleware::class])->prefix('admin-sekola
     Route::get('/houses', [HouseController::class, 'index'])->name('houses.index');
     Route::get('/houses/create', [HouseController::class, 'create'])->name('houses.create');
     Route::post('/houses', [HouseController::class, 'store'])->name('houses.store');
-    Route::post('/houses/auto-assign', [HouseController::class, 'autoAssign'])->name('houses.auto-assign');
     Route::get('/houses/{house}', [HouseController::class, 'show'])->name('houses.show');
     Route::delete('/houses/{house}', [HouseController::class, 'destroy'])->name('houses.destroy');
 

@@ -6,6 +6,12 @@
 
         <title inertia>{{ config('app.name', 'Laravel') }}</title>
 
+        <!-- PWA -->
+        <meta name="theme-color" content="#ea580c">
+        <meta name="apple-mobile-web-app-capable" content="yes">
+        <meta name="apple-mobile-web-app-status-bar-style" content="default">
+        <meta name="apple-mobile-web-app-title" content="HariSukan">
+
         <!-- Favicon -->
         <link rel="icon" type="image/svg+xml" href="/favicon.svg">
         <link rel="alternate icon" type="image/x-icon" href="/favicon.ico">

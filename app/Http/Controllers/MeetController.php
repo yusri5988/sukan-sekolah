@@ -38,6 +38,45 @@ class MeetController extends Controller
     }
 
     /**
+     * Show launch page to set dates
+     */
+    public function launch()
+    {
+        $meet = $this->getMeetForCurrentUser();
+
+        return Inertia::render('AdminSekolah/Launch', [
+            'meet' => [
+                'id' => $meet->id,
+                'name' => $meet->name,
+                'date' => $meet->date ? $meet->date->format('Y-m-d') : null,
+                'closing_date' => $meet->closing_date ? $meet->closing_date->format('Y-m-d') : null,
+            ],
+        ]);
+    }
+
+    /**
+     * Process launch - set dates and activate meet
+     */
+    public function processLaunch(Request $request)
+    {
+        $meet = $this->getMeetForCurrentUser();
+
+        $validated = $request->validate([
+            'date' => 'required|date',
+            'closing_date' => 'required|date|before_or_equal:date',
+        ]);
+
+        // Import the Meet model if not already imported or use fully qualified name
+        $this->meetService->updateMeet($meet, array_merge($validated, [
+            'status' => \App\Models\Meet::STATUS_ACTIVE,
+        ]));
+
+        return redirect()
+            ->route('admin-sekolah.dashboard')
+            ->with('success', 'Kejohanan berjaya dilancarkan!');
+    }
+
+    /**
      * Show form to create new meet
      */
     public function create()

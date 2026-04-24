@@ -109,23 +109,4 @@ class HouseController extends Controller
             ->with('success', 'Rumah sukan berjaya dipadam.');
     }
 
-    /**
-     * Auto-assign students to houses
-     */
-    public function autoAssign(Request $request)
-    {
-        $sekolah = Auth::user()->sekolah;
-
-        $result = $this->houseService->autoAssignStudentsToHouses($sekolah);
-
-        if ($result['success']) {
-            return redirect()
-                ->route('admin-sekolah.houses.index')
-                ->with('success', $result['message']);
-        } else {
-            return redirect()
-                ->route('admin-sekolah.houses.index')
-                ->with('error', $result['message']);
-        }
-    }
 }

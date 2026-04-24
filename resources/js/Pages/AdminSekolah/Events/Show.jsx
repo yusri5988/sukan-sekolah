@@ -8,33 +8,43 @@ export default function EventsShow({ meet, event }) {
         <AdminSekolahLayout>
             <Head title={`${event.name} - Perincian`} />
 
-            <div className="max-w-7xl mx-auto px-4 sm:px-0 -mt-2 pb-10 md:py-10 space-y-6 mb-20">
-                {/* Breadcrumb & Navigation */}
-                <div className="flex items-center justify-between">
-                    <Link 
-                        href={route('admin-sekolah.events.index')}
-                        className="group transition-all active:scale-95"
-                    >
-                        <div className="w-10 h-10 rounded-xl bg-white border-2 border-slate-900 flex items-center justify-center shadow-[3px_3px_0px_0px_rgba(15,23,42,1)] group-hover:bg-orange-600 group-hover:border-orange-600 group-hover:text-white group-hover:-translate-x-0.5 group-hover:-translate-y-0.5 group-hover:shadow-[5px_5px_0px_0px_rgba(15,23,42,1)] transition-all">
-                            <svg className="w-5 h-5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M15 19l-7-7 7-7" />
+            <div className="space-y-8 md:space-y-12 pb-24">
+                {/* Header Actions */}
+                <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+                    <div className="flex items-center gap-4">
+                        <Link 
+                            href={route('admin-sekolah.events.index')}
+                            className="w-12 h-12 rounded-2xl bg-white border border-slate-200 flex items-center justify-center text-slate-900 shadow-sm hover:bg-slate-50 transition-all active:scale-90"
+                        >
+                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="3">
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
                             </svg>
+                        </Link>
+                        <div>
+                            <div className="inline-flex items-center gap-2">
+                                <span className="w-2 h-2 rounded-full bg-orange-600 animate-pulse" />
+                                <span className="text-orange-600 text-[10px] font-black uppercase tracking-[0.3em]">Event Intelligence</span>
+                            </div>
+                            <h2 className="text-2xl md:text-3xl font-black italic uppercase tracking-tighter text-slate-900 leading-none mt-1">
+                                Butiran Acara
+                            </h2>
                         </div>
-                    </Link>
+                    </div>
 
                     <div className="flex items-center gap-3">
                         <Link
                             href={route('admin-sekolah.events.edit', event.id)}
-                            className="px-6 py-2 bg-white border-2 border-slate-100 text-slate-400 font-black uppercase tracking-widest text-[10px] rounded-xl hover:border-slate-900 hover:text-slate-900 transition-all shadow-sm"
+                            className="px-6 py-3.5 bg-white border border-slate-200 text-slate-900 text-[10px] font-black uppercase tracking-widest italic rounded-2xl hover:bg-slate-50 transition-all shadow-sm flex items-center gap-2"
                         >
-                            Edit Acara
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.5"><path strokeLinecap="round" strokeLinejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
+                            Kemas Kini
                         </Link>
                         <button
                             type="button"
-                            className={`px-6 py-2 font-black uppercase tracking-widest text-[10px] rounded-xl transition-all shadow-sm ${
+                            className={`px-6 py-3.5 font-black uppercase tracking-widest text-[10px] rounded-2xl transition-all shadow-sm border italic ${
                                 event.is_active 
-                                    ? 'bg-red-50 text-red-600 hover:bg-red-600 hover:text-white' 
-                                    : 'bg-green-50 text-green-600 hover:bg-green-600 hover:text-white'
+                                    ? 'bg-red-50 text-red-600 border-red-100 hover:bg-red-600 hover:text-white' 
+                                    : 'bg-emerald-50 text-emerald-600 border-emerald-100 hover:bg-emerald-600 hover:text-white'
                             }`}
                         >
                             {event.is_active ? 'Nyahaktif' : 'Aktifkan'}
@@ -42,144 +52,151 @@ export default function EventsShow({ meet, event }) {
                     </div>
                 </div>
 
-                {/* Hero Section */}
-                <div className="bg-slate-900 rounded-[2.5rem] md:rounded-[3rem] p-8 md:p-16 relative overflow-hidden shadow-2xl shadow-slate-200 mx-1 md:mx-0">
-                    {/* Background Accents */}
-                    <div className="absolute top-0 right-0 w-1/2 h-full bg-gradient-to-l from-orange-600/20 to-transparent pointer-events-none" />
-                    <div className="absolute -bottom-10 -right-10 w-64 h-64 bg-slate-800 rounded-full blur-3xl opacity-50 pointer-events-none" />
+                {/* Main Event Card - Hero Style */}
+                <div className="bg-slate-900 rounded-[3rem] p-8 md:p-14 relative overflow-hidden shadow-2xl">
+                    <div className="absolute top-0 right-0 w-1/2 h-full bg-gradient-to-l from-orange-600/10 to-transparent pointer-events-none" />
+                    <div className="absolute -bottom-10 -right-10 w-64 h-64 bg-white/5 rounded-full blur-3xl pointer-events-none" />
                     
-                    <div className="relative z-10 flex flex-col lg:flex-row items-center justify-between gap-10 md:gap-12">
-                        <div className="text-center lg:text-left flex-1 w-full">
-                            <div className="flex items-center justify-center lg:justify-start gap-3 mb-6">
-                                <span className={`px-4 py-1 rounded-full text-[9px] md:text-[10px] font-black uppercase tracking-[0.2em] transform -rotate-2 ${
-                                    event.is_active ? 'bg-orange-500 text-white' : 'bg-slate-700 text-slate-400'
+                    <div className="relative z-10 flex flex-col lg:flex-row items-center justify-between gap-12">
+                        <div className="flex-1 w-full text-center lg:text-left">
+                            <div className="flex flex-col sm:flex-row items-center gap-4 mb-8">
+                                <span className={`px-5 py-2 rounded-full text-[10px] font-black uppercase tracking-widest italic shadow-lg ${
+                                    event.is_active ? 'bg-orange-600 text-white' : 'bg-slate-800 text-slate-500'
                                 }`}>
-                                    {event.is_active ? 'Aktif' : 'Tidak Aktif'}
+                                    {event.is_active ? 'Live Status: Aktif' : 'Status: Tidak Aktif'}
                                 </span>
-                                <span className="text-slate-500 font-bold italic text-[10px] md:text-xs uppercase tracking-widest">{meet.name}</span>
+                                <span className="text-slate-500 font-bold italic text-xs uppercase tracking-widest">{meet.name}</span>
                             </div>
-                            <h1 className="text-5xl sm:text-7xl md:text-8xl lg:text-9xl font-black italic uppercase tracking-tighter text-white leading-[0.8] mb-8 break-words">
+                            
+                            <h1 className="text-5xl sm:text-7xl lg:text-8xl font-black italic uppercase tracking-tighter text-white leading-[0.85] mb-12">
                                 {event.name}
                             </h1>
-                            <div className="grid grid-cols-2 md:grid-cols-3 lg:flex lg:flex-wrap items-center justify-center lg:justify-start gap-3 md:gap-4">
-                                <div className="px-4 md:px-6 py-3 md:py-4 bg-white/5 backdrop-blur-md rounded-2xl border border-white/10 group hover:bg-white transition-all duration-300">
-                                    <div className="text-[9px] font-bold text-slate-400 uppercase tracking-widest group-hover:text-slate-500 mb-1">Kategori</div>
-                                    <div className="text-lg md:text-2xl font-black italic uppercase text-white group-hover:text-slate-900 leading-none">{event.category.replace('_', ' ')}</div>
+
+                            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                                <div className="p-5 bg-white/5 backdrop-blur-md rounded-2xl border border-white/10 group hover:bg-white hover:shadow-2xl transition-all duration-500">
+                                    <div className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] mb-2">Kategori</div>
+                                    <div className="text-xl font-black italic uppercase text-white group-hover:text-slate-900 transition-colors">{event.category.replace('tahun_', 'Tahun ')}</div>
                                 </div>
-                                <div className="px-4 md:px-6 py-3 md:py-4 bg-white/5 backdrop-blur-md rounded-2xl border border-white/10 group hover:bg-white transition-all duration-300">
-                                    <div className="text-[9px] font-bold text-slate-400 uppercase tracking-widest group-hover:text-slate-500 mb-1">Jantina</div>
-                                    <div className="text-lg md:text-2xl font-black italic uppercase text-white group-hover:text-slate-900 leading-none">
+                                <div className="p-5 bg-white/5 backdrop-blur-md rounded-2xl border border-white/10 group hover:bg-white hover:shadow-2xl transition-all duration-500">
+                                    <div className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] mb-2">Jantina</div>
+                                    <div className="text-xl font-black italic uppercase text-white group-hover:text-slate-900 transition-colors">
                                         {event.gender === 'male' ? 'Lelaki' : event.gender === 'female' ? 'Perempuan' : 'Campuran'}
                                     </div>
                                 </div>
-                                <div className="px-4 md:px-6 py-3 md:py-4 bg-white/5 backdrop-blur-md rounded-2xl border border-white/10 group hover:bg-white transition-all duration-300 col-span-2 md:col-span-1">
-                                    <div className="text-[9px] font-bold text-slate-400 uppercase tracking-widest group-hover:text-slate-500 mb-1">Maksimum Pelajar / Rumah</div>
-                                    <div className="text-lg md:text-2xl font-black italic uppercase text-white group-hover:text-slate-900 leading-none">{maxParticipantsPerHouse} <span className="text-[10px] italic opacity-50">Pelajar</span></div>
+                                <div className="p-5 bg-white/5 backdrop-blur-md rounded-2xl border border-white/10 group hover:bg-white hover:shadow-2xl transition-all duration-500">
+                                    <div className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] mb-2">Had Peserta</div>
+                                    <div className="text-xl font-black italic uppercase text-white group-hover:text-slate-900 transition-colors">{maxParticipantsPerHouse} <span className="text-xs opacity-40">/ Rumah</span></div>
                                 </div>
                             </div>
                         </div>
                         
-                        <div className="flex flex-col gap-3 md:gap-4 w-full lg:w-72">
+                        <div className="flex flex-col gap-4 w-full lg:w-80">
                             <Link
                                 href={route('admin-sekolah.events.participants.index', event.id)}
-                                className="w-full px-8 py-5 md:py-6 bg-orange-600 text-white font-black italic uppercase tracking-[0.2em] rounded-2xl md:rounded-[2rem] hover:bg-orange-500 hover:-translate-y-1 transition-all shadow-xl shadow-orange-900/20 text-center text-xs flex items-center justify-center gap-3"
+                                className="w-full p-6 bg-orange-600 text-white font-black italic uppercase tracking-widest rounded-3xl border-b-[6px] border-orange-800 shadow-xl active:translate-y-1 active:border-b-[1px] active:shadow-none transition-all text-center flex items-center justify-center gap-3"
                             >
-                                Urus Peserta
-                                <svg className="w-5 h-5 md:w-6 md:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.5">
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
                                 </svg>
+                                Urus Peserta
                             </Link>
                             <Link
                                 href={route('admin-sekolah.results.index', event.id)}
-                                className="w-full px-8 py-5 md:py-6 bg-white text-slate-900 font-black italic uppercase tracking-[0.2em] rounded-2xl md:rounded-[2rem] hover:bg-slate-50 hover:-translate-y-1 transition-all shadow-lg text-center text-xs flex items-center justify-center gap-3"
+                                className="w-full p-6 bg-white text-slate-900 font-black italic uppercase tracking-widest rounded-3xl border-b-[6px] border-slate-200 shadow-xl active:translate-y-1 active:border-b-[1px] active:shadow-none transition-all text-center flex items-center justify-center gap-3"
                             >
-                                Keputusan
-                                <svg className="w-5 h-5 md:w-6 md:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                <svg className="w-6 h-6 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.5">
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                                 </svg>
+                                Keputusan
                             </Link>
                         </div>
                     </div>
                 </div>
 
-                {/* Secondary Content */}
+                {/* Secondary Cards Grid */}
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                    {/* Left Column: Schedule & Metadata */}
-                    <div className="lg:col-span-1 space-y-8">
-                        <div className="bg-white rounded-[2.5rem] p-10 shadow-xl shadow-slate-100 border border-slate-50 relative overflow-hidden">
-                            <div className="absolute top-0 right-0 w-24 h-24 bg-slate-50 rounded-full -mr-12 -mt-12 pointer-events-none" />
-                            
-                            <h3 className="text-xl font-black italic uppercase tracking-tighter text-slate-900 mb-8 flex items-center gap-3">
-                                <div className="w-8 h-8 rounded-lg bg-slate-900 flex items-center justify-center text-white">
-                                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    {/* Schedule Sidebar */}
+                    <div className="lg:col-span-1">
+                        <div className="bg-white border border-slate-100 rounded-[2.5rem] p-8 md:p-10 shadow-sm relative overflow-hidden group">
+                            <h3 className="text-xl font-black italic uppercase tracking-tighter text-slate-900 mb-8 flex items-center gap-4">
+                                <div className="w-10 h-10 rounded-xl bg-slate-900 text-white flex items-center justify-center shadow-lg">
+                                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.5">
+                                        <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                                     </svg>
                                 </div>
-                                Jadual
+                                Masa & Jadual
                             </h3>
 
                             <div className="space-y-8">
-                                <div className="group">
-                                    <div className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1 group-hover:text-orange-600 transition-colors">Tarikh Acara</div>
-                                    <div className="text-2xl font-black italic uppercase text-slate-900">{event.scheduled_date || 'N/A'}</div>
+                                <div className="p-6 bg-slate-50 rounded-2xl border border-slate-100/50">
+                                    <div className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1.5 italic">Tarikh Acara</div>
+                                    <div className="text-2xl font-black italic uppercase text-slate-900 tabular-nums leading-none">{event.scheduled_date || 'TBD'}</div>
                                 </div>
-                                <div className="group">
-                                    <div className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1 group-hover:text-orange-600 transition-colors">Masa Mula</div>
-                                    <div className="text-2xl font-black italic uppercase text-slate-900">{event.scheduled_time || 'N/A'}</div>
+                                <div className="p-6 bg-slate-50 rounded-2xl border border-slate-100/50">
+                                    <div className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1.5 italic">Masa Bermula</div>
+                                    <div className="text-2xl font-black italic uppercase text-slate-900 tabular-nums leading-none">{event.scheduled_time || 'TBD'}</div>
                                 </div>
-                                <div className="pt-4 border-t border-slate-50 group">
-                                    <div className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Jenis Acara</div>
-                                    <div className="text-sm font-black italic uppercase text-slate-600">{event.type === 'individual' ? 'Individu' : 'Pasukan (Relay)'}</div>
+                                <div className="pt-6 border-t border-slate-50">
+                                    <div className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 italic">Format Kejohanan</div>
+                                    <span className="px-4 py-2 bg-slate-900 text-white rounded-xl text-[10px] font-black uppercase tracking-widest italic shadow-lg shadow-slate-900/10">
+                                        {event.type === 'individual' ? 'Individu' : 'Pasukan / Relay'}
+                                    </span>
                                 </div>
                             </div>
                         </div>
                     </div>
 
-                    {/* Right Column: Status Sections */}
+                    {/* Content Area */}
                     <div className="lg:col-span-2 space-y-8">
-                        {/* Peserta Section */}
-                        <div className="bg-white rounded-[2.5rem] p-10 shadow-xl shadow-slate-100 border border-slate-50 group">
-                            <div className="flex items-center justify-between mb-8">
-                                <h3 className="text-xl font-black italic uppercase tracking-tighter text-slate-900 flex items-center gap-3">
-                                    <div className="w-8 h-8 rounded-lg bg-orange-600 flex items-center justify-center text-white shadow-lg shadow-orange-100">
-                                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+                        {/* Status Sections */}
+                        <div className="bg-white border border-slate-100 rounded-[3rem] p-10 shadow-sm group">
+                            <div className="flex items-center justify-between mb-10">
+                                <h3 className="text-xl md:text-2xl font-black italic uppercase tracking-tighter text-slate-900 flex items-center gap-4">
+                                    <div className="w-10 h-10 rounded-xl bg-orange-50 text-orange-600 flex items-center justify-center shadow-inner border border-orange-100">
+                                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.5">
+                                            <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
                                         </svg>
                                     </div>
-                                    Peserta Berkumpul
+                                    Analitik Peserta
                                 </h3>
-                                <div className="w-12 h-1 bg-slate-100 group-hover:bg-orange-500 transition-all duration-500" />
+                                <div className="px-4 py-1.5 bg-slate-50 rounded-full text-[10px] font-black uppercase tracking-widest text-slate-400 border border-slate-100 italic">Pendaftaran</div>
                             </div>
                             
-                            <div className="py-20 text-center border-2 border-dashed border-slate-100 rounded-[2rem] group-hover:border-orange-100 transition-all">
-                                <div className="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:scale-110 group-hover:bg-orange-50 transition-all">
-                                    <svg className="w-8 h-8 text-slate-300 group-hover:text-orange-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                            <div className="py-24 text-center border-2 border-dashed border-slate-100 rounded-[2.5rem] bg-slate-50/50">
+                                <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center mx-auto mb-6 shadow-sm">
+                                    <svg className="w-8 h-8 text-slate-200" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2">
+                                        <path strokeLinecap="round" strokeLinejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
                                     </svg>
                                 </div>
-                                <p className="text-slate-400 font-bold italic text-sm">
-                                    Pengurusan peserta akan dibuka sepenuhnya dalam <span className="text-slate-900 font-black italic uppercase">Fasa Pendaftaran</span>.
+                                <p className="text-slate-400 font-bold italic text-sm md:text-base max-w-sm mx-auto">
+                                    Data peserta secara terperinci akan dipaparkan sebaik sahaja <span className="text-slate-900 font-black">Admin Sekolah</span> membuka tempoh pendaftaran atlet.
                                 </p>
                             </div>
                         </div>
 
-                        {/* Keputusan Section */}
-                        <div className="bg-slate-900 rounded-[2.5rem] p-10 shadow-2xl shadow-slate-200 group">
-                            <div className="flex items-center justify-between mb-8">
-                                <h3 className="text-xl font-black italic uppercase tracking-tighter text-white flex items-center gap-3">
-                                    <div className="w-8 h-8 rounded-lg bg-white flex items-center justify-center text-slate-900">
-                                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
+                        {/* Results Insight */}
+                        <div className="bg-slate-900 border border-slate-800 rounded-[3rem] p-10 shadow-2xl relative overflow-hidden">
+                            <div className="absolute top-0 right-0 p-10 opacity-5 pointer-events-none select-none">
+                                <svg className="w-48 h-48 text-white" fill="currentColor" viewBox="0 0 24 24">
+                                    <path d="M19 5h-2V3H7v2H5c-1.1 0-2 .9-2 2v1c0 2.55 1.92 4.63 4.39 4.94.47 1.21 1.48 2.15 2.74 2.53L10 18h-2v2h8v-2h-2l-.13-2.53c1.26-.38 2.27-1.32 2.74-2.53C19.08 11.63 21 9.55 21 8V7c0-1.1-.9-2-2-2z"/>
+                                </svg>
+                            </div>
+                            
+                            <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6 mb-10">
+                                <h3 className="text-xl md:text-2xl font-black italic uppercase tracking-tighter text-white flex items-center gap-4">
+                                    <div className="w-10 h-10 rounded-xl bg-white text-slate-900 flex items-center justify-center shadow-lg shadow-white/5">
+                                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.5">
+                                            <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                                         </svg>
                                     </div>
                                     Keputusan Rasmi
                                 </h3>
-                                <div className="text-[10px] font-black italic uppercase text-slate-500 tracking-widest">Belum Tersedia</div>
+                                <div className="text-[10px] font-black italic uppercase text-slate-600 tracking-widest">Status: Menunggu Saringan</div>
                             </div>
                             
-                            <div className="py-20 text-center border-2 border-dashed border-white/5 rounded-[2rem] group-hover:border-white/10 transition-all">
-                                <p className="text-slate-500 font-bold italic text-sm">
-                                    Ranking dan markah rumah akan direkodkan dalam <span className="text-white font-black italic uppercase">Fasa Keputusan</span>.
+                            <div className="py-24 text-center border border-dashed border-white/10 rounded-[2.5rem] bg-white/5">
+                                <p className="text-slate-500 font-bold italic text-sm md:text-base max-w-sm mx-auto leading-relaxed">
+                                    Pemarkahan dan pengesahan pemenang bagi acara <span className="text-white font-black">{event.name}</span> akan dilakukan oleh Pengurus Acara yang dilantik.
                                 </p>
                             </div>
                         </div>

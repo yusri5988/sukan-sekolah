@@ -1,33 +1,36 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 1200" role="img" aria-label="Parent phone notification illustration">
-  <defs>
-    <linearGradient id="bg2" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#020617"/>
-      <stop offset="100%" stop-color="#1e293b"/>
-    </linearGradient>
-    <linearGradient id="screen" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0%" stop-color="#dbeafe"/>
-      <stop offset="100%" stop-color="#f8fafc"/>
-    </linearGradient>
-  </defs>
-  <rect width="800" height="1200" fill="url(#bg2)"/>
-  <circle cx="130" cy="170" r="110" fill="#2563eb" opacity=".18"/>
-  <circle cx="670" cy="1040" r="170" fill="#f97316" opacity=".16"/>
-  <rect x="170" y="90" width="460" height="1020" rx="64" fill="#0f172a" stroke="#334155" stroke-width="8"/>
-  <rect x="200" y="160" width="400" height="860" rx="38" fill="url(#screen)"/>
-  <rect x="318" y="120" width="164" height="18" rx="9" fill="#475569"/>
-  <rect x="250" y="230" width="300" height="260" rx="28" fill="#1d4ed8"/>
-  <circle cx="390" cy="335" r="72" fill="#ffffff" opacity=".18"/>
-  <path d="M352 336l24 24 54-60" fill="none" stroke="#fff" stroke-width="14" stroke-linecap="round" stroke-linejoin="round"/>
-  <rect x="240" y="530" width="320" height="86" rx="22" fill="#fff" stroke="#e2e8f0"/>
-  <rect x="240" y="640" width="320" height="86" rx="22" fill="#fff" stroke="#e2e8f0"/>
-  <rect x="240" y="750" width="320" height="86" rx="22" fill="#fff" stroke="#e2e8f0"/>
-  <circle cx="290" cy="573" r="20" fill="#22c55e"/>
-  <circle cx="290" cy="683" r="20" fill="#f97316"/>
-  <circle cx="290" cy="793" r="20" fill="#2563eb"/>
-  <text x="330" y="580" fill="#0f172a" font-family="Arial, sans-serif" font-size="28" font-weight="700">Live result</text>
-  <text x="330" y="690" fill="#0f172a" font-family="Arial, sans-serif" font-size="28" font-weight="700">Parent alert</text>
-  <text x="330" y="800" fill="#0f172a" font-family="Arial, sans-serif" font-size="28" font-weight="700">Event updates</text>
-  <rect x="500" y="415" width="220" height="120" rx="28" fill="#ffffff" stroke="#e2e8f0" stroke-width="4"/>
-  <text x="536" y="468" fill="#0f172a" font-family="Arial, sans-serif" font-size="28" font-weight="700">Gold!</text>
-  <text x="536" y="504" fill="#64748b" font-family="Arial, sans-serif" font-size="20">100m final</text>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 1200" fill="none">
+  <rect width="800" height="1200" fill="#0f172a"/>
+  
+  <!-- Phone Frame -->
+  <rect x="150" y="100" width="500" height="1000" rx="80" stroke="#334155" stroke-width="12" fill="#1e293b"/>
+  <rect x="180" y="130" width="440" height="940" rx="60" fill="#f8fafc"/>
+  
+  <!-- Dynamic Notch -->
+  <rect x="300" y="150" width="200" height="40" rx="20" fill="#0f172a"/>
+  
+  <!-- Notification Content -->
+  <g transform="translate(210, 250)">
+    <rect width="380" height="500" rx="40" fill="white" shadow="0 10 30 rgba(0,0,0,0.1)"/>
+    <rect width="380" height="500" rx="40" stroke="#e2e8f0" stroke-width="2"/>
+    
+    <!-- Medal Icon -->
+    <circle cx="190" cy="150" r="80" fill="#fef3c7"/>
+    <path d="M190 100V200M140 150H240" stroke="#f59e0b" stroke-width="4" opacity="0.3"/>
+    <circle cx="190" cy="150" r="50" fill="#f59e0b"/>
+    <text x="178" y="172" fill="white" font-family="sans-serif" font-size="60" font-weight="900">1</text>
+    
+    <text x="190" y="300" text-anchor="middle" fill="#0f172a" font-family="sans-serif" font-size="32" font-weight="900">TAHNIAH!</text>
+    <text x="190" y="350" text-anchor="middle" fill="#64748b" font-family="sans-serif" font-size="20" font-weight="bold">Anak anda menang EMAS</text>
+    
+    <!-- Event Label -->
+    <rect x="80" y="390" width="220" height="50" rx="25" fill="#f1f5f9"/>
+    <text x="190" y="422" text-anchor="middle" fill="#1e293b" font-family="sans-serif" font-size="16" font-weight="900" style="text-transform:uppercase">100m Lelaki 1</text>
+  </g>
+  
+  <!-- App Elements below notification -->
+  <rect x="210" y="780" width="380" height="80" rx="20" fill="#e2e8f0" opacity="0.5"/>
+  <rect x="210" y="880" width="380" height="80" rx="20" fill="#e2e8f0" opacity="0.5"/>
+  
+  <!-- Bottom Bar -->
+  <rect x="325" y="1040" width="150" height="6" rx="3" fill="#cbd5e1"/>
 </svg>

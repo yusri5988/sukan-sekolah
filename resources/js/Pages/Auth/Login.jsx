@@ -6,7 +6,7 @@ import TextInput from '@/Components/TextInput';
 import GuestLayout from '@/Layouts/GuestLayout';
 import { Head, Link, useForm } from '@inertiajs/react';
 
-export default function Login({ status, canResetPassword }) {
+export default function Login({ status }) {
     const { data, setData, post, processing, errors, reset } = useForm({
         email: '',
         password: '',
@@ -25,23 +25,23 @@ export default function Login({ status, canResetPassword }) {
         <GuestLayout>
             <Head title="Log Masuk" />
 
-            <div className="mb-8">
-                <h1 className="text-4xl font-black italic uppercase tracking-tighter text-slate-900 leading-none">
-                    Log <span className="text-orange-600">Masuk</span>
+            <div className="mb-8 text-center sm:text-left">
+                <h1 className="text-2xl font-bold text-slate-900 tracking-tight">
+                    Selamat <span className="text-orange-600">Kembali</span>
                 </h1>
-                <p className="text-xs font-bold text-slate-400 mt-2 uppercase tracking-widest">
-                    Selamat Kembali, Hero Sukan!
+                <p className="text-xs text-slate-400 mt-1 font-medium">
+                    Log masuk ke akaun anda untuk meneruskan.
                 </p>
             </div>
 
             {status && (
-                <div className="mb-6 p-4 bg-emerald-50 border-l-4 border-emerald-500 text-xs font-black uppercase tracking-widest text-emerald-700">
+                <div className="mb-4 p-3 bg-emerald-50 rounded-2xl border border-emerald-100 text-xs font-medium text-emerald-700">
                     {status}
                 </div>
             )}
 
-            <form onSubmit={submit} className="space-y-6">
-                <div>
+            <form onSubmit={submit} className="space-y-4">
+                <div className="group transition-all">
                     <InputLabel htmlFor="email" value="Alamat Emel" />
 
                     <TextInput
@@ -49,19 +49,19 @@ export default function Login({ status, canResetPassword }) {
                         type="email"
                         name="email"
                         value={data.email}
-                        className="mt-2 block w-full"
+                        className="mt-1"
                         autoComplete="username"
                         isFocused={true}
                         placeholder="nama@sekolah.edu.my"
                         onChange={(e) => setData('email', e.target.value)}
                     />
 
-                    <InputError message={errors.email} className="mt-2" />
+                    <InputError message={errors.email} className="mt-1" />
                 </div>
 
-                <div>
-                    <div>
-                        <InputLabel htmlFor="password" value="Kata Laluan" />
+                <div className="group transition-all">
+                    <div className="flex justify-between items-center">
+                        <InputLabel htmlFor="password" value="Kata Laluan" className="mb-0" />
                     </div>
 
                     <TextInput
@@ -69,13 +69,13 @@ export default function Login({ status, canResetPassword }) {
                         type="password"
                         name="password"
                         value={data.password}
-                        className="mt-2 block w-full"
+                        className="mt-1"
                         autoComplete="current-password"
-                        placeholder="••••••••"
+                        placeholder="Masukkan kata laluan"
                         onChange={(e) => setData('password', e.target.value)}
                     />
 
-                    <InputError message={errors.password} className="mt-2" />
+                    <InputError message={errors.password} className="mt-1" />
                 </div>
 
                 <div className="flex items-center">
@@ -86,23 +86,23 @@ export default function Login({ status, canResetPassword }) {
                             setData('remember', e.target.checked)
                         }
                     />
-                    <span className="ms-3 text-[10px] font-black uppercase tracking-widest text-slate-600">
-                        Ingat Saya
+                    <span className="ms-3 text-xs font-semibold text-slate-500 cursor-pointer select-none" onClick={() => setData('remember', !data.remember)}>
+                        Ingat sesi saya
                     </span>
                 </div>
 
-                <div className="pt-4">
-                    <PrimaryButton className="w-full justify-center py-4 text-sm" disabled={processing}>
-                        Masuk Sekarang
+                <div className="pt-1">
+                    <PrimaryButton className="w-full" disabled={processing}>
+                        Log Masuk
                     </PrimaryButton>
                 </div>
 
-                <div className="text-center pt-4 border-t-2 border-slate-50">
-                    <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">
+                <div className="text-center pt-6 border-t border-slate-50">
+                    <p className="text-xs font-medium text-slate-400">
                         Belum ada akaun? {' '}
                         <Link
                             href={route('register')}
-                            className="text-orange-600 hover:text-slate-900 transition-colors underline decoration-2 underline-offset-4"
+                            className="text-orange-600 hover:text-orange-700 font-bold transition-all ml-1 underline underline-offset-4 decoration-orange-200 hover:decoration-orange-600"
                         >
                             Daftar Sekolah
                         </Link>
