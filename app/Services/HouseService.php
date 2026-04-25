@@ -5,29 +5,21 @@ namespace App\Services;
 use App\Models\House;
 use App\Models\Sekolah;
 use App\Models\Student;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\DB;
 
 class HouseService
 {
-    /**
-     * Create a new house for a sekolah
-     */
     public function createHouse(array $data, Sekolah $sekolah): House
     {
-        return DB::transaction(function () use ($data, $sekolah) {
-            return House::create([
-                'sekolah_id' => $sekolah->id,
-                'name' => $data['name'],
-                'color' => $data['color'] ?? null,
-                'logo' => $data['logo'] ?? null,
-                'points' => 0,
-            ]);
-        });
+        return House::create([
+            'sekolah_id' => $sekolah->id,
+            'name' => $data['name'],
+            'color' => $data['color'] ?? null,
+            'logo' => $data['logo'] ?? null,
+        ]);
     }
 
-    /**
-     * Delete a house
-     */
     public function deleteHouse(House $house): bool
     {
         if ($house->students()->exists()) {
@@ -37,18 +29,7 @@ class HouseService
         return $house->delete();
     }
 
-    /**
-     * Get houses for a sekolah with student count
-     */
-    public function getHousesWithStudentCount(Sekolah $sekolah)
-    {
-        return $sekolah->houses()->withCount('students')->get();
-    }
-
-    /**
-     * Get houses for a sekolah with student count and teachers
-     */
-    public function getHousesWithCounts(Sekolah $sekolah)
+    public function getHousesWithCounts(Sekolah $sekolah): Collection
     {
         return $sekolah->houses()
             ->withCount('students')
@@ -58,9 +39,6 @@ class HouseService
             ->get();
     }
 
-    /**
-     * Assign a student to a house
-     */
     public function assignStudentToHouse(Student $student, House $house): Student
     {
         $student->update(['house_id' => $house->id]);
@@ -68,9 +46,6 @@ class HouseService
         return $student->fresh();
     }
 
-    /**
-     * Auto-assign students to houses (balanced distribution)
-     */
     public function autoAssignStudentsToHouses(Sekolah $sekolah): array
     {
         $houses = $sekolah->houses()->withCount('students')->get();

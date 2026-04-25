@@ -2,6 +2,7 @@ import ApplicationLogo from '@/Components/ApplicationLogo';
 import Dropdown from '@/Components/Dropdown';
 import NavLink from '@/Components/NavLink';
 import ResponsiveNavLink from '@/Components/ResponsiveNavLink';
+import PwaInstallPrompt from '@/Components/PwaInstallPrompt';
 import { Link, usePage } from '@inertiajs/react';
 import { useState } from 'react';
 
@@ -10,20 +11,21 @@ export default function CikguLayout({ header, children }) {
     const [showingNavigationDropdown, setShowingNavigationDropdown] = useState(false);
 
     return (
-        <div className="min-h-screen bg-white selection:bg-orange-600 selection:text-white font-sans">
-            <nav className="fixed top-0 w-full z-50 bg-white/95 backdrop-blur-md border-b-2 border-slate-100 h-20 flex items-center">
+        <div className="min-h-screen bg-white selection:bg-orange-600 selection:text-white font-sans pb-28 sm:pb-0">
+            {/* Top Desktop Nav */}
+            <nav className="hidden sm:flex fixed top-0 w-full z-50 bg-white/95 backdrop-blur-md border-b-2 border-slate-100 h-20 items-center">
                 <div className="max-w-7xl mx-auto px-4 lg:px-8 w-full flex items-center justify-between">
                     <div className="flex items-center gap-12">
                         <div className="flex items-center gap-3">
                             <Link href="/">
                                 <ApplicationLogo className="w-9 h-9" />
                             </Link>
-                            <span className="hidden sm:block text-2xl font-black italic tracking-tighter uppercase leading-none">
+                            <span className="text-2xl font-black italic tracking-tighter uppercase leading-none">
                                 Cikgu<span className="text-orange-600">Panel</span>
                             </span>
                         </div>
 
-                        <div className="hidden space-x-6 sm:flex">
+                        <div className="flex space-x-6">
                             <NavLink
                                 href={route('cikgu.dashboard')}
                                 active={route().current('cikgu.dashboard')}
@@ -45,7 +47,7 @@ export default function CikguLayout({ header, children }) {
                         </div>
                     </div>
 
-                    <div className="hidden sm:ms-6 sm:flex sm:items-center">
+                    <div className="flex items-center">
                         <div className="relative ms-3">
                             <Dropdown>
                                 <Dropdown.Trigger>
@@ -86,106 +88,118 @@ export default function CikguLayout({ header, children }) {
                             </Dropdown>
                         </div>
                     </div>
-
-                    <div className="-me-2 flex items-center sm:hidden">
-                        <button
-                            onClick={() =>
-                                setShowingNavigationDropdown(
-                                    (previousState) => !previousState,
-                                )
-                            }
-                            className="inline-flex items-center justify-center p-2 rounded-xl bg-slate-900 text-orange-500 hover:text-white focus:outline-none transition duration-150 ease-in-out"
-                        >
-                            <svg
-                                className="h-6 w-6"
-                                stroke="currentColor"
-                                fill="none"
-                                viewBox="0 0 24 24"
-                            >
-                                <path
-                                    className={
-                                        !showingNavigationDropdown
-                                            ? 'inline-flex'
-                                            : 'hidden'
-                                    }
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    strokeWidth="3"
-                                    d="M4 6h16M4 12h16M4 18h16"
-                                />
-                                <path
-                                    className={
-                                        showingNavigationDropdown
-                                            ? 'inline-flex'
-                                            : 'hidden'
-                                    }
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    strokeWidth="3"
-                                    d="M6 18L18 6M6 6l12 12"
-                                />
-                            </svg>
-                        </button>
-                    </div>
-                </div>
-
-                <div
-                    className={
-                        (showingNavigationDropdown ? 'block' : 'hidden') +
-                        ' sm:hidden absolute top-20 left-0 w-full bg-white border-b-4 border-slate-900 z-50 shadow-2xl transition-all duration-300'
-                    }
-                >
-                    <div className="space-y-1 pb-3 pt-2">
-                        <ResponsiveNavLink
-                            href={route('cikgu.dashboard')}
-                            active={route().current('cikgu.dashboard')}
-                        >
-                            Dashboard
-                        </ResponsiveNavLink>
-                        <ResponsiveNavLink
-                            href={route('cikgu.students.index')}
-                            active={route().current('cikgu.students.*')}
-                        >
-                            Pelajar
-                        </ResponsiveNavLink>
-                        <ResponsiveNavLink
-                            href={route('cikgu.events.index')}
-                            active={route().current('cikgu.events.*')}
-                        >
-                            Acara
-                        </ResponsiveNavLink>
-                    </div>
-
-                    <div className="border-t-2 border-slate-100 pb-1 pt-4">
-                        <div className="px-4 mb-4">
-                            <div className="text-sm font-black italic uppercase tracking-widest text-slate-900">
-                                {user.name}
-                            </div>
-                            <div className="text-[10px] font-bold text-slate-400">
-                                {user.email}
-                            </div>
-                        </div>
-
-                        <div className="mt-3 space-y-1">
-                            <ResponsiveNavLink href={route('profile.edit')}>
-                                Profil
-                            </ResponsiveNavLink>
-                            <ResponsiveNavLink
-                                method="post"
-                                href={route('logout')}
-                                as="button"
-                            >
-                                Log Keluar
-                            </ResponsiveNavLink>
-                        </div>
-                    </div>
                 </div>
             </nav>
 
-            <div className="pt-20">
+            {/* Mobile Bottom Nav */}
+            <div className="sm:hidden fixed bottom-0 left-0 right-0 z-[999] bg-white border-t-2 border-slate-200 shadow-[0_-4px_20px_rgba(0,0,0,0.1)]">
+                <nav className="flex items-center justify-around h-16 px-2 max-w-md mx-auto">
+                    <Link
+                        href={route('cikgu.dashboard')}
+                        className={`flex flex-col items-center justify-center flex-1 min-w-[60px] h-full transition-all duration-200 ${
+                            route().current('cikgu.dashboard')
+                            ? 'text-orange-600'
+                            : 'text-slate-400'
+                        }`}
+                    >
+                        <div className={`p-1.5 rounded-xl transition-all ${route().current('cikgu.dashboard') ? 'bg-orange-50' : ''}`}>
+                            <svg className="w-5 h-5" fill={route().current('cikgu.dashboard') ? 'currentColor' : 'none'} stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.5">
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                            </svg>
+                        </div>
+                        <span className="text-[9px] font-black uppercase tracking-widest mt-0.5 italic">Dashboard</span>
+                    </Link>
+
+                    <Link
+                        href={route('cikgu.students.index')}
+                        className={`flex flex-col items-center justify-center flex-1 min-w-[60px] h-full transition-all duration-200 ${
+                            route().current('cikgu.students.*')
+                            ? 'text-orange-600'
+                            : 'text-slate-400'
+                        }`}
+                    >
+                        <div className={`p-1.5 rounded-xl transition-all ${route().current('cikgu.students.*') ? 'bg-orange-50' : ''}`}>
+                            <svg className="w-5 h-5" fill={route().current('cikgu.students.*') ? 'currentColor' : 'none'} stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.5">
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+                            </svg>
+                        </div>
+                        <span className="text-[9px] font-black uppercase tracking-widest mt-0.5 italic">Pelajar</span>
+                    </Link>
+
+                    <Link
+                        href={route('cikgu.events.index')}
+                        className={`flex flex-col items-center justify-center flex-1 min-w-[60px] h-full transition-all duration-200 ${
+                            route().current('cikgu.events.*')
+                            ? 'text-orange-600'
+                            : 'text-slate-400'
+                        }`}
+                    >
+                        <div className={`p-1.5 rounded-xl transition-all ${route().current('cikgu.events.*') ? 'bg-orange-50' : ''}`}>
+                            <svg className="w-5 h-5" fill={route().current('cikgu.events.*') ? 'currentColor' : 'none'} stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.5">
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                            </svg>
+                        </div>
+                        <span className="text-[9px] font-black uppercase tracking-widest mt-0.5 italic">Acara</span>
+                    </Link>
+
+                    <button
+                        onClick={() => setShowingNavigationDropdown(!showingNavigationDropdown)}
+                        className={`flex flex-col items-center justify-center flex-1 min-w-[60px] h-full transition-all duration-200 ${
+                            showingNavigationDropdown
+                            ? 'text-slate-900'
+                            : 'text-slate-400'
+                        }`}
+                    >
+                        <div className={`p-1.5 rounded-xl transition-all ${showingNavigationDropdown ? 'bg-slate-100' : ''}`}>
+                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.5">
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+                            </svg>
+                        </div>
+                        <span className="text-[9px] font-black uppercase tracking-widest mt-0.5 italic">Menu</span>
+                    </button>
+                </nav>
+            </div>
+
+            {/* Mobile Drawer Overlay */}
+            {showingNavigationDropdown && (
+                <div className="sm:hidden fixed inset-0 z-[110] bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-300">
+                    <div className="absolute bottom-0 left-0 right-0 bg-white rounded-t-[2.5rem] p-8 shadow-2xl animate-in slide-in-from-bottom duration-300">
+                        <div className="w-12 h-1.5 bg-slate-200 rounded-full mx-auto mb-8" />
+                        <h4 className="text-sm font-black uppercase tracking-widest text-slate-400 mb-6 italic text-center">Navigasi Cikgu</h4>
+                        <div className="grid grid-cols-2 gap-4 pb-8">
+                            <Link href={route('cikgu.dashboard')} className="p-4 bg-slate-50 rounded-2xl border border-slate-100 flex flex-col items-center gap-2" onClick={() => setShowingNavigationDropdown(false)}>
+                                <span className="text-xs font-black uppercase tracking-widest text-slate-900 italic">Dashboard</span>
+                            </Link>
+                            <Link href={route('cikgu.students.index')} className="p-4 bg-slate-50 rounded-2xl border border-slate-100 flex flex-col items-center gap-2" onClick={() => setShowingNavigationDropdown(false)}>
+                                <span className="text-xs font-black uppercase tracking-widest text-slate-900 italic">Pelajar</span>
+                            </Link>
+                            <Link href={route('cikgu.students.create')} className="p-4 bg-orange-50 rounded-2xl border border-orange-100 flex flex-col items-center gap-2" onClick={() => setShowingNavigationDropdown(false)}>
+                                <span className="text-xs font-black uppercase tracking-widest text-orange-600 italic">+ Tambah Pelajar</span>
+                            </Link>
+                            <Link href={route('cikgu.events.index')} className="p-4 bg-slate-50 rounded-2xl border border-slate-100 flex flex-col items-center gap-2" onClick={() => setShowingNavigationDropdown(false)}>
+                                <span className="text-xs font-black uppercase tracking-widest text-slate-900 italic">Acara</span>
+                            </Link>
+                            <Link href={route('profile.edit')} className="p-4 bg-slate-50 rounded-2xl border border-slate-100 flex flex-col items-center gap-2" onClick={() => setShowingNavigationDropdown(false)}>
+                                <span className="text-xs font-black uppercase tracking-widest text-slate-900 italic">Profil</span>
+                            </Link>
+                            <Link href={route('logout')} method="post" as="button" className="p-4 bg-red-50 rounded-2xl border border-red-100 flex flex-col items-center gap-2 w-full text-center" onClick={() => setShowingNavigationDropdown(false)}>
+                                <span className="text-xs font-black uppercase tracking-widest text-red-600 italic">Log Keluar</span>
+                            </Link>
+                        </div>
+                        <button
+                            onClick={() => setShowingNavigationDropdown(false)}
+                            className="w-full py-4 bg-slate-900 text-white rounded-full text-xs font-black uppercase tracking-widest italic"
+                        >
+                            Tutup Menu
+                        </button>
+                    </div>
+                </div>
+            )}
+
+            <div className="pt-0 sm:pt-20">
                 {header && (
                     <header className="bg-white border-b-8 border-slate-900">
-                        <div className="max-w-7xl mx-auto px-4 py-12 lg:px-8">
+                        <div className="max-w-7xl mx-auto px-4 py-8 sm:py-12 lg:px-8">
                             {typeof header === 'string' ? (
                                 <h2 className="text-4xl lg:text-6xl font-black italic uppercase tracking-tighter text-slate-900 leading-none">
                                     {header}
@@ -197,7 +211,7 @@ export default function CikguLayout({ header, children }) {
                     </header>
                 )}
 
-                <main className="py-12 bg-white relative overflow-hidden min-h-[calc(100vh-80px)]">
+                <main className="py-8 sm:py-12 bg-white relative overflow-hidden min-h-[calc(100vh-80px)]">
                     <div className="absolute inset-0 opacity-[0.01] pointer-events-none select-none overflow-hidden uppercase font-black text-[15vw] leading-none text-slate-900 flex flex-col gap-0 items-center justify-center rotate-[-10deg] -z-10">
                         <div>Faster</div>
                         <div className="ml-40">Stronger</div>
@@ -209,6 +223,8 @@ export default function CikguLayout({ header, children }) {
                     </div>
                 </main>
             </div>
+
+            <PwaInstallPrompt />
         </div>
     );
 }

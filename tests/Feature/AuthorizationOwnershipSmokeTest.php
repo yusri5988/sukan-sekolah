@@ -90,7 +90,10 @@ class AuthorizationOwnershipSmokeTest extends TestCase
     {
         $school = $this->school();
         $admin = $this->admin($school);
-        House::factory()->count(2)->create(['sekolah_id' => $school->id]);
+        House::factory()->createMany([
+            ['sekolah_id' => $school->id, 'name' => 'Merah', 'color' => '#ef4444'],
+            ['sekolah_id' => $school->id, 'name' => 'Biru', 'color' => '#3b82f6'],
+        ]);
 
         $response = $this->actingAs($admin)
             ->get(route('admin-sekolah.teachers.assignments.index'));

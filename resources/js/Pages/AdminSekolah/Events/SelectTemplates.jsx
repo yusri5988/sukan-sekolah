@@ -1,16 +1,14 @@
 import AdminSekolahLayout from '@/Layouts/AdminSekolahLayout';
-import { Head, Link, useForm, router } from '@inertiajs/react';
+import { Head, Link, useForm } from '@inertiajs/react';
 
 export default function EventsSelectTemplates({ meet, categories }) {
-    const { data, setData, processing, errors } = useForm({
+    const { data, setData, post, processing, errors } = useForm({
         names: [],
     });
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        router.get(route('admin-sekolah.events.configure-templates'), {
-            names: data.names
-        });
+        post(route('admin-sekolah.events.store-selections'));
     };
 
     const toggleName = (name) => {
@@ -91,7 +89,7 @@ export default function EventsSelectTemplates({ meet, categories }) {
                         <div>
                             <h3 className="text-2xl font-black italic uppercase tracking-tighter text-white">Acara Induk</h3>
                             <p className="text-slate-400 font-bold italic text-sm">
-                                Pilih jenis acara utama. Selepas ini anda akan memilih jantina dan tahun.
+                                Pilih jenis acara utama. Pengurus Acara akan konfigurasi tahun dan jantina.
                             </p>
                         </div>
                     </div>
@@ -208,10 +206,10 @@ export default function EventsSelectTemplates({ meet, categories }) {
                                 </Link>
                                 <button
                                     type="submit"
-                                    disabled={data.names.length === 0}
+                                    disabled={data.names.length === 0 || processing}
                                     className="px-12 py-5 bg-slate-900 text-white text-sm font-black uppercase tracking-[0.2em] italic rounded-2xl hover:bg-orange-600 hover:-translate-y-1 transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed shadow-2xl shadow-slate-200 flex items-center justify-center gap-3 group"
                                 >
-                                    Seterusnya: Konfigurasi
+                                    {processing ? 'Menyimpan...' : 'Simpan Pilihan'}
                                     <svg className="w-5 h-5 transition-transform group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M13 7l5 5m0 0l-5 5m5-5H6" />
                                     </svg>

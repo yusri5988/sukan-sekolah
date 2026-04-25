@@ -53,19 +53,19 @@ export default function AdminSekolahDashboard({ stats, houses, sekolah }) {
                                 <div className="h-px bg-slate-200 flex-1" />
                             </div>
                             
-                            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
+                            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 md:gap-8">
                                 {group.items.map((item, i) => (
                                     <Link 
                                         key={i} 
                                         href={item.href}
-                                        className="group bg-white border border-slate-100 border-b-[6px] border-b-slate-200 p-5 md:p-6 rounded-3xl shadow-sm hover:shadow-md active:translate-y-1 active:border-b-[2px] transition-all duration-150 flex flex-col items-center text-center gap-3"
+                                        className="group bg-white border-2 border-slate-100 border-b-[8px] border-b-slate-200 p-5 md:p-7 rounded-[2.5rem] shadow-sm hover:shadow-xl hover:border-slate-200 active:translate-y-1 active:border-b-[2px] transition-all duration-200 flex flex-col items-center text-center gap-4"
                                     >
-                                        <div className={`w-11 h-11 md:w-14 md:h-14 rounded-2xl flex items-center justify-center bg-${item.color}-50 text-${item.color}-600 group-hover:scale-110 transition-transform duration-500`}>
-                                            <svg className="w-5 h-5 md:w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.5">
+                                        <div className={`w-14 h-14 md:w-20 md:h-20 rounded-[1.75rem] flex items-center justify-center bg-${item.color}-50 text-${item.color}-600 group-hover:scale-110 group-hover:rotate-3 transition-all duration-500 shadow-inner`}>
+                                            <svg className="w-7 h-7 md:w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.5">
                                                 <path strokeLinecap="round" strokeLinejoin="round" d={item.icon} />
                                             </svg>
                                         </div>
-                                        <span className="text-[9px] md:text-[11px] font-black uppercase tracking-widest italic text-slate-800 leading-tight">
+                                        <span className="text-[10px] md:text-xs font-black uppercase tracking-[0.2em] italic text-slate-800 leading-tight">
                                             {item.label}
                                         </span>
                                     </Link>
@@ -160,15 +160,15 @@ export default function AdminSekolahDashboard({ stats, houses, sekolah }) {
                                             <div key={house.id} className="relative group">
                                                 <div className="bg-white/5 border border-white/10 p-4 md:p-6 rounded-2xl md:rounded-3xl flex items-center justify-between hover:bg-white/10 transition-all">
                                                     <div className="flex items-center gap-4 md:gap-6">
-                                                        <div className={`w-10 h-10 md:w-12 md:h-12 flex items-center justify-center rounded-xl md:rounded-2xl text-xl md:text-2xl font-black italic tracking-tighter tabular-nums ${
-                                                            index === 0 ? 'bg-yellow-400 text-yellow-900' :
-                                                            index === 1 ? 'bg-slate-300 text-slate-700' :
-                                                            index === 2 ? 'bg-orange-400 text-orange-900' :
-                                                            'bg-white/10 text-slate-500'
-                                                        }`}>
+                                                        <div 
+                                                           className="w-10 h-10 md:w-12 md:h-12 flex items-center justify-center rounded-xl md:rounded-2xl text-xl md:text-2xl font-black italic tracking-tighter tabular-nums"
+                                                           style={{ 
+                                                               backgroundColor: house.color,
+                                                               color: ['#f8fafc', '#eab308'].includes(house.color) ? '#0f172a' : '#ffffff'
+                                                           }}
+                                                        >
                                                             {index + 1}
-                                                        </div>
-                                                        <div>
+                                                        </div>                                                        <div>
                                                             <div className="text-xl md:text-2xl font-black italic uppercase tracking-tighter text-white">
                                                                 {house.name}
                                                             </div>

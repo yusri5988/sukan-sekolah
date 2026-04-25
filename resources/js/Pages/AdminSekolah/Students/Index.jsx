@@ -7,17 +7,18 @@ export default function StudentsIndex({ students, houses, selectedHouseId, sekol
     return (
         <AdminSekolahLayout
             header={
-                <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+                <div className="flex flex-col items-center text-center gap-6">
                     <div>
-                        <div className="inline-flex items-center gap-2 mb-2">
+                        <div className="inline-flex items-center justify-center gap-2 mb-2 w-full">
                             <span className="w-6 h-1 bg-orange-600 rounded-full" />
                             <span className="text-orange-600 text-[10px] font-black uppercase tracking-[0.3em]">Official Roster</span>
+                            <span className="w-6 h-1 bg-orange-600 rounded-full" />
                         </div>
                         <h2 className="text-3xl lg:text-5xl font-black italic uppercase tracking-tighter text-slate-900 leading-none">
                             Senarai <span className="text-orange-600">Pelajar</span>
                         </h2>
                     </div>
-                    <div className="flex flex-wrap gap-3">
+                    <div className="flex flex-wrap items-center justify-center gap-3">
                         <Link
                             href={route('admin-sekolah.students.import')}
                             className="px-6 py-3.5 bg-white border border-slate-200 text-slate-900 text-[10px] font-black uppercase tracking-widest italic rounded-2xl hover:bg-slate-50 transition-all active:scale-95 shadow-sm"

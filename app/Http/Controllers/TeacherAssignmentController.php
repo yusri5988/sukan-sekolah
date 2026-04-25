@@ -108,7 +108,6 @@ class TeacherAssignmentController extends Controller
 
         $data = $request->validate([
             'role' => ['required', Rule::in([
-                User::ROLE_CIKGU,
                 User::ROLE_CIKGU_SUKAN,
                 User::ROLE_PENGURUS_ACARA,
                 User::ROLE_PENGURUSAN_KEPUTUSAN,

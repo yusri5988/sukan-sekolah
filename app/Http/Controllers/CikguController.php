@@ -115,14 +115,9 @@ class CikguController extends Controller
             return redirect()->route('cikgu.dashboard')->with('error', 'Tiada rumah sukan dihubungkan dengan akaun anda. Sila hubungi pentadbir.');
         }
 
-        $filterYear = $request->query('year');
         $filterClass = $request->query('class');
 
         $query = $sekolah->students()->whereNull('house_id');
-
-        if ($filterYear) {
-            $query->where('year', $filterYear);
-        }
 
         if ($filterClass) {
             $query->where('class', $filterClass);
@@ -133,16 +128,13 @@ class CikguController extends Controller
             ->orderBy('name', 'asc')
             ->get();
 
-        $years = $sekolah->students()->whereNull('house_id')->distinct()->pluck('year')->sort()->values();
         $classes = $sekolah->students()->whereNull('house_id')->distinct()->pluck('class')->sort()->values();
 
         return Inertia::render('Cikgu/Students/Create', [
             'sekolah' => $sekolah,
             'myHouse' => $user->house,
             'unassignedStudents' => $unassignedStudents,
-            'years' => $years,
             'classes' => $classes,
-            'filterYear' => $filterYear,
             'filterClass' => $filterClass,
         ]);
     }

@@ -76,7 +76,7 @@ class PengurusAcaraAccessTest extends TestCase
         $response = $this->actingAs($manager)
             ->get(route('dashboard'));
 
-        $response->assertRedirect(route('admin-sekolah.events.index'));
+        $response->assertRedirect(route('pengurus-acara.event-selections.index'));
     }
 
     public function test_pengurus_acara_cannot_access_non_event_admin_routes(): void

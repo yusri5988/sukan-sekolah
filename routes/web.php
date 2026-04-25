@@ -17,6 +17,7 @@ use App\Http\Controllers\TeacherAssignmentController;
 use App\Http\Controllers\TeacherController;
 use App\Http\Middleware\AdminSekolahMiddleware;
 use App\Http\Middleware\CikguMiddleware;
+use App\Http\Middleware\PengurusAcaraMiddleware;
 use App\Http\Middleware\SuperAdminMiddleware;
 use App\Models\User;
 use Illuminate\Foundation\Application;
@@ -46,7 +47,7 @@ Route::get('/dashboard', function () {
     }
 
     if ($user->isPengurusAcara()) {
-        return redirect()->route('admin-sekolah.events.index');
+        return redirect()->route('pengurus-acara.event-selections.index');
     }
 
     if ($user->isPengurusanKeputusan()) {
@@ -126,6 +127,7 @@ Route::middleware(['auth', AdminSekolahMiddleware::class])->prefix('admin-sekola
     Route::get('/events/select-templates', [EventController::class, 'selectTemplates'])->name('events.select-templates');
     Route::get('/events/configure-templates', [EventController::class, 'configureTemplates'])->name('events.configure-templates');
     Route::post('/events/from-templates', [EventController::class, 'storeFromTemplates'])->name('events.store-from-templates');
+    Route::post('/events/store-selections', [EventController::class, 'storeSelections'])->name('events.store-selections');
     Route::get('/events', [EventController::class, 'index'])->name('events.index');
     Route::get('/events/create', [EventController::class, 'create'])->name('events.create');
     Route::post('/events', [EventController::class, 'store'])->name('events.store');
@@ -152,6 +154,13 @@ Route::middleware(['auth', AdminSekolahMiddleware::class])->prefix('admin-sekola
     Route::post('/events/{event}/results/{result}/toggle-lock', [ResultController::class, 'toggleLock'])->name('results.toggle-lock');
     Route::get('/events/{event}/ranking', [ResultController::class, 'ranking'])->name('results.ranking');
     Route::post('/events/{event}/results/process-qualification', [ResultController::class, 'processQualification'])->name('results.process-qualification');
+});
+
+// Pengurus Acara Routes
+Route::middleware(['auth', PengurusAcaraMiddleware::class])->prefix('pengurus-acara')->name('pengurus-acara.')->group(function () {
+    Route::get('/event-selections', [App\Http\Controllers\PengurusAcaraEventSelectionController::class, 'index'])->name('event-selections.index');
+    Route::get('/event-selections/{eventSelection}/configure', [App\Http\Controllers\PengurusAcaraEventSelectionController::class, 'configure'])->name('event-selections.configure');
+    Route::post('/event-selections/{eventSelection}/configure', [App\Http\Controllers\PengurusAcaraEventSelectionController::class, 'update'])->name('event-selections.update');
 });
 
 // Cikgu Routes

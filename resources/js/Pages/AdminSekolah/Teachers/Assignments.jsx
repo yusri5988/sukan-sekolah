@@ -10,11 +10,15 @@ const ROLE_LABELS = {
 };
 
 function AssignmentRow({ teacher, houses, onSuccess }) {
-    const [role, setRole] = useState(teacher.role);
+    const [role, setRole] = useState(teacher.role === 'cikgu' ? '' : teacher.role);
     const [houseId, setHouseId] = useState(teacher.house ? teacher.house.id : null);
     const [saving, setSaving] = useState(false);
 
     const handleSave = async () => {
+        if (!role) {
+            onSuccess?.('Sila pilih peranan terlebih dahulu.', true);
+            return;
+        }
         setSaving(true);
         try {
             const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
@@ -70,7 +74,7 @@ function AssignmentRow({ teacher, houses, onSuccess }) {
                         value={role}
                         onChange={e => setRole(e.target.value)}
                     >
-                        <option value="cikgu" className="font-black uppercase">Cikgu</option>
+                        <option value="" className="text-slate-400 font-black italic">-- PILIH PERANAN --</option>
                         <option value="cikgu_sukan" className="font-black uppercase">Cikgu Rumah Sukan</option>
                         <option value="pengurus_acara" className="font-black uppercase">Pengurus Acara</option>
                         <option value="pengurusan_keputusan" className="font-black uppercase">Pengurusan Keputusan</option>
@@ -117,16 +121,15 @@ export default function TeacherAssignments({ teachers, houses }) {
     return (
         <AdminSekolahLayout
             header={
-                <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
-                    <div>
-                        <div className="inline-flex items-center gap-2 mb-2">
-                            <span className="w-6 h-1 bg-orange-600 rounded-full" />
-                            <span className="text-orange-600 text-[10px] font-black uppercase tracking-[0.3em]">Staff Assignments</span>
-                        </div>
-                        <h2 className="text-3xl lg:text-5xl font-black italic uppercase tracking-tighter text-slate-900 leading-none">
-                            Lantikan <span className="text-orange-600">Guru</span>
-                        </h2>
+                <div className="flex flex-col items-center text-center">
+                    <div className="inline-flex items-center justify-center gap-2 mb-2 w-full">
+                        <span className="w-6 h-1 bg-orange-600 rounded-full" />
+                        <span className="text-orange-600 text-[10px] font-black uppercase tracking-[0.3em]">Staff Assignments</span>
+                        <span className="w-6 h-1 bg-orange-600 rounded-full" />
                     </div>
+                    <h2 className="text-3xl lg:text-5xl font-black italic uppercase tracking-tighter text-slate-900 leading-none">
+                        Lantikan <span className="text-orange-600">Guru</span>
+                    </h2>
                 </div>
             }
         >

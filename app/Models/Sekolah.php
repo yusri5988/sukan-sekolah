@@ -88,4 +88,12 @@ class Sekolah extends Model
     {
         return $this->hasMany(Event::class);
     }
+
+    /**
+     * Get all event selections for this sekolah
+     */
+    public function eventSelections(): HasMany
+    {
+        return $this->hasMany(EventSelection::class);
+    }
 }

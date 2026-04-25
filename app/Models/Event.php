@@ -17,6 +17,7 @@ class Event extends Model
         'sekolah_id',
         'event_category_id',
         'event_template_id',
+        'event_selection_id',
         'name',
         'category',
         'gender',
@@ -96,6 +97,14 @@ class Event extends Model
     public function template(): BelongsTo
     {
         return $this->belongsTo(EventTemplate::class, 'event_template_id');
+    }
+
+    /**
+     * Get the event selection that this event belongs to
+     */
+    public function eventSelection(): BelongsTo
+    {
+        return $this->belongsTo(EventSelection::class, 'event_selection_id');
     }
 
     /**

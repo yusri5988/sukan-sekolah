@@ -1,30 +1,29 @@
 import AdminSekolahLayout from '@/Layouts/AdminSekolahLayout';
+import ColorPicker from '@/Components/ColorPicker';
+import FormActions from '@/Components/FormActions';
+import { HOUSE_COLORS } from '@/constants/colors';
 import { Head, Link, useForm } from '@inertiajs/react';
 
-const fixedColorOptions = [
-    { label: 'Merah', value: '#ef4444' },
-    { label: 'Biru', value: '#3b82f6' },
-    { label: 'Hijau', value: '#22c55e' },
-    { label: 'Kuning', value: '#eab308' },
-];
+function getFinalName(color, customName) {
+    const option = HOUSE_COLORS.find(o => o.value === color);
+    const label = option ? option.label : 'Rumah';
+    return customName ? `${label} (${customName})` : label;
+}
 
-export default function HousesCreate() {
+export default function HousesCreate({ usedColors = [] }) {
     const { data, setData, post, processing, errors, transform } = useForm({
         name: '',
         color: '',
         custom_name: '',
     });
 
+    const isColorUsed = usedColors.includes(data.color);
+
     const handleSubmit = (e) => {
         e.preventDefault();
-        
-        // Cari label warna berdasarkan value
-        const colorOption = fixedColorOptions.find(o => o.value === data.color);
-        const colorLabel = colorOption ? colorOption.label : 'Rumah';
-        
-        // Gabungkan nama
-        const finalName = data.custom_name ? `${colorLabel} (${data.custom_name})` : colorLabel;
-        
+
+        const finalName = getFinalName(data.color, data.custom_name);
+
         transform((data) => ({
             ...data,
             name: finalName,
@@ -36,9 +35,9 @@ export default function HousesCreate() {
     return (
         <AdminSekolahLayout
             header={
-                <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
+                <div className="flex flex-col items-center justify-center text-center gap-4">
                     <div>
-                        <div className="inline-flex items-center gap-2 mb-1 sm:mb-2">
+                        <div className="inline-flex items-center justify-center gap-2 mb-1 sm:mb-2 w-full">
                             <div className="w-6 sm:w-8 h-[2px] bg-orange-600" />
                             <span className="text-orange-600 text-[10px] sm:text-xs font-black uppercase tracking-[0.2em] sm:tracking-[0.3em]">Pengurusan Rumah</span>
                         </div>
@@ -48,49 +47,37 @@ export default function HousesCreate() {
                     </div>
                     <Link
                         href={route('admin-sekolah.houses.index')}
-                        className="text-[10px] sm:text-xs font-black uppercase tracking-widest text-slate-400 hover:text-slate-900 transition-colors flex items-center gap-2"
+                        className="text-[10px] sm:text-xs font-black uppercase tracking-widest text-slate-400 hover:text-slate-900 transition-colors flex items-center justify-center gap-2"
                     >
-                        ← Kembali ke Senarai
+                        Kembali ke Senarai
                     </Link>
                 </div>
             }
         >
             <Head title="Tambah Rumah Sukan" />
 
-            <div className="py-6 sm:py-12">
+            <div className="pt-0 pb-4 sm:pb-8">
                 <div className="mx-auto max-w-2xl px-4 sm:px-6 lg:px-8">
                     <div className="bg-white border-2 sm:border-4 border-slate-900 shadow-[4px_4px_0px_0px_rgba(15,23,42,1)] sm:shadow-[10px_10px_0px_0px_rgba(15,23,42,1)] rounded-2xl sm:rounded-[2.5rem] overflow-hidden">
                         <div className="p-6 sm:p-10">
                             <form onSubmit={handleSubmit} className="space-y-6 sm:space-y-10">
                                 <div className="space-y-6 sm:space-y-8">
-                                    
-                                    <div className="space-y-3 sm:space-y-4">
-                                        <label className="text-[10px] sm:text-xs font-black uppercase tracking-widest text-slate-500 italic block">
-                                            Pilih Warna Rumah <span className="text-orange-600">*</span>
-                                        </label>
-                                        <div className="grid grid-cols-4 gap-3 sm:gap-4">
-                                            {fixedColorOptions.map((option) => (
-                                                <button
-                                                    key={option.value}
-                                                    type="button"
-                                                    onClick={() => setData('color', option.value)}
-                                                    className={`aspect-square sm:h-20 rounded-xl sm:rounded-2xl border-2 sm:border-4 transition-all transform active:scale-95 flex flex-col items-center justify-center gap-2 ${
-                                                        data.color === option.value
-                                                            ? 'border-slate-900 shadow-[3px_3px_0px_0px_rgba(15,23,42,1)] sm:shadow-[6px_6px_0px_0px_rgba(15,23,42,1)] -translate-y-1 scale-105'
-                                                            : 'border-slate-200 hover:border-slate-300 shadow-none translate-y-0 scale-100'
-                                                    }`}
-                                                    style={{ backgroundColor: option.value }}
-                                                >
-                                                    <span className="text-[10px] sm:text-sm font-black uppercase tracking-widest text-white drop-shadow-md">
-                                                        {option.label}
-                                                    </span>
-                                                </button>
-                                            ))}
+                                    <ColorPicker
+                                        value={data.color}
+                                        onChange={(val) => setData('color', val)}
+                                        error={errors.color}
+                                    />
+
+                                    {isColorUsed && (
+                                        <div className="bg-orange-50 border-2 border-orange-200 p-4 rounded-xl flex items-start gap-3 animate-pulse">
+                                            <svg className="w-5 h-5 text-orange-600 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                                            </svg>
+                                            <p className="text-[10px] sm:text-xs font-black uppercase tracking-widest text-orange-700 leading-relaxed">
+                                                Amaran: Warna ini telah dipilih oleh rumah sukan lain dalam sekolah anda.
+                                            </p>
                                         </div>
-                                        {errors.color && (
-                                            <p className="text-[10px] font-black uppercase tracking-widest text-red-500 italic">{errors.color}</p>
-                                        )}
-                                    </div>
+                                    )}
 
                                     <div className="space-y-2 sm:space-y-3">
                                         <label className="text-[10px] sm:text-xs font-black uppercase tracking-widest text-slate-500 italic block">
@@ -104,23 +91,26 @@ export default function HousesCreate() {
                                             placeholder="CONTOH: GAMMA (Nama penuh: MERAH (GAMMA))"
                                         />
                                     </div>
+
+                                    {data.color && (
+                                        <div className="bg-slate-50 border-2 border-slate-200 rounded-xl sm:rounded-2xl p-4 sm:p-6">
+                                            <div className="text-[9px] sm:text-[10px] font-black uppercase tracking-widest text-slate-400 italic mb-2 sm:mb-3">Preview Nama Rumah</div>
+                                            <div className="flex items-center gap-3 sm:gap-4">
+                                                <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg shrink-0 border-2 border-slate-200" style={{ backgroundColor: data.color }} />
+                                                <span className="text-lg sm:text-2xl font-black italic uppercase tracking-tighter text-slate-900">
+                                                    {getFinalName(data.color, data.custom_name)}
+                                                </span>
+                                            </div>
+                                        </div>
+                                    )}
                                 </div>
 
-                                <div className="flex flex-col sm:flex-row items-center justify-end gap-4 sm:gap-6 pt-6 sm:pt-10 border-t-2 sm:border-t-4 border-slate-50">
-                                    <Link
-                                        href={route('admin-sekolah.houses.index')}
-                                        className="w-full sm:w-auto px-6 sm:px-10 py-3 sm:py-4 bg-white border-2 sm:border-4 border-slate-900 rounded-xl sm:rounded-2xl text-sm sm:text-lg font-black uppercase tracking-widest italic text-slate-900 hover:bg-slate-50 transition-all active:scale-95 text-center shadow-[4px_4px_0px_0px_rgba(15,23,42,1)] sm:shadow-[6px_6px_0px_0px_rgba(15,23,42,1)]"
-                                    >
-                                        Batal
-                                    </Link>
-                                    <button
-                                        type="submit"
-                                        disabled={processing}
-                                        className="w-full sm:w-auto px-6 sm:px-10 py-3 sm:py-4 bg-orange-600 text-white border-2 sm:border-4 border-slate-900 rounded-xl sm:rounded-2xl text-sm sm:text-lg font-black uppercase tracking-widest italic hover:bg-slate-900 transition-all active:scale-95 disabled:opacity-50 shadow-[4px_4px_0px_0px_rgba(15,23,42,1)] sm:shadow-[6px_6px_0px_0px_rgba(15,23,42,1)]"
-                                    >
-                                        {processing ? 'MEMPROSES...' : 'CIPTA RUMAH →'}
-                                    </button>
-                                </div>
+                                <FormActions
+                                    processing={processing}
+                                    submitLabel="CIPTA RUMAH →"
+                                    processingLabel="MEMPROSES..."
+                                    cancelRoute={route('admin-sekolah.houses.index')}
+                                />
                             </form>
                         </div>
                     </div>

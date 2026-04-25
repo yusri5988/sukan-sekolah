@@ -131,7 +131,7 @@ class CikguStudentControllerTest extends TestCase
         );
     }
 
-    public function test_create_form_supports_year_and_class_filters(): void
+    public function test_create_form_supports_class_filter(): void
     {
         $school = $this->createSchool();
         $house = House::factory()->create(['sekolah_id' => $school->id]);
@@ -140,14 +140,14 @@ class CikguStudentControllerTest extends TestCase
         $this->createStudent($school, null, ['name' => 'Other Student', 'year' => 4, 'class' => '4A']);
 
         $response = $this->actingAs($cikgu)
-            ->get(route('cikgu.students.create', ['year' => 3, 'class' => '3A']));
+            ->get(route('cikgu.students.create', ['class' => '3A']));
 
         $response->assertOk();
         $response->assertInertia(fn ($page) => $page
             ->has('unassignedStudents', 1)
             ->where('unassignedStudents.0.name', $matching->name)
-            ->where('filterYear', '3')
             ->where('filterClass', '3A')
+            ->missing('filterYear')
         );
     }
 

@@ -120,6 +120,30 @@ class EventController extends Controller
     }
 
     /**
+     * Store event selections from admin-chosen master template names
+     */
+    public function storeSelections(Request $request)
+    {
+        $meet = $this->getMeetForCurrentUser();
+        $user = auth()->user();
+
+        $validated = $request->validate([
+            'names' => 'required|array|min:1',
+            'names.*' => 'string',
+        ]);
+
+        $selections = $this->eventService->createEventSelections(
+            $validated['names'],
+            $meet->sekolah,
+            $user
+        );
+
+        return redirect()
+            ->route('admin-sekolah.events.index')
+            ->with('success', count($selections).' acara induk telah dipilih. Sila minta Pengurus Acara untuk konfigurasi tahun dan jantina.');
+    }
+
+    /**
      * Show single event details
      */
     public function show(Event $event)

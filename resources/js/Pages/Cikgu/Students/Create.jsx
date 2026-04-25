@@ -3,7 +3,7 @@ import CikguLayout from '@/Layouts/CikguLayout';
 import { Head, Link, useForm, usePage } from '@inertiajs/react';
 import { router } from '@inertiajs/react';
 
-export default function CikguStudentCreate({ sekolah, myHouse, unassignedStudents = [], years = [], classes = [], filterYear = null, filterClass = null }) {
+export default function CikguStudentCreate({ sekolah, myHouse, unassignedStudents = [], classes = [], filterClass = null }) {
     const [selected, setSelected] = useState([]);
     const { data, setData, post, processing, errors } = useForm({
         student_ids: [],
@@ -49,13 +49,7 @@ export default function CikguStudentCreate({ sekolah, myHouse, unassignedStudent
 
     const handleFilterChange = (key, value) => {
         const params = {};
-        if (key === 'year') {
-            params.year = value || null;
-            params.class = filterClass || null;
-        } else {
-            params.year = filterYear || null;
-            params.class = value || null;
-        }
+        params.class = value || null;
         router.get(route('cikgu.students.create', params));
     };
 
@@ -108,28 +102,12 @@ export default function CikguStudentCreate({ sekolah, myHouse, unassignedStudent
                         
                         <div className="space-y-3">
                             <div className="text-[10px] font-black text-slate-400 uppercase tracking-[0.3em] pl-2">Tapis Senarai Pelajar</div>
-                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
-                                <div className="relative">
-                                    <select
-                                        value={filterYear || ''}
-                                        onChange={(e) => handleFilterChange('year', e.target.value)}
-                                        className="w-full appearance-none px-6 py-4 bg-white border-2 border-slate-300 rounded-2xl text-[11px] sm:text-xs font-black uppercase tracking-widest italic text-slate-900 focus:ring-0 focus:border-orange-600 cursor-pointer shadow-sm transition-colors"
-                                    >
-                                        <option value="">Semua Tahun</option>
-                                        {years.map((y) => (
-                                            <option key={y} value={y}>Tahun {y}</option>
-                                        ))}
-                                    </select>
-                                    <div className="absolute inset-y-0 right-4 flex items-center pointer-events-none text-slate-400">
-                                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M19 9l-7 7-7-7" /></svg>
-                                    </div>
-                                </div>
-                                
+                            <div className="grid grid-cols-1 gap-3 sm:gap-4">
                                 <div className="relative">
                                     <select
                                         value={filterClass || ''}
                                         onChange={(e) => handleFilterChange('class', e.target.value)}
-                                        className="w-full appearance-none px-6 py-4 bg-white border-2 border-slate-300 rounded-2xl text-[11px] sm:text-xs font-black uppercase tracking-widest italic text-slate-900 focus:ring-0 focus:border-orange-600 cursor-pointer shadow-sm transition-colors"
+                                        className="w-full !appearance-none !bg-none px-6 py-4 bg-white border-2 border-slate-300 rounded-2xl text-[11px] sm:text-xs font-black uppercase tracking-widest italic text-slate-900 focus:ring-0 focus:border-orange-600 cursor-pointer shadow-sm transition-colors [&::-ms-expand]:hidden [-webkit-appearance:none] [-moz-appearance:none]"
                                     >
                                         <option value="">Semua Kelas</option>
                                         {classes.map((c) => (
@@ -142,7 +120,7 @@ export default function CikguStudentCreate({ sekolah, myHouse, unassignedStudent
                                 </div>
                             </div>
 
-                            {(filterYear || filterClass) && (
+                            {filterClass && (
                                 <button
                                     onClick={clearFilters}
                                     className="w-full px-4 py-4 mt-3 bg-red-50 text-red-600 text-[10px] font-black uppercase tracking-[0.3em] rounded-2xl border-2 border-red-200 hover:bg-red-600 hover:text-white transition-all shadow-sm active:scale-95"

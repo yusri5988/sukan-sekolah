@@ -2,22 +2,23 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Controllers\Concerns\HandlesUniqueConstraint;
+use App\Http\Requests\StoreHouseRequest;
+use App\Http\Requests\UpdateHouseRequest;
 use App\Models\House;
 use App\Services\HouseService;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Validation\Rule;
+use Illuminate\Support\Facades\Gate;
 use Inertia\Inertia;
 
 class HouseController extends Controller
 {
+    use HandlesUniqueConstraint;
+
     public function __construct(
         private HouseService $houseService
     ) {}
 
-    /**
-     * Display list of houses for admin sekolah's sekolah
-     */
     public function index()
     {
         $sekolah = Auth::user()->sekolah;
@@ -29,94 +30,65 @@ class HouseController extends Controller
         ]);
     }
 
-    /**
-     * Show form to create new house
-     */
     public function create()
     {
-        return Inertia::render('AdminSekolah/Houses/Create');
+        $sekolah = Auth::user()->sekolah;
+        $usedColors = $sekolah->houses()->pluck('color')->toArray();
+
+        return Inertia::render('AdminSekolah/Houses/Create', [
+            'usedColors' => $usedColors,
+        ]);
     }
 
-    /**
-     * Store new house
-     */
-    public function store(Request $request)
+    public function store(StoreHouseRequest $request)
     {
         $sekolah = Auth::user()->sekolah;
 
-        $validated = $request->validate([
-            'color' => ['required', Rule::in(['#ef4444', '#3b82f6', '#22c55e', '#eab308'])],
-            'name' => [
-                'required',
-                'string',
-                'max:255',
-                Rule::unique('houses', 'name')->where(fn ($query) => $query->where('sekolah_id', $sekolah->id)),
-            ],
-        ]);
-
-        $this->houseService->createHouse($validated, $sekolah);
+        try {
+            $this->houseService->createHouse($request->validated(), $sekolah);
+        } catch (\Illuminate\Database\QueryException $e) {
+            return $this->handleUniqueConstraintError($e);
+        }
 
         return redirect()
             ->route('admin-sekolah.houses.index')
             ->with('success', 'Rumah sukan berjaya ditambah.');
     }
 
-    /**
-     * Show form to edit house
-     */
     public function edit(House $house)
     {
-        $user = Auth::user();
+        Gate::authorize('access', $house);
 
-        if ($house->sekolah_id !== $user->sekolah_id) {
-            abort(403, 'Anda tidak mempunyai akses ke rumah sukan ini.');
-        }
+        $sekolah = Auth::user()->sekolah;
+        $usedColors = $sekolah->houses()
+            ->where('id', '!=', $house->id)
+            ->pluck('color')
+            ->toArray();
 
         return Inertia::render('AdminSekolah/Houses/Edit', [
             'house' => $house,
+            'usedColors' => $usedColors,
         ]);
     }
 
-    /**
-     * Update house
-     */
-    public function update(Request $request, House $house)
+    public function update(UpdateHouseRequest $request, House $house)
     {
-        $user = Auth::user();
-        $sekolah = $user->sekolah;
+        Gate::authorize('access', $house);
 
-        if ($house->sekolah_id !== $sekolah->id) {
-            abort(403, 'Anda tidak mempunyai akses ke rumah sukan ini.');
+        try {
+            $house->update($request->validated());
+        } catch (\Illuminate\Database\QueryException $e) {
+            return $this->handleUniqueConstraintError($e);
         }
-
-        $validated = $request->validate([
-            'color' => ['required', Rule::in(['#ef4444', '#3b82f6', '#22c55e', '#eab308'])],
-            'name' => [
-                'required',
-                'string',
-                'max:255',
-                Rule::unique('houses', 'name')->where(fn ($query) => $query->where('sekolah_id', $sekolah->id))->ignore($house->id),
-            ],
-        ]);
-
-        $house->update($validated);
 
         return redirect()
             ->route('admin-sekolah.houses.index')
             ->with('success', 'Rumah sukan berjaya dikemaskini.');
     }
 
-    /**
-     * Show single house details
-     * Paparkan pelajar dan cikgu-cikgu yang menjaga rumah ini
-     */
     public function show(House $house)
     {
-        $user = Auth::user();
-
-        if ($house->sekolah_id !== $user->sekolah_id) {
-            abort(403, 'Anda tidak mempunyai akses ke rumah sukan ini.');
-        }
+        Gate::authorize('access', $house);
 
         $house->load(['teachers']);
 
@@ -132,16 +104,9 @@ class HouseController extends Controller
         ]);
     }
 
-    /**
-     * Delete house
-     */
     public function destroy(House $house)
     {
-        $user = Auth::user();
-
-        if ($house->sekolah_id !== $user->sekolah_id) {
-            abort(403, 'Anda tidak mempunyai akses ke rumah sukan ini.');
-        }
+        Gate::authorize('access', $house);
 
         if (! $this->houseService->deleteHouse($house)) {
             return redirect()
@@ -153,5 +118,4 @@ class HouseController extends Controller
             ->route('admin-sekolah.houses.index')
             ->with('success', 'Rumah sukan berjaya dipadam.');
     }
-
 }
