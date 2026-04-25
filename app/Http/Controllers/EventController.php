@@ -19,8 +19,23 @@ class EventController extends Controller
      */
     public function index()
     {
-        $meet = $this->getMeetForCurrentUser();
-        $events = $this->eventService->getEventsForSekolah($meet->sekolah);
+        $user = auth()->user();
+        $sekolah = $user->sekolah;
+        
+        if (! $sekolah) {
+            abort(403, 'Tiada sekolah dihubungkan dengan akaun anda.');
+        }
+
+        $meet = $sekolah->meet;
+        
+        if (! $meet) {
+            return Inertia::render('AdminSekolah/Events/Index', [
+                'meet' => null,
+                'events' => [],
+            ]);
+        }
+
+        $events = $this->eventService->getEventsForSekolah($sekolah);
 
         return Inertia::render('AdminSekolah/Events/Index', [
             'meet' => $meet,

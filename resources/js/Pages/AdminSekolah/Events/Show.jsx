@@ -91,24 +91,35 @@ export default function EventsShow({ meet, event }) {
                         </div>
                         
                         <div className="flex flex-col gap-4 w-full lg:w-80">
-                            <Link
-                                href={route('admin-sekolah.events.participants.index', event.id)}
-                                className="w-full p-6 bg-orange-600 text-white font-black italic uppercase tracking-widest rounded-3xl border-b-[6px] border-orange-800 shadow-xl active:translate-y-1 active:border-b-[1px] active:shadow-none transition-all text-center flex items-center justify-center gap-3"
-                            >
-                                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.5">
-                                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
-                                </svg>
-                                Urus Peserta
-                            </Link>
-                            <Link
-                                href={route('admin-sekolah.results.index', event.id)}
-                                className="w-full p-6 bg-white text-slate-900 font-black italic uppercase tracking-widest rounded-3xl border-b-[6px] border-slate-200 shadow-xl active:translate-y-1 active:border-b-[1px] active:shadow-none transition-all text-center flex items-center justify-center gap-3"
-                            >
-                                <svg className="w-6 h-6 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.5">
-                                    <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                </svg>
-                                Keputusan
-                            </Link>
+                            {usePage().props.auth.user.role === 'admin_sekolah' && (
+                                <>
+                                    <Link
+                                        href={route('admin-sekolah.events.participants.index', event.id)}
+                                        className="w-full p-6 bg-orange-600 text-white font-black italic uppercase tracking-widest rounded-3xl border-b-[6px] border-orange-800 shadow-xl active:translate-y-1 active:border-b-[1px] active:shadow-none transition-all text-center flex items-center justify-center gap-3"
+                                    >
+                                        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.5">
+                                            <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+                                        </svg>
+                                        Urus Peserta
+                                    </Link>
+                                    <Link
+                                        href={route('admin-sekolah.results.index', event.id)}
+                                        className="w-full p-6 bg-white text-slate-900 font-black italic uppercase tracking-widest rounded-3xl border-b-[6px] border-slate-200 shadow-xl active:translate-y-1 active:border-b-[1px] active:shadow-none transition-all text-center flex items-center justify-center gap-3"
+                                    >
+                                        <svg className="w-6 h-6 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.5">
+                                            <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                        </svg>
+                                        Keputusan
+                                    </Link>
+                                </>
+                            )}
+                            {usePage().props.auth.user.role === 'pengurus_acara' && (
+                                <div className="p-8 bg-white/5 backdrop-blur-md rounded-[2rem] border border-white/10 text-center">
+                                    <p className="text-white/40 font-bold italic text-xs uppercase tracking-widest leading-relaxed">
+                                        Anda mempunyai akses untuk <span className="text-orange-500">tambah acara</span> dan <span className="text-orange-500">kemas kini jadual</span> sahaja.
+                                    </p>
+                                </div>
+                            )}
                         </div>
                     </div>
                 </div>

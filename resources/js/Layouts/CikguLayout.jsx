@@ -218,7 +218,7 @@ export default function CikguLayout({ header, children }) {
                         <div>Higher</div>
                     </div>
 
-                    <div className="max-w-7xl mx-auto sm:px-6 lg:px-8">
+                    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                         {children}
                     </div>
                 </main>

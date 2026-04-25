@@ -57,6 +57,7 @@ class TeacherManagementTest extends TestCase
                 'email' => 'newteacher@test.com',
                 'password' => 'password123',
                 'password_confirmation' => 'password123',
+                'telefon' => '011-12345678',
             ]);
 
         $response->assertRedirect(route('admin-sekolah.teachers.index'));

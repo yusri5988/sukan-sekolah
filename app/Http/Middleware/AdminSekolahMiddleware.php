@@ -44,7 +44,16 @@ class AdminSekolahMiddleware
         }
 
         if ($user->isPengurusAcara()) {
-            return $request->routeIs('admin-sekolah.events.*');
+            return $request->routeIs(
+                'admin-sekolah.events.index',
+                'admin-sekolah.events.show',
+                'admin-sekolah.events.create',
+                'admin-sekolah.events.store',
+                'admin-sekolah.events.edit',
+                'admin-sekolah.events.update',
+                'admin-sekolah.events.toggle-active',
+                'admin-sekolah.events.destroy'
+            );
         }
 
         if ($user->isPengurusanKeputusan()) {

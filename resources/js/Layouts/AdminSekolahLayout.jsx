@@ -25,23 +25,33 @@ export default function AdminSekolahLayout({ header, children }) {
                         </div>
 
                         <div className="flex space-x-6">
-                            <NavLink href={route('admin-sekolah.dashboard')} active={route().current('admin-sekolah.dashboard')}>
-                                Dashboard
-                            </NavLink>
+                            {user.role === 'admin_sekolah' && (
+                                <NavLink href={route('admin-sekolah.dashboard')} active={route().current('admin-sekolah.dashboard')}>
+                                    Dashboard
+                                </NavLink>
+                            )}
+
+                            {user.role === 'pengurus_acara' && (
+                                <NavLink href={route('pengurus-acara.event-selections.index')} active={route().current('pengurus-acara.*')}>
+                                    Konfigurasi Acara
+                                </NavLink>
+                            )}
                             
-                            <Dropdown>
-                                <Dropdown.Trigger>
-                                    <button className="inline-flex items-center px-1 pt-1 text-sm font-black uppercase tracking-widest text-slate-500 hover:text-slate-700 transition italic">
-                                        Pendaftaran
-                                    </button>
-                                </Dropdown.Trigger>
-                                <Dropdown.Content>
-                                    <Dropdown.Link href={route('admin-sekolah.houses.index')}>Rumah Sukan</Dropdown.Link>
-                                    <Dropdown.Link href={route('admin-sekolah.teachers.index')}>Guru</Dropdown.Link>
-                                    <Dropdown.Link href={route('admin-sekolah.teachers.assignments.index')}>Lantikan Guru</Dropdown.Link>
-                                    <Dropdown.Link href={route('admin-sekolah.students.index')}>Pelajar</Dropdown.Link>
-                                </Dropdown.Content>
-                            </Dropdown>
+                            {user.role === 'admin_sekolah' && (
+                                <Dropdown>
+                                    <Dropdown.Trigger>
+                                        <button className="inline-flex items-center px-1 pt-1 text-sm font-black uppercase tracking-widest text-slate-500 hover:text-slate-700 transition italic">
+                                            Pendaftaran
+                                        </button>
+                                    </Dropdown.Trigger>
+                                    <Dropdown.Content>
+                                        <Dropdown.Link href={route('admin-sekolah.houses.index')}>Rumah Sukan</Dropdown.Link>
+                                        <Dropdown.Link href={route('admin-sekolah.teachers.index')}>Guru</Dropdown.Link>
+                                        <Dropdown.Link href={route('admin-sekolah.teachers.assignments.index')}>Lantikan Guru</Dropdown.Link>
+                                        <Dropdown.Link href={route('admin-sekolah.students.index')}>Pelajar</Dropdown.Link>
+                                    </Dropdown.Content>
+                                </Dropdown>
+                            )}
 
                             <Dropdown>
                                 <Dropdown.Trigger>
@@ -50,9 +60,13 @@ export default function AdminSekolahLayout({ header, children }) {
                                     </button>
                                 </Dropdown.Trigger>
                                 <Dropdown.Content>
-                                    <Dropdown.Link href={route('admin-sekolah.meets.index')}>Kejohanan</Dropdown.Link>
+                                    {user.role === 'admin_sekolah' && (
+                                        <Dropdown.Link href={route('admin-sekolah.meets.index')}>Kejohanan</Dropdown.Link>
+                                    )}
                                     <Dropdown.Link href={route('admin-sekolah.events.index')}>Urus Acara</Dropdown.Link>
-                                    <Dropdown.Link href={route('admin-sekolah.scoring.index')}>Pemarkahan</Dropdown.Link>
+                                    {user.role === 'admin_sekolah' && (
+                                        <Dropdown.Link href={route('admin-sekolah.scoring.index')}>Pemarkahan</Dropdown.Link>
+                                    )}
                                 </Dropdown.Content>
                             </Dropdown>
                         </div>
@@ -77,56 +91,81 @@ export default function AdminSekolahLayout({ header, children }) {
             {/* Fixed Mobile Bottom Nav - Solid & Consistent */}
             <div className="md:hidden fixed bottom-0 left-0 right-0 z-[999] bg-white border-t border-slate-200 shadow-[0_-4px_20px_rgba(0,0,0,0.1)]">
                 <nav className="flex items-center justify-around h-20 px-2 max-w-md mx-auto pb-safe">
-                    {/* Home */}
+                    {/* Home/Dashboard */}
                     <Link 
-                        href={route('admin-sekolah.dashboard')} 
+                        href={user.role === 'admin_sekolah' ? route('admin-sekolah.dashboard') : route('pengurus-acara.event-selections.index')} 
                         className={`flex flex-col items-center justify-center flex-1 min-w-[70px] h-full transition-all duration-200 ${
-                            route().current('admin-sekolah.dashboard') 
+                            route().current('admin-sekolah.dashboard') || route().current('pengurus-acara.event-selections.index')
                             ? 'text-orange-600' 
                             : 'text-slate-400'
                         }`}
                     >
-                        <div className={`p-2 rounded-2xl transition-all ${route().current('admin-sekolah.dashboard') ? 'bg-orange-50' : ''}`}>
-                            <svg className="w-6 h-6" fill={route().current('admin-sekolah.dashboard') ? 'currentColor' : 'none'} stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.5">
+                        <div className={`p-2 rounded-2xl transition-all ${route().current('admin-sekolah.dashboard') || route().current('pengurus-acara.event-selections.index') ? 'bg-orange-50' : ''}`}>
+                            <svg className="w-6 h-6" fill={route().current('admin-sekolah.dashboard') || route().current('pengurus-acara.event-selections.index') ? 'currentColor' : 'none'} stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.5">
                                 <path strokeLinecap="round" strokeLinejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
                             </svg>
                         </div>
-                        <span className="text-[10px] font-black uppercase tracking-widest mt-1 italic">Home</span>
+                        <span className="text-[10px] font-black uppercase tracking-widest mt-1 italic">
+                            {user.role === 'admin_sekolah' ? 'Home' : 'Acara'}
+                        </span>
                     </Link>
                     
-                    {/* Meets */}
-                    <Link 
-                        href={route('admin-sekolah.meets.index')} 
-                        className={`flex flex-col items-center justify-center flex-1 min-w-[70px] h-full transition-all duration-200 ${
-                            route().current('admin-sekolah.meets.*') 
-                            ? 'text-orange-600' 
-                            : 'text-slate-400'
-                        }`}
-                    >
-                        <div className={`p-2 rounded-2xl transition-all ${route().current('admin-sekolah.meets.*') ? 'bg-orange-50' : ''}`}>
-                            <svg className="w-6 h-6" fill={route().current('admin-sekolah.meets.*') ? 'currentColor' : 'none'} stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.5">
-                                <path strokeLinecap="round" strokeLinejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-                            </svg>
-                        </div>
-                        <span className="text-[10px] font-black uppercase tracking-widest mt-1 italic">Meets</span>
-                    </Link>
+                    {/* Meets - Only for Admin Sekolah */}
+                    {user.role === 'admin_sekolah' && (
+                        <Link 
+                            href={route('admin-sekolah.meets.index')} 
+                            className={`flex flex-col items-center justify-center flex-1 min-w-[70px] h-full transition-all duration-200 ${
+                                route().current('admin-sekolah.meets.*') 
+                                ? 'text-orange-600' 
+                                : 'text-slate-400'
+                            }`}
+                        >
+                            <div className={`p-2 rounded-2xl transition-all ${route().current('admin-sekolah.meets.*') ? 'bg-orange-50' : ''}`}>
+                                <svg className="w-6 h-6" fill={route().current('admin-sekolah.meets.*') ? 'currentColor' : 'none'} stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.5">
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                                </svg>
+                            </div>
+                            <span className="text-[10px] font-black uppercase tracking-widest mt-1 italic">Meets</span>
+                        </Link>
+                    )}
 
-                    {/* Launch - Always Bright Orange Bolt */}
-                    <Link 
-                        href={route('admin-sekolah.launch')} 
-                        className={`flex flex-col items-center justify-center flex-1 min-w-[70px] h-full transition-all duration-200 ${
-                            route().current('admin-sekolah.launch') 
-                            ? 'text-orange-600 scale-110' 
-                            : 'text-slate-400'
-                        }`}
-                    >
-                        <div className={`p-3 rounded-full transition-all shadow-sm ${route().current('admin-sekolah.launch') ? 'bg-orange-600 text-white shadow-orange-200' : 'bg-slate-50'}`}>
-                            <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
-                                <path d="M13 10V3L4 14h7v7l9-11h-7z" />
-                            </svg>
-                        </div>
-                        <span className={`text-[10px] font-black uppercase tracking-widest mt-1 italic ${route().current('admin-sekolah.launch') ? 'text-orange-600' : ''}`}>Launch</span>
-                    </Link>
+                    {/* Urus Acara for Pengurus Acara (Mobile replacement for Launch) */}
+                    {user.role === 'pengurus_acara' && (
+                        <Link 
+                            href={route('admin-sekolah.events.index')} 
+                            className={`flex flex-col items-center justify-center flex-1 min-w-[70px] h-full transition-all duration-200 ${
+                                route().current('admin-sekolah.events.*') 
+                                ? 'text-orange-600' 
+                                : 'text-slate-400'
+                            }`}
+                        >
+                            <div className={`p-2 rounded-2xl transition-all ${route().current('admin-sekolah.events.*') ? 'bg-orange-50' : ''}`}>
+                                <svg className="w-6 h-6" fill={route().current('admin-sekolah.events.*') ? 'currentColor' : 'none'} stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.5">
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                                </svg>
+                            </div>
+                            <span className="text-[10px] font-black uppercase tracking-widest mt-1 italic">Urus</span>
+                        </Link>
+                    )}
+
+                    {/* Launch - Only for Admin Sekolah */}
+                    {user.role === 'admin_sekolah' && (
+                        <Link 
+                            href={route('admin-sekolah.launch')} 
+                            className={`flex flex-col items-center justify-center flex-1 min-w-[70px] h-full transition-all duration-200 ${
+                                route().current('admin-sekolah.launch') 
+                                ? 'text-orange-600 scale-110' 
+                                : 'text-slate-400'
+                            }`}
+                        >
+                            <div className={`p-3 rounded-full transition-all shadow-sm ${route().current('admin-sekolah.launch') ? 'bg-orange-600 text-white shadow-orange-200' : 'bg-slate-50'}`}>
+                                <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                                    <path d="M13 10V3L4 14h7v7l9-11h-7z" />
+                                </svg>
+                            </div>
+                            <span className={`text-[10px] font-black uppercase tracking-widest mt-1 italic ${route().current('admin-sekolah.launch') ? 'text-orange-600' : ''}`}>Launch</span>
+                        </Link>
+                    )}
 
                     {/* Menu Trigger */}
                     <button 
@@ -154,18 +193,32 @@ export default function AdminSekolahLayout({ header, children }) {
                         <div className="w-12 h-1.5 bg-slate-200 rounded-full mx-auto mb-8" />
                         <h4 className="text-sm font-black uppercase tracking-widest text-slate-400 mb-6 italic text-center">Pengurusan Lanjut</h4>
                         <div className="grid grid-cols-2 gap-4 pb-8">
-                            <Link href={route('admin-sekolah.houses.index')} className="p-4 bg-slate-50 rounded-2xl border border-slate-100 flex flex-col items-center gap-2">
-                                <span className="text-xs font-black uppercase tracking-widest text-slate-900 italic">Rumah Sukan</span>
-                            </Link>
-                            <Link href={route('admin-sekolah.teachers.index')} className="p-4 bg-slate-50 rounded-2xl border border-slate-100 flex flex-col items-center gap-2">
-                                <span className="text-xs font-black uppercase tracking-widest text-slate-900 italic">Guru</span>
-                            </Link>
-                            <Link href={route('admin-sekolah.students.index')} className="p-4 bg-slate-50 rounded-2xl border border-slate-100 flex flex-col items-center gap-2">
-                                <span className="text-xs font-black uppercase tracking-widest text-slate-900 italic">Pelajar</span>
-                            </Link>
-                            <Link href={route('admin-sekolah.scoring.index')} className="p-4 bg-slate-50 rounded-2xl border border-slate-100 flex flex-col items-center gap-2">
-                                <span className="text-xs font-black uppercase tracking-widest text-slate-900 italic">Pemarkahan</span>
-                            </Link>
+                            {user.role === 'admin_sekolah' && (
+                                <>
+                                    <Link href={route('admin-sekolah.houses.index')} className="p-4 bg-slate-50 rounded-2xl border border-slate-100 flex flex-col items-center gap-2">
+                                        <span className="text-xs font-black uppercase tracking-widest text-slate-900 italic">Rumah Sukan</span>
+                                    </Link>
+                                    <Link href={route('admin-sekolah.teachers.index')} className="p-4 bg-slate-50 rounded-2xl border border-slate-100 flex flex-col items-center gap-2">
+                                        <span className="text-xs font-black uppercase tracking-widest text-slate-900 italic">Guru</span>
+                                    </Link>
+                                    <Link href={route('admin-sekolah.students.index')} className="p-4 bg-slate-50 rounded-2xl border border-slate-100 flex flex-col items-center gap-2">
+                                        <span className="text-xs font-black uppercase tracking-widest text-slate-900 italic">Pelajar</span>
+                                    </Link>
+                                    <Link href={route('admin-sekolah.scoring.index')} className="p-4 bg-slate-50 rounded-2xl border border-slate-100 flex flex-col items-center gap-2">
+                                        <span className="text-xs font-black uppercase tracking-widest text-slate-900 italic">Pemarkahan</span>
+                                    </Link>
+                                </>
+                            )}
+                            {user.role === 'pengurus_acara' && (
+                                <>
+                                    <Link href={route('pengurus-acara.event-selections.index')} className="p-4 bg-slate-50 rounded-2xl border border-slate-100 flex flex-col items-center gap-2">
+                                        <span className="text-xs font-black uppercase tracking-widest text-slate-900 italic">Konfigurasi</span>
+                                    </Link>
+                                    <Link href={route('admin-sekolah.events.index')} className="p-4 bg-slate-50 rounded-2xl border border-slate-100 flex flex-col items-center gap-2">
+                                        <span className="text-xs font-black uppercase tracking-widest text-slate-900 italic">Urus Acara</span>
+                                    </Link>
+                                </>
+                            )}
                             <Link href={route('profile.edit')} className="p-4 bg-orange-50 rounded-2xl border border-orange-100 flex flex-col items-center gap-2">
                                 <span className="text-xs font-black uppercase tracking-widest text-orange-600 italic">Profil Saya</span>
                             </Link>

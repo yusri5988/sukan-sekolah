@@ -56,6 +56,7 @@ class TeacherController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
             'password' => 'required|string|min:6|confirmed',
+            'telefon' => 'required|string|max:20',
         ]);
 
         $this->teacherService->createTeacher($sekolah, $validated);

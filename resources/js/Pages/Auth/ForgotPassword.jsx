@@ -6,7 +6,7 @@ import { Head, useForm, Link } from '@inertiajs/react';
 
 export default function ForgotPassword({ status }) {
     const { data, setData, post, processing, errors } = useForm({
-        email: '',
+        phone: '',
     });
 
     const submit = (e) => {
@@ -24,7 +24,7 @@ export default function ForgotPassword({ status }) {
                     Lupa <span className="text-orange-600">Kata Laluan</span>
                 </h1>
                 <p className="text-xs font-bold text-slate-400 mt-2 uppercase tracking-widest leading-relaxed">
-                    Jangan risau, hero pun boleh lupa! Kami bantu hantarkan link reset.
+                    Jangan risau, hero pun boleh lupa! Masukkan nombor telefon anda untuk reset.
                 </p>
             </div>
 
@@ -37,22 +37,22 @@ export default function ForgotPassword({ status }) {
             <form onSubmit={submit} className="space-y-6">
                 <div>
                     <TextInput
-                        id="email"
-                        type="email"
-                        name="email"
-                        value={data.email}
+                        id="phone"
+                        type="tel"
+                        name="phone"
+                        value={data.phone}
                         className="block w-full"
                         isFocused={true}
-                        placeholder="Masukkan alamat emel anda"
-                        onChange={(e) => setData('email', e.target.value)}
+                        placeholder="Masukkan nombor telefon (cth: 0123456789)"
+                        onChange={(e) => setData('phone', e.target.value)}
                     />
 
-                    <InputError message={errors.email} className="mt-2" />
+                    <InputError message={errors.phone} className="mt-2" />
                 </div>
 
                 <div>
                     <PrimaryButton className="w-full justify-center py-4 text-sm" disabled={processing}>
-                        Hantar Link Reset
+                        Hantar Kod OTP
                     </PrimaryButton>
                 </div>
 

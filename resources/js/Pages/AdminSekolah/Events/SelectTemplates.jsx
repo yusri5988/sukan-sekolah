@@ -191,33 +191,36 @@ export default function EventsSelectTemplates({ meet, categories }) {
                     )}
 
                     {/* Bottom Action Bar */}
-                    <div className="fixed bottom-0 left-0 right-0 bg-white/80 backdrop-blur-xl border-t border-slate-100 p-6 z-40 md:relative md:bg-transparent md:border-none md:p-0 md:mt-12">
-                        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-6">
+                    <div className="fixed bottom-20 left-0 right-0 bg-white/95 backdrop-blur-xl border-t border-slate-100 px-5 py-3 z-40 md:relative md:bottom-0 md:bg-transparent md:border-none md:p-0 md:mt-12">
+                        <div className="max-w-7xl mx-auto flex flex-row items-center justify-between gap-4">
                             <div>
-                                <p className="text-slate-900 font-black italic uppercase"><span className="text-orange-600">{data.names.length}</span> Acara Induk dipilih</p>
+                                <p className="text-slate-900 font-black italic uppercase text-[10px] tracking-widest">
+                                    Jumlah Acara : <span className="text-orange-600">{data.names.length}</span>
+                                </p>
                             </div>
-                            
-                            <div className="flex items-center gap-4 w-full sm:w-auto">
+
+                            <div className="flex items-center gap-2">
                                 <Link
                                     href={route('admin-sekolah.events.index')}
-                                    className="px-8 py-4 text-slate-500 font-bold uppercase tracking-widest text-xs"
+                                    className="px-6 py-3 bg-red-600 text-white text-[10px] font-black uppercase tracking-widest italic rounded-xl hover:bg-red-700 transition-all active:scale-95 shadow-lg flex items-center justify-center min-w-[80px]"
                                 >
                                     Batal
                                 </Link>
                                 <button
                                     type="submit"
                                     disabled={data.names.length === 0 || processing}
-                                    className="px-12 py-5 bg-slate-900 text-white text-sm font-black uppercase tracking-[0.2em] italic rounded-2xl hover:bg-orange-600 hover:-translate-y-1 transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed shadow-2xl shadow-slate-200 flex items-center justify-center gap-3 group"
+                                    className="px-6 py-3 bg-slate-900 text-white text-[10px] font-black uppercase tracking-widest italic rounded-xl hover:bg-orange-600 transition-all active:scale-95 disabled:opacity-50 shadow-lg flex items-center justify-center gap-2 min-w-[80px]"
                                 >
-                                    {processing ? 'Menyimpan...' : 'Simpan Pilihan'}
-                                    <svg className="w-5 h-5 transition-transform group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M13 7l5 5m0 0l-5 5m5-5H6" />
-                                    </svg>
+                                    {processing ? '...' : 'Simpan'}
+                                    {!processing && (
+                                        <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                                        </svg>
+                                    )}
                                 </button>
                             </div>
                         </div>
-                    </div>
-                </form>
+                    </div>                </form>
             </div>
         </AdminSekolahLayout>
     );

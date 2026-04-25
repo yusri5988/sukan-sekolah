@@ -3,11 +3,12 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Models\User;
 use Illuminate\Auth\Events\PasswordReset;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rules;
 use Illuminate\Validation\ValidationException;
@@ -16,54 +17,78 @@ use Inertia\Response;
 
 class NewPasswordController extends Controller
 {
-    /**
-     * Display the password reset view.
-     */
     public function create(Request $request): Response
     {
         return Inertia::render('Auth/ResetPassword', [
-            'email' => $request->email,
-            'token' => $request->route('token'),
+            'phone' => $request->phone,
+            'status' => session('status'),
         ]);
     }
 
-    /**
-     * Handle an incoming new password request.
-     *
-     * @throws ValidationException
-     */
     public function store(Request $request): RedirectResponse
     {
         $request->validate([
-            'token' => 'required',
-            'email' => 'required|email',
+            'phone' => 'required|string|max:20',
+            'otp' => 'required|string|size:6',
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
         ]);
 
-        // Here we will attempt to reset the user's password. If it is successful we
-        // will update the password on an actual user model and persist it to the
-        // database. Otherwise we will parse the error and return the response.
-        $status = Password::reset(
-            $request->only('email', 'password', 'password_confirmation', 'token'),
-            function ($user) use ($request) {
-                $user->forceFill([
-                    'password' => Hash::make($request->password),
-                    'remember_token' => Str::random(60),
-                ])->save();
+        $phone = $this->formatPhone($request->phone);
 
-                event(new PasswordReset($user));
-            }
-        );
+        $otpRecord = DB::table('otp_codes')
+            ->where('phone', $phone)
+            ->where('otp', $request->otp)
+            ->whereNull('verified_at')
+            ->where('expires_at', '>', now())
+            ->latest()
+            ->first();
 
-        // If the password was successfully reset, we will redirect the user back to
-        // the application's home authenticated view. If there is an error we can
-        // redirect them back to where they came from with their error message.
-        if ($status == Password::PASSWORD_RESET) {
-            return redirect()->route('login')->with('status', __($status));
+        if (! $otpRecord) {
+            throw ValidationException::withMessages([
+                'otp' => ['Kod OTP tidak sah atau telah tamat tempoh.'],
+            ]);
         }
 
-        throw ValidationException::withMessages([
-            'email' => [trans($status)],
-        ]);
+        DB::table('otp_codes')
+            ->where('id', $otpRecord->id)
+            ->update(['verified_at' => now()]);
+
+        $user = User::where('telefon', $phone)->first();
+
+        if (! $user) {
+            throw ValidationException::withMessages([
+                'phone' => ['No account found with this phone number.'],
+            ]);
+        }
+
+        $user->forceFill([
+            'password' => Hash::make($request->password),
+            'remember_token' => Str::random(60),
+        ])->save();
+
+        event(new PasswordReset($user));
+
+        DB::table('otp_codes')
+            ->where('phone', $phone)
+            ->delete();
+
+        return redirect()->route('login')->with('status', 'Kata laluan berjaya dikemaskini. Sila log masuk.');
+    }
+
+    protected function formatPhone(string $phone): string
+    {
+        $clean = preg_replace('/[^0-9]/', '', $phone);
+
+        if (strlen($clean) === 10 && str_starts_with($clean, '0')) {
+            $clean = '6' . $clean;
+        } elseif (strlen($clean) === 9 && str_starts_with($clean, '0')) {
+            $clean = '60' . $clean;
+        }
+
+        if (! str_starts_with($clean, '60')) {
+            $clean = '60' . $clean;
+        }
+
+        return $clean;
     }
 }

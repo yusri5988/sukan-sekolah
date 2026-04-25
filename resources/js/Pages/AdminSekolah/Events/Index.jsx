@@ -2,7 +2,7 @@ import AdminSekolahLayout from '@/Layouts/AdminSekolahLayout';
 import { Head, Link, usePage } from '@inertiajs/react';
 
 export default function EventsIndex({ meet, events }) {
-    const { flash } = usePage().props;
+    const { flash, auth } = usePage().props;
 
     return (
         <AdminSekolahLayout
@@ -14,26 +14,58 @@ export default function EventsIndex({ meet, events }) {
                             <span className="text-orange-600 text-[10px] font-black uppercase tracking-[0.3em]">Official Events</span>
                         </div>
                         <h2 className="text-3xl lg:text-5xl font-black italic uppercase tracking-tighter text-slate-900 leading-none">
-                            {meet.name}
+                            {meet ? meet.name : 'Kejohanan'}
                         </h2>
                     </div>
-                    <div className="hidden md:flex items-center gap-4">
-                        <Link
-                            href={route('admin-sekolah.meets.show')}
-                            className="px-5 py-3 bg-slate-900 text-white rounded-[1.25rem] shadow-xl shadow-slate-900/10 border border-slate-800 flex items-center gap-2 text-xs font-black uppercase tracking-widest italic hover:bg-orange-600 transition-all"
-                        >
-                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M15 19l-7-7 7-7" /></svg>
-                            Kembali
-                        </Link>
-                    </div>
+                    {meet && (
+                        <div className="hidden md:flex items-center gap-4">
+                            <Link
+                                href={auth.user.role === 'admin_sekolah' ? route('admin-sekolah.meets.show') : route('pengurus-acara.event-selections.index')}
+                                className="px-5 py-3 bg-slate-900 text-white rounded-[1.25rem] shadow-xl shadow-slate-900/10 border border-slate-800 flex items-center gap-2 text-xs font-black uppercase tracking-widest italic hover:bg-orange-600 transition-all"
+                            >
+                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M15 19l-7-7 7-7" /></svg>
+                                Kembali
+                            </Link>
+                        </div>
+                    )}
                 </div>
             }
         >
-            <Head title={`Acara - ${meet.name}`} />
+            <Head title={meet ? `Acara - ${meet.name}` : 'Acara'} />
 
             <div className="space-y-8 md:space-y-12">
-                {/* Hero Stats Section - Modern Style */}
-                <div className="bg-slate-900 rounded-[2.5rem] md:rounded-[3rem] p-8 md:p-12 shadow-2xl relative overflow-hidden">
+                {!meet ? (
+                    <div className="bg-white border-4 border-slate-900 rounded-[3rem] py-16 md:py-32 flex flex-col items-center justify-center text-center px-8 shadow-[10px_10px_0px_0px_rgba(15,23,42,1)]">
+                        <div className="w-24 h-24 bg-orange-100 rounded-[2.5rem] flex items-center justify-center mb-8 border-4 border-slate-900 shadow-[6px_6px_0px_0px_rgba(15,23,42,1)]">
+                             <svg className="h-12 w-12 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z" />
+                            </svg>
+                        </div>
+                        
+                        <div className="space-y-4 mb-10">
+                            <h4 className="text-3xl md:text-5xl font-black text-slate-900 uppercase italic tracking-tighter leading-none">
+                                Kejohanan <span className="block text-orange-600">Belum Bermula</span>
+                            </h4>
+                            <p className="text-slate-500 font-bold italic max-w-sm mx-auto text-sm md:text-base">
+                                {auth.user.role === 'admin_sekolah' 
+                                    ? 'Sila daftar maklumat kejohanan di bahagian Launch sebelum menguruskan acara.'
+                                    : 'Admin Sekolah belum mewujudkan kejohanan untuk sekolah ini. Sila hubungi Admin Sekolah anda.'}
+                            </p>
+                        </div>
+
+                        {auth.user.role === 'admin_sekolah' && (
+                            <Link
+                                href={route('admin-sekolah.launch')}
+                                className="px-10 py-6 bg-slate-900 text-white text-xs font-black uppercase tracking-[0.2em] italic rounded-3xl hover:bg-orange-600 transition-all shadow-xl active:scale-95"
+                            >
+                                Pergi ke Launch
+                            </Link>
+                        )}
+                    </div>
+                ) : (
+                    <>
+                        {/* Hero Stats Section - Modern Style */}
+                        <div className="bg-slate-900 rounded-[2.5rem] md:rounded-[3rem] p-8 md:p-12 shadow-2xl relative overflow-hidden">
                     <div className="absolute top-0 right-0 p-12 opacity-5 pointer-events-none select-none">
                         <svg className="w-48 h-48 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M13 10V3L4 14h7v7l9-11h-7z" />
@@ -55,12 +87,14 @@ export default function EventsIndex({ meet, events }) {
                             </div>
                         </div>
                         
-                        <Link
-                            href={route('admin-sekolah.events.select-templates')}
-                            className="w-full md:w-auto px-10 py-5 bg-orange-600 text-white text-xs font-black uppercase tracking-[0.2em] italic rounded-2xl hover:bg-white hover:text-slate-900 transition-all active:scale-95 shadow-xl shadow-orange-600/20"
-                        >
-                            + Pilih Acara Baru
-                        </Link>
+                        {usePage().props.auth.user.role === 'admin_sekolah' && (
+                            <Link
+                                href={route('admin-sekolah.events.select-templates')}
+                                className="w-full md:w-auto px-10 py-5 bg-orange-600 text-white text-xs font-black uppercase tracking-[0.2em] italic rounded-2xl hover:bg-white hover:text-slate-900 transition-all active:scale-95 shadow-xl shadow-orange-600/20"
+                            >
+                                + Pilih Acara Baru
+                            </Link>
+                        )}
                     </div>
                 </div>
 
@@ -91,16 +125,27 @@ export default function EventsIndex({ meet, events }) {
                                 Tiada Acara <span className="block text-orange-600">Ditemui</span>
                             </h4>
                             <p className="text-slate-400 font-bold italic max-w-xs mx-auto text-sm md:text-base">
-                                Mula bina kejohanan anda dengan menambah beberapa acara sukan sekarang.
+                                {usePage().props.auth.user.role === 'admin_sekolah' 
+                                    ? 'Mula bina kejohanan anda dengan menambah beberapa acara sukan sekarang.'
+                                    : 'Admin Sekolah belum mewujudkan sebarang acara lagi.'}
                             </p>
                         </div>
 
-                        <Link
-                            href={route('admin-sekolah.events.select-templates')}
-                            className="px-10 py-6 bg-slate-900 text-white text-xs font-black uppercase tracking-[0.2em] italic rounded-3xl hover:bg-orange-600 transition-all shadow-xl active:scale-95"
-                        >
-                            Tambah Acara Pertama
-                        </Link>
+                        {usePage().props.auth.user.role === 'admin_sekolah' ? (
+                            <Link
+                                href={route('admin-sekolah.events.select-templates')}
+                                className="px-10 py-6 bg-slate-900 text-white text-xs font-black uppercase tracking-[0.2em] italic rounded-3xl hover:bg-orange-600 transition-all shadow-xl active:scale-95"
+                            >
+                                Tambah Acara Pertama
+                            </Link>
+                        ) : (
+                            <Link
+                                href={route('pengurus-acara.event-selections.index')}
+                                className="px-10 py-6 bg-slate-900 text-white text-xs font-black uppercase tracking-[0.2em] italic rounded-3xl hover:bg-orange-600 transition-all shadow-xl active:scale-95"
+                            >
+                                Lihat Acara Induk
+                            </Link>
+                        )}
                     </div>
                 ) : (
                     <div className="grid grid-cols-1 gap-4 md:gap-6">
@@ -142,7 +187,9 @@ export default function EventsIndex({ meet, events }) {
                         ))}
                     </div>
                 )}
-            </div>
-        </AdminSekolahLayout>
+            </>
+        )}
+    </div>
+</AdminSekolahLayout>
     );
 }

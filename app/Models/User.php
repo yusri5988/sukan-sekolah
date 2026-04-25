@@ -119,4 +119,9 @@ class User extends Authenticatable
     {
         return $this->belongsTo(House::class);
     }
+
+    public function routeNotificationForWhatsApp()
+    {
+        return $this->telefon;
+    }
 }

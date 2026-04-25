@@ -5,6 +5,7 @@ export default function TeachersCreate() {
     const { data, setData, post, processing, errors, reset } = useForm({
         name: '',
         email: '',
+        telefon: '',
         password: '',
         password_confirmation: '',
     });
@@ -78,6 +79,20 @@ export default function TeachersCreate() {
                                                 <div className="mt-2 text-red-600 text-[10px] font-bold italic uppercase tracking-widest px-1">{errors.email}</div>
                                             ) : (
                                                 <p className="mt-2 text-slate-400 text-[9px] font-bold italic ml-1 uppercase tracking-widest">Akan digunakan untuk log masuk.</p>
+                                            )}
+                                        </div>
+
+                                        <div>
+                                            <label className="block text-[10px] font-black uppercase tracking-widest text-slate-500 italic mb-2 ml-1">Nombor Telefon</label>
+                                            <input
+                                                type="tel"
+                                                value={data.telefon}
+                                                onChange={(e) => setData('telefon', e.target.value)}
+                                                className="w-full px-4 sm:px-6 py-3.5 sm:py-4 bg-slate-50 border-2 sm:border-4 border-slate-900 rounded-xl sm:rounded-2xl text-base sm:text-lg font-black italic tracking-tighter text-slate-900 focus:ring-0 focus:border-orange-600 transition-colors placeholder:text-slate-300 placeholder:italic"
+                                                placeholder="011-12345678"
+                                            />
+                                            {errors.telefon && (
+                                                <div className="mt-2 text-red-600 text-[10px] font-bold italic uppercase tracking-widest px-1">{errors.telefon}</div>
                                             )}
                                         </div>
                                     </div>

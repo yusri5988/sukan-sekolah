@@ -84,9 +84,56 @@ class PengurusAcaraAccessTest extends TestCase
         $school = $this->school();
         $manager = $this->eventManager($school);
 
+        // Cannot access Houses
         $response = $this->actingAs($manager)
             ->get(route('admin-sekolah.houses.index'));
+        $response->assertStatus(403);
 
+        // Cannot access Students
+        $response = $this->actingAs($manager)
+            ->get(route('admin-sekolah.students.index'));
+        $response->assertStatus(403);
+
+        // Cannot access Scoring
+        $response = $this->actingAs($manager)
+            ->get(route('admin-sekolah.scoring.index'));
+        $response->assertStatus(403);
+    }
+
+    public function test_pengurus_acara_cannot_access_participants_and_results(): void
+    {
+        $school = $this->school();
+        $school->meets()->create([
+            'name' => 'Hari Sukan',
+            'date' => '2026-04-16',
+        ]);
+        $category = EventCategory::create([
+            'name' => 'Balapan',
+            'code' => 'track',
+            'order' => 1,
+            'is_active' => true,
+        ]);
+        $event = Event::create([
+            'sekolah_id' => $school->id,
+            'event_category_id' => $category->id,
+            'name' => '100 Meter',
+            'category' => Event::CATEGORY_TAHUN_1,
+            'gender' => Event::GENDER_MALE,
+            'type' => Event::TYPE_INDIVIDUAL,
+            'is_active' => true,
+            'order' => 1,
+        ]);
+
+        $manager = $this->eventManager($school);
+
+        // Cannot access Participants
+        $response = $this->actingAs($manager)
+            ->get(route('admin-sekolah.events.participants.index', $event->id));
+        $response->assertStatus(403);
+
+        // Cannot access Results
+        $response = $this->actingAs($manager)
+            ->get(route('admin-sekolah.results.index', $event->id));
         $response->assertStatus(403);
     }
 }

@@ -61,8 +61,11 @@ export default function Login({ status }) {
 
                 <div className="group transition-all">
                     <div className="flex justify-between items-center">
-                        <InputLabel htmlFor="password" value="Kata Laluan" className="mb-0" />
-                    </div>
+                                <InputLabel htmlFor="password" value="Kata Laluan" className="mb-0" />
+                                        <Link href={route('password.request')} className="text-[10px] font-bold text-orange-600 hover:text-orange-700 underline underline-offset-2">
+                                            Lupa?
+                                        </Link>
+                                    </div>
 
                     <TextInput
                         id="password"

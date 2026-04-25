@@ -36,8 +36,6 @@ class CikguController extends Controller
             'total_students' => $houseId
                 ? $sekolah->students()->where('house_id', $houseId)->count()
                 : 0,
-            'total_houses' => $sekolah->houses()->count(),
-            'students_without_house' => $sekolah->students()->whereNull('house_id')->count(),
         ];
 
         $houses = $sekolah->houses()
@@ -51,14 +49,16 @@ class CikguController extends Controller
             ->orderBy('order')
             ->orderBy('name')
             ->get()
-            ->map(function ($event) {
+            ->map(function ($event) use ($houseId) {
                 return [
                     'id' => $event->id,
                     'name' => $event->name,
                     'category_label' => $event->category_label,
                     'gender_label' => $event->gender_label,
                     'type_label' => $event->type_label,
-                    'participants_count' => $event->participants()->count(),
+                    'my_house_participants' => $houseId 
+                        ? $event->participants()->where('house_id', $houseId)->count() 
+                        : 0,
                     'max_participants' => $event->max_participants,
                 ];
             });

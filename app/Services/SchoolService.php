@@ -48,6 +48,7 @@ class SchoolService
                 'password' => Hash::make($generatedPassword),
                 'role' => User::ROLE_ADMIN_SEKOLAH,
                 'sekolah_id' => $sekolah->id,
+                'telefon' => $telefon,
             ]);
 
             $sekolah->update(['admin_sekolah_id' => $adminSekolah->id]);

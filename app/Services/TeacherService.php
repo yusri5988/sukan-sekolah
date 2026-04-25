@@ -36,6 +36,7 @@ class TeacherService
             'password' => Hash::make($data['password']),
             'role' => $role,
             'sekolah_id' => $sekolah->id,
+            'telefon' => $data['telefon'] ?? null,
         ]);
     }
 
