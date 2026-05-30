@@ -1,25 +1,29 @@
 {
-    "$schema": "https://www.schemastore.org/package.json",
-    "private": true,
-    "type": "module",
-    "scripts": {
-        "build": "vite build",
-        "dev": "vite"
-    },
-    "devDependencies": {
-        "@headlessui/react": "^2.0.0",
-        "@inertiajs/react": "^2.3.21",
-        "@tailwindcss/forms": "^0.5.3",
-        "@vitejs/plugin-react": "^4.7.0",
-        "autoprefixer": "^10.4.12",
-        "axios": "^1.15.2",
-        "concurrently": "^9.0.1",
-        "laravel-vite-plugin": "^2.1.0",
-        "postcss": "^8.5.10",
-        "react": "^18.3.1",
-        "react-dom": "^18.3.1",
-        "tailwindcss": "^3.2.1",
-        "vite": "^7.3.2",
-        "vite-plugin-pwa": "^1.2.0"
-    }
+  "$schema": "https://www.schemastore.org/package.json",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "vite build",
+    "dev": "vite",
+    "deploy": "npm run build && wrangler deploy",
+    "preview": "npm run build && wrangler dev"
+  },
+  "devDependencies": {
+    "@cloudflare/vite-plugin": "^1.39.0",
+    "@headlessui/react": "^2.0.0",
+    "@inertiajs/react": "^2.3.21",
+    "@tailwindcss/forms": "^0.5.3",
+    "@vitejs/plugin-react": "^4.7.0",
+    "autoprefixer": "^10.4.12",
+    "axios": "^1.15.2",
+    "concurrently": "^9.0.1",
+    "laravel-vite-plugin": "^2.1.0",
+    "postcss": "^8.5.10",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "tailwindcss": "^3.2.1",
+    "vite": "^7.3.2",
+    "vite-plugin-pwa": "^1.2.0",
+    "wrangler": "^4.95.0"
+  }
 }
